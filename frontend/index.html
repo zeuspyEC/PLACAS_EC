@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECPlacas 2.0 - Sistema de Consulta Vehicular</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: #000;
+            color: #fff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        /* Fondo futurista con partículas */
+        .futuristic-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(0, 150, 255, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 255, 255, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(0, 100, 255, 0.1) 0%, transparent 50%),
+                linear-gradient(135deg, #000 0%, #001122 50%, #000033 100%);
+        }
+        
+        /* Líneas de circuito futuristas */
+        .circuit-lines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+            background-image: 
+                linear-gradient(90deg, #00ffff 1px, transparent 1px),
+                linear-gradient(0deg, #00ffff 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: circuitFlow 20s linear infinite;
+        }
+        
+        @keyframes circuitFlow {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+        
+        /* Paleta de colores neon */
+        :root {
+            --neon-blue: #00ffff;
+            --neon-blue-dark: #0099cc;
+            --electric-blue: #0066ff;
+            --deep-blue: #003366;
+            --glow-blue: rgba(0, 255, 255, 0.5);
+            --glow-electric: rgba(0, 102, 255, 0.5);
+        }
+        
+        /* Efectos de brillo neon */
+        .neon-glow {
+            box-shadow: 
+                0 0 10px var(--neon-blue),
+                0 0 20px var(--neon-blue),
+                0 0 40px var(--neon-blue);
+        }
+        
+        .neon-text {
+            color: var(--neon-blue);
+            text-shadow: 
+                0 0 10px var(--neon-blue),
+                0 0 20px var(--neon-blue),
+                0 0 40px var(--neon-blue);
+        }
+        
+        .electric-glow {
+            box-shadow: 
+                0 0 10px var(--electric-blue),
+                0 0 20px var(--electric-blue),
+                0 0 40px var(--electric-blue);
+        }
+        
+        /* Contenedor principal */
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        /* Header futurista */
+        .header {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 51, 102, 0.8) 100%);
+            backdrop-filter: blur(20px);
+            border-bottom: 2px solid var(--neon-blue);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-family: 'Orbitron', monospace;
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--neon-blue);
+            text-shadow: 0 0 20px var(--glow-blue);
+            letter-spacing: 2px;
+        }
+        
+        .subtitle {
+            font-size: 0.9rem;
+            color: #99ccff;
+            margin-top: 0.2rem;
+            letter-spacing: 1px;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(0, 255, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            border: 1px solid var(--neon-blue);
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--neon-blue);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+        
+        /* Main content */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        /* Cards futuristas */
+        .futuristic-card {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 51, 102, 0.3) 100%);
+            backdrop-filter: blur(20px);
+            border: 2px solid transparent;
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .futuristic-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--neon-blue) 0%, var(--electric-blue) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+            border-radius: 18px;
+        }
+        
+        .futuristic-card:hover::before {
+            opacity: 0.1;
+        }
+        
+        .futuristic-card:hover {
+            border-color: var(--neon-blue);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
+        }
+        
+        /* Indicadores de progreso */
+        .progress-container {
+            text-align: center;
+            padding: 3rem;
+        }
+        
+        .progress-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(var(--neon-blue) 0deg, var(--electric-blue) 180deg, rgba(0, 0, 0, 0.3) 360deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            position: relative;
+            animation: rotate 3s linear infinite;
+        }
+        
+        .progress-circle::before {
+            content: '';
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.9);
+            position: absolute;
+        }
+        
+        .progress-text {
+            position: relative;
+            z-index: 1;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--neon-blue);
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Formularios futuristas */
+        .form-group {
+            margin-bottom: 2rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--neon-blue);
+            font-weight: 600;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1.1rem;
+            font-family: 'Rajdhani', sans-serif;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+            background: rgba(0, 51, 102, 0.2);
+        }
+        
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .form-input.error {
+            border-color: #ff0066;
+            box-shadow: 0 0 20px rgba(255, 0, 102, 0.4);
+        }
+        
+        .form-input.success {
+            border-color: #00ff66;
+            box-shadow: 0 0 20px rgba(0, 255, 102, 0.4);
+        }
+        
+        /* Botones futuristas */
+        .btn-futuristic {
+            background: linear-gradient(135deg, var(--electric-blue) 0%, var(--neon-blue) 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 1rem 2rem;
+            color: #000;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-width: 200px;
+        }
+        
+        .btn-futuristic:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 255, 255, 0.5);
+        }
+        
+        .btn-futuristic:active {
+            transform: translateY(-1px);
+        }
+        
+        .btn-futuristic:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .btn-futuristic::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-futuristic:hover::before {
+            left: 100%;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 51, 102, 0.6) 100%);
+            border: 2px solid var(--neon-blue);
+            color: var(--neon-blue);
+        }
+        
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, var(--neon-blue) 0%, var(--electric-blue) 100%);
+            color: #000;
+        }
+        
+        /* Indicadores de pasos */
+        .steps-indicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 3rem 0;
+            gap: 1rem;
+        }
+        
+        .step {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .step.active {
+            background: linear-gradient(135deg, var(--neon-blue) 0%, var(--electric-blue) 100%);
+            border-color: var(--neon-blue);
+            color: #000;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.6);
+            transform: scale(1.1);
+        }
+        
+        .step.completed {
+            background: linear-gradient(135deg, #00ff66 0%, #00cc55 100%);
+            border-color: #00ff66;
+            color: #000;
+        }
+        
+        .step-connector {
+            width: 40px;
+            height: 2px;
+            background: rgba(0, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .step-connector.active {
+            background: var(--neon-blue);
+            box-shadow: 0 0 10px var(--glow-blue);
+        }
+        
+        /* Resultados vehiculares */
+        .vehicle-results {
+            animation: slideUp 0.5s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .vehicle-header {
+            background: linear-gradient(135deg, var(--electric-blue) 0%, var(--neon-blue) 100%);
+            color: #000;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .vehicle-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+        }
+        
+        .vehicle-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+        
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .data-card {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .data-card:hover {
+            border-color: var(--neon-blue);
+            box-shadow: 0 5px 20px rgba(0, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .data-card-title {
+            color: var(--neon-blue);
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+        }
+        
+        .data-row:last-child {
+            border-bottom: none;
+        }
+        
+        .data-label {
+            color: #99ccff;
+            font-weight: 500;
+        }
+        
+        .data-value {
+            color: #fff;
+            font-weight: 600;
+            text-align: right;
+        }
+        
+        /* Status badges */
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-vigente {
+            background: linear-gradient(135deg, #00ff66, #00cc55);
+            color: #000;
+        }
+        
+        .status-vencida {
+            background: linear-gradient(135deg, #ff0066, #cc0055);
+            color: #fff;
+        }
+        
+        .status-por-vencer {
+            background: linear-gradient(135deg, #ffaa00, #ff8800);
+            color: #000;
+        }
+        
+        /* Mensajes de error y éxito */
+        .message {
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .message-error {
+            background: rgba(255, 0, 102, 0.2);
+            border: 1px solid #ff0066;
+            color: #ff99cc;
+        }
+        
+        .message-success {
+            background: rgba(0, 255, 102, 0.2);
+            border: 1px solid #00ff66;
+            color: #99ffcc;
+        }
+        
+        .message-info {
+            background: rgba(0, 255, 255, 0.2);
+            border: 1px solid var(--neon-blue);
+            color: #99ffff;
+        }
+        
+        /* Responsivo */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .logo {
+                font-size: 1.5rem;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .futuristic-card {
+                padding: 1.5rem;
+                margin: 1rem 0;
+            }
+            
+            .data-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .steps-indicator {
+                gap: 0.5rem;
+            }
+            
+            .step {
+                width: 40px;
+                height: 40px;
+                font-size: 0.9rem;
+            }
+            
+            .step-connector {
+                width: 20px;
+            }
+        }
+        
+        /* Efectos de loading */
+        .loading-dots {
+            display: inline-flex;
+            gap: 0.3rem;
+        }
+        
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--neon-blue);
+            animation: loadingDots 1.4s ease-in-out infinite both;
+        }
+        
+        .loading-dot:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dot:nth-child(2) { animation-delay: -0.16s; }
+        .loading-dot:nth-child(3) { animation-delay: 0s; }
+        
+        @keyframes loadingDots {
+            0%, 80%, 100% { 
+                transform: scale(0);
+            }
+            40% { 
+                transform: scale(1);
+            }
+        }
+        
+        /* Efectos de brillo en texto */
+        .glitch-text {
+            color: var(--neon-blue);
+            font-family: 'Orbitron', monospace;
+            animation: glitch 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glitch {
+            0% {
+                text-shadow: 
+                    0.05em 0 0 #00ffff,
+                    -0.05em -0.025em 0 #ff00ff,
+                    0.025em 0.05em 0 #ffff00;
+            }
+            15% {
+                text-shadow: 
+                    0.05em 0 0 #00ffff,
+                    -0.05em -0.025em 0 #ff00ff,
+                    0.025em 0.05em 0 #ffff00;
+            }
+            16% {
+                text-shadow: 
+                    -0.05em -0.025em 0 #00ffff,
+                    0.025em 0.025em 0 #ff00ff,
+                    -0.05em -0.05em 0 #ffff00;
+            }
+            49% {
+                text-shadow: 
+                    -0.05em -0.025em 0 #00ffff,
+                    0.025em 0.025em 0 #ff00ff,
+                    -0.05em -0.05em 0 #ffff00;
+            }
+            50% {
+                text-shadow: 
+                    0.025em 0.05em 0 #00ffff,
+                    0.05em 0 0 #ff00ff,
+                    0 -0.05em 0 #ffff00;
+            }
+            99% {
+                text-shadow: 
+                    0.025em 0.05em 0 #00ffff,
+                    0.05em 0 0 #ff00ff,
+                    0 -0.05em 0 #ffff00;
+            }
+            100% {
+                text-shadow: 
+                    -0.025em 0 0 #00ffff,
+                    -0.025em -0.025em 0 #ff00ff,
+                    -0.025em -0.05em 0 #ffff00;
+            }
+        }
+        
+        /* Checkbox futurista */
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .checkbox-futuristic {
+            position: relative;
+            width: 20px;
+            height: 20px;
+        }
+        
+        .checkbox-futuristic input {
+            opacity: 0;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .checkbox-mark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--neon-blue);
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            background: rgba(0, 0, 0, 0.6);
+        }
+        
+        .checkbox-futuristic input:checked + .checkbox-mark {
+            background: linear-gradient(135deg, var(--neon-blue), var(--electric-blue));
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+        }
+        
+        .checkbox-mark::after {
+            content: '';
+            position: absolute;
+            display: none;
+            left: 6px;
+            top: 2px;
+            width: 5px;
+            height: 10px;
+            border: solid #000;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+        
+        .checkbox-futuristic input:checked + .checkbox-mark::after {
+            display: block;
+        }
+        
+        /* Select futurista */
+        .select-futuristic {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1.1rem;
+            font-family: 'Rajdhani', sans-serif;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+        }
+        
+        .select-futuristic:focus {
+            outline: none;
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+            background: rgba(0, 51, 102, 0.2);
+        }
+        
+        .select-futuristic option {
+            background: #001122;
+            color: #fff;
+            padding: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="futuristic-bg"></div>
+    <div class="circuit-lines"></div>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useCallback } = React;
+
+        // Configuración de la API
+        const API_CONFIG = {
+            baseUrl: 'http://localhost:5000',
+            endpoints: {
+                health: '/api/health',
+                consultar: '/api/consultar-vehiculo',
+                estado: '/api/estado-consulta',
+                resultado: '/api/resultado'
+            }
+        };
+
+        // Códigos de países
+        const COUNTRY_CODES = [
+            { code: '+593', country: 'Ecuador', flag: '🇪🇨' },
+            { code: '+57', country: 'Colombia', flag: '🇨🇴' },
+            { code: '+51', country: 'Perú', flag: '🇵🇪' },
+            { code: '+1', country: 'Estados Unidos', flag: '🇺🇸' },
+            { code: '+34', country: 'España', flag: '🇪🇸' }
+        ];
+
+        // Hook para validación de formularios
+        const useFormValidation = (initialState, validationRules) => {
+            const [formData, setFormData] = useState(initialState);
+            const [errors, setErrors] = useState({});
+            const [isValid, setIsValid] = useState(false);
+
+            const validateField = (name, value) => {
+                const rule = validationRules[name];
+                if (!rule) return null;
+
+                if (rule.required && !value.trim()) {
+                    return rule.message || `${name} es requerido`;
+                }
+
+                if (rule.pattern && !rule.pattern.test(value)) {
+                    return rule.message || `Formato de ${name} inválido`;
+                }
+
+                if (rule.minLength && value.length < rule.minLength) {
+                    return `${name} debe tener al menos ${rule.minLength} caracteres`;
+                }
+
+                if (rule.custom) {
+                    return rule.custom(value);
+                }
+
+                return null;
+            };
+
+            const updateField = (name, value) => {
+                setFormData(prev => ({ ...prev, [name]: value }));
+                
+                const error = validateField(name, value);
+                setErrors(prev => ({
+                    ...prev,
+                    [name]: error
+                }));
+            };
+
+            useEffect(() => {
+                const newErrors = {};
+                let hasErrors = false;
+
+                Object.keys(validationRules).forEach(field => {
+                    const error = validateField(field, formData[field] || '');
+                    if (error) {
+                        newErrors[field] = error;
+                        hasErrors = true;
+                    }
+                });
+
+                setErrors(newErrors);
+                setIsValid(!hasErrors && Object.keys(formData).length > 0);
+            }, [formData]);
+
+            return { formData, errors, isValid, updateField, setFormData };
+        };
+
+        // Hook para conexión API
+        const useApiConnection = () => {
+            const [connectionState, setConnectionState] = useState({
+                isConnected: false,
+                isChecking: true,
+                responseTime: null
+            });
+
+            const checkConnection = async () => {
+                try {
+                    const start = performance.now();
+                    const response = await fetch(`${API_CONFIG.baseUrl}${API_CONFIG.endpoints.health}`);
+                    const end = performance.now();
+                    
+                    if (response.ok) {
+                        setConnectionState({
+                            isConnected: true,
+                            isChecking: false,
+                            responseTime: Math.round(end - start)
+                        });
+                    } else {
+                        setConnectionState({
+                            isConnected: false,
+                            isChecking: false,
+                            responseTime: null
+                        });
+                    }
+                } catch (error) {
+                    setConnectionState({
+                        isConnected: false,
+                        isChecking: false,
+                        responseTime: null
+                    });
+                }
+            };
+
+            useEffect(() => {
+                checkConnection();
+                const interval = setInterval(checkConnection, 30000);
+                return () => clearInterval(interval);
+            }, []);
+
+            return { ...connectionState, retry: checkConnection };
+        };
+
+        // Componente de validación de cédula
+        const validateCedula = (cedula) => {
+            if (!cedula || cedula.length !== 10) return 'Cédula debe tener 10 dígitos';
+            
+            const digits = cedula.split('').map(Number);
+            const provinceCode = cedula.substring(0, 2);
+            
+            // Verificar código de provincia válido
+            const validProvinceCodes = [
+                '01', '02', '03', '04', '05', '06', '07', '08', '09', '10',
+                '11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
+                '21', '22', '23', '24', '30'
+            ];
+            
+            if (!validProvinceCodes.includes(provinceCode)) {
+                return 'Código de provincia inválido';
+            }
+            
+            // Tercer dígito debe ser menor a 6
+            if (digits[2] >= 6) return 'Cédula inválida';
+            
+            // Algoritmo de validación
+            const coefficients = [2, 1, 2, 1, 2, 1, 2, 1, 2];
+            let sum = 0;
+            
+            for (let i = 0; i < 9; i++) {
+                let result = digits[i] * coefficients[i];
+                if (result > 9) result -= 9;
+                sum += result;
+            }
+            
+            const checkDigit = (10 - (sum % 10)) % 10;
+            
+            if (checkDigit !== digits[9]) {
+                return 'Cédula ecuatoriana inválida';
+            }
+            
+            return null;
+        };
+
+        // Componente principal
+        const ECPlacasApp = () => {
+            const [currentStep, setCurrentStep] = useState(1);
+            const [isLoading, setIsLoading] = useState(false);
+            const [sessionId, setSessionId] = useState(null);
+            const [vehicleData, setVehicleData] = useState(null);
+            const [progress, setProgress] = useState(0);
+            const [progressMessage, setProgressMessage] = useState('');
+
+            const { isConnected, isChecking, responseTime, retry } = useApiConnection();
+
+            // Validación de formulario de usuario
+            const userValidationRules = {
+                nombre: {
+                    required: true,
+                    minLength: 2,
+                    pattern: /^[a-zA-ZáéíóúñÁÉÍÓÚÑ\s]+$/,
+                    message: 'Solo letras y espacios permitidos'
+                },
+                cedula: {
+                    required: true,
+                    pattern: /^\d{10}$/,
+                    message: 'Debe tener exactamente 10 dígitos',
+                    custom: validateCedula
+                },
+                telefono: {
+                    required: true,
+                    pattern: /^\d{9,10}$/,
+                    message: 'Formato de teléfono inválido'
+                },
+                correo: {
+                    required: true,
+                    pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: 'Formato de correo inválido'
+                }
+            };
+
+            const { formData: userData, errors: userErrors, isValid: isUserValid, updateField: updateUserField, setFormData: setUserData } = useFormValidation({
+                nombre: '',
+                cedula: '',
+                telefono: '',
+                correo: '',
+                country_code: '+593',
+                acepta_terminos: false
+            }, userValidationRules);
+
+            // Estado de placa
+            const [plateData, setPlateData] = useState('');
+            const [plateValidation, setPlateValidation] = useState({
+                isValid: false,
+                error: '',
+                normalized: ''
+            });
+
+            // Validación de placa
+            const validatePlate = (placa) => {
+                const clean = placa.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                const isValid = /^[A-Z]{2,3}[0-9]{3,4}$/.test(clean);
+                
+                let normalized = clean;
+                if (/^[A-Z]{2,3}[0-9]{3}$/.test(clean)) {
+                    const letters = clean.match(/^[A-Z]{2,3}/)[0];
+                    const numbers = clean.match(/[0-9]{3}$/)[0];
+                    normalized = `${letters}0${numbers}`;
+                }
+
+                setPlateValidation({
+                    isValid,
+                    error: isValid ? '' : 'Formato de placa inválido (ej: ABC1234)',
+                    normalized
+                });
+            };
+
+            // Manejar cambios en formulario de usuario
+            const handleUserChange = (e) => {
+                const { name, value, type, checked } = e.target;
+                
+                if (type === 'checkbox') {
+                    setUserData(prev => ({ ...prev, [name]: checked }));
+                } else {
+                    let processedValue = value;
+                    
+                    if (name === 'nombre') {
+                        processedValue = value.replace(/[^a-zA-ZáéíóúñÁÉÍÓÚÑ\s]/g, '').toUpperCase();
+                    } else if (name === 'cedula') {
+                        processedValue = value.replace(/\D/g, '').slice(0, 10);
+                    } else if (name === 'telefono') {
+                        processedValue = value.replace(/\D/g, '').slice(0, 10);
+                    } else if (name === 'correo') {
+                        processedValue = value.toLowerCase();
+                    }
+                    
+                    updateUserField(name, processedValue);
+                }
+            };
+
+            // Manejar cambios en placa
+            const handlePlateChange = (e) => {
+                const value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 7);
+                setPlateData(value);
+                if (value.length >= 6) {
+                    validatePlate(value);
+                } else {
+                    setPlateValidation({ isValid: false, error: '', normalized: '' });
+                }
+            };
+
+            // Navegar pasos
+            const nextStep = () => {
+                if (currentStep === 1 && isUserValid && userData.acepta_terminos) {
+                    setCurrentStep(2);
+                }
+            };
+
+            const prevStep = () => {
+                if (currentStep > 1) {
+                    setCurrentStep(currentStep - 1);
+                }
+            };
+
+            // Simular progreso
+            const simulateProgress = () => {
+                const messages = [
+                    '🔍 Conectando con sistema ANT...',
+                    '📊 Obteniendo datos vehiculares...',
+                    '🔧 Procesando información técnica...',
+                    '⚖️ Analizando estado legal...',
+                    '💎 Calculando estimaciones...',
+                    '✅ Finalizando consulta...'
+                ];
+
+                let currentProgress = 0;
+                let messageIndex = 0;
+
+                const interval = setInterval(() => {
+                    currentProgress += Math.random() * 20 + 10;
+                    
+                    if (currentProgress >= 100) {
+                        currentProgress = 100;
+                        setProgress(currentProgress);
+                        setProgressMessage('✅ Consulta completada exitosamente');
+                        clearInterval(interval);
+                        
+                        // Simular datos de respuesta
+                        setTimeout(() => {
+                            setVehicleData({
+                                numero_placa: plateData,
+                                marca: 'CHEVROLET',
+                                modelo: 'VITARA 3P STD T/M',
+                                anio_fabricacion: 1993,
+                                vin_chasis: '93100350',
+                                numero_motor: 'G16B524515',
+                                pais_fabricacion: 'ECUADOR',
+                                clase_vehiculo: 'VEHICULO UTILITARIO',
+                                tipo_vehiculo: 'JEEP',
+                                color_primario: 'BLANCO',
+                                tipo_carroceria: 'METALICA',
+                                servicio: 'USO PARTICULAR',
+                                matricula_desde: '10-10-2016 16:36:00',
+                                matricula_hasta: '09-10-2025 16:36:00',
+                                estado_matricula: 'VIGENTE',
+                                estimacion_valor: 8500,
+                                recomendacion: '✅ Matrícula vigente | ⭐ Vehículo en buen estado',
+                                ultima_actualizacion: '01-07-2024 09:29:03'
+                            });
+                            setCurrentStep(4);
+                            setIsLoading(false);
+                        }, 1000);
+                        
+                        return;
+                    }
+                    
+                    setProgress(currentProgress);
+                    
+                    if (messageIndex < messages.length - 1) {
+                        messageIndex++;
+                        setProgressMessage(messages[messageIndex]);
+                    }
+                }, 1500);
+            };
+
+            // Consultar vehículo
+            const handleVehicleConsult = async (e) => {
+                e.preventDefault();
+                
+                if (!isConnected) {
+                    alert('Sin conexión con el servidor');
+                    return;
+                }
+                
+                if (!plateValidation.isValid) {
+                    alert('Formato de placa inválido');
+                    return;
+                }
+                
+                setIsLoading(true);
+                setCurrentStep(3);
+                setProgress(0);
+                setProgressMessage('🚀 Iniciando consulta ECPlacas 2.0...');
+                
+                // Simular consulta real
+                simulateProgress();
+            };
+
+            // Reiniciar consulta
+            const handleNewConsult = () => {
+                setCurrentStep(1);
+                setUserData({
+                    nombre: '',
+                    cedula: '',
+                    telefono: '',
+                    correo: '',
+                    country_code: '+593',
+                    acepta_terminos: false
+                });
+                setPlateData('');
+                setPlateValidation({ isValid: false, error: '', normalized: '' });
+                setVehicleData(null);
+                setIsLoading(false);
+                setProgress(0);
+                setProgressMessage('');
+            };
+
+            // Renderizar paso actual
+            const renderCurrentStep = () => {
+                switch (currentStep) {
+                    case 1:
+                        return (
+                            <div className="futuristic-card">
+                                <h2 className="neon-text" style={{ fontSize: '2rem', marginBottom: '2rem', textAlign: 'center', fontFamily: 'Orbitron, monospace' }}>
+                                    Información del Usuario
+                                </h2>
+                                
+                                {/* Indicador de validación */}
+                                {Object.keys(userData).some(key => userData[key] !== '' && userData[key] !== false) && (
+                                    <div className={`message ${isUserValid && userData.acepta_terminos ? 'message-success' : 'message-info'}`}>
+                                        {isUserValid && userData.acepta_terminos ? '✅ Formulario válido - Puede continuar' : '⏳ Complete todos los campos correctamente'}
+                                    </div>
+                                )}
+                                
+                                <div className="form-group">
+                                    <label className="form-label">Nombre Completo *</label>
+                                    <input
+                                        type="text"
+                                        name="nombre"
+                                        value={userData.nombre}
+                                        onChange={handleUserChange}
+                                        className={`form-input ${userErrors.nombre ? 'error' : userData.nombre && !userErrors.nombre ? 'success' : ''}`}
+                                        placeholder="JUAN PÉREZ GARCÍA"
+                                        maxLength="100"
+                                    />
+                                    {userErrors.nombre && (
+                                        <div className="message-error" style={{ padding: '0.5rem', marginTop: '0.5rem' }}>
+                                            ⚠️ {userErrors.nombre}
+                                        </div>
+                                    )}
+                                </div>
+                                
+                                <div className="form-group">
+                                    <label className="form-label">Cédula de Identidad *</label>
+                                    <input
+                                        type="text"
+                                        name="cedula"
+                                        value={userData.cedula}
+                                        onChange={handleUserChange}
+                                        className={`form-input ${userErrors.cedula ? 'error' : userData.cedula && !userErrors.cedula ? 'success' : ''}`}
+                                        placeholder="1234567890"
+                                        maxLength="10"
+                                    />
+                                    {userErrors.cedula && (
+                                        <div className="message-error" style={{ padding: '0.5rem', marginTop: '0.5rem' }}>
+                                            ⚠️ {userErrors.cedula}
+                                        </div>
+                                    )}
+                                </div>
+                                
+                                <div className="form-group">
+                                    <label className="form-label">Teléfono *</label>
+                                    <div style={{ display: 'flex', gap: '1rem' }}>
+                                        <select
+                                            name="country_code"
+                                            value={userData.country_code}
+                                            onChange={handleUserChange}
+                                            className="select-futuristic"
+                                            style={{ flex: '1' }}
+                                        >
+                                            {COUNTRY_CODES.map(country => (
+                                                <option key={country.code} value={country.code}>
+                                                    {country.flag} {country.country}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <input
+                                            type="tel"
+                                            name="telefono"
+                                            value={userData.telefono}
+                                            onChange={handleUserChange}
+                                            className={`form-input ${userErrors.telefono ? 'error' : userData.telefono && !userErrors.telefono ? 'success' : ''}`}
+                                            placeholder="993747474"
+                                            style={{ flex: '2' }}
+                                        />
+                                    </div>
+                                    {userErrors.telefono && (
+                                        <div className="message-error" style={{ padding: '0.5rem', marginTop: '0.5rem' }}>
+                                            ⚠️ {userErrors.telefono}
+                                        </div>
+                                    )}
+                                </div>
+                                
+                                <div className="form-group">
+                                    <label className="form-label">Correo Electrónico *</label>
+                                    <input
+                                        type="email"
+                                        name="correo"
+                                        value={userData.correo}
+                                        onChange={handleUserChange}
+                                        className={`form-input ${userErrors.correo ? 'error' : userData.correo && !userErrors.correo ? 'success' : ''}`}
+                                        placeholder="correo@ejemplo.com"
+                                    />
+                                    {userErrors.correo && (
+                                        <div className="message-error" style={{ padding: '0.5rem', marginTop: '0.5rem' }}>
+                                            ⚠️ {userErrors.correo}
+                                        </div>
+                                    )}
+                                </div>
+                                
+                                <div className="checkbox-container">
+                                    <div className="checkbox-futuristic">
+                                        <input
+                                            type="checkbox"
+                                            name="acepta_terminos"
+                                            checked={userData.acepta_terminos}
+                                            onChange={handleUserChange}
+                                        />
+                                        <div className="checkbox-mark"></div>
+                                    </div>
+                                    <label style={{ color: '#99ccff', fontSize: '1rem' }}>
+                                        Acepto los términos y condiciones de uso del sistema ECPlacas 2.0
+                                    </label>
+                                </div>
+                                
+                                <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+                                    <button
+                                        onClick={nextStep}
+                                        disabled={!isUserValid || !userData.acepta_terminos}
+                                        className="btn-futuristic"
+                                    >
+                                        {isUserValid && userData.acepta_terminos ? 'CONTINUAR ▶' : 'COMPLETE EL FORMULARIO'}
+                                    </button>
+                                </div>
+                            </div>
+                        );
+                    
+                    case 2:
+                        return (
+                            <div className="futuristic-card" style={{ maxWidth: '600px', margin: '0 auto' }}>
+                                <h2 className="neon-text" style={{ fontSize: '2rem', marginBottom: '2rem', textAlign: 'center', fontFamily: 'Orbitron, monospace' }}>
+                                    Consulta de Placa
+                                </h2>
+                                
+                                <form onSubmit={handleVehicleConsult}>
+                                    <div className="form-group">
+                                        <label className="form-label">Número de Placa *</label>
+                                        <input
+                                            type="text"
+                                            value={plateData}
+                                            onChange={handlePlateChange}
+                                            className={`form-input ${plateValidation.error ? 'error' : plateValidation.isValid ? 'success' : ''}`}
+                                            placeholder="ABC1234"
+                                            style={{ textAlign: 'center', fontSize: '1.5rem', fontWeight: 'bold', letterSpacing: '2px' }}
+                                            maxLength="7"
+                                        />
+                                        
+                                        {plateValidation.normalized && plateValidation.normalized !== plateData && (
+                                            <div className="message-info" style={{ padding: '0.5rem', marginTop: '0.5rem' }}>
+                                                🔧 Placa normalizada: {plateData} → {plateValidation.normalized}
+                                            </div>
+                                        )}
+                                        
+                                        {plateValidation.error && (
+                                            <div className="message-error" style={{ padding: '0.5rem', marginTop: '0.5rem' }}>
+                                                ⚠️ {plateValidation.error}
+                                            </div>
+                                        )}
+                                        
+                                        {plateValidation.isValid && (
+                                            <div className="message-success" style={{ padding: '0.5rem', marginTop: '0.5rem' }}>
+                                                ✅ Formato de placa válido
+                                            </div>
+                                        )}
+                                    </div>
+                                    
+                                    <div className="message-info" style={{ margin: '1.5rem 0' }}>
+                                        <strong>💡 Formatos válidos:</strong><br/>
+                                        • ABC1234 (formato estándar)<br/>
+                                        • ABC123 (se normaliza automáticamente a ABC0123)<br/>
+                                        • PBA567 → PBA0567
+                                    </div>
+                                    
+                                    <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+                                        <button
+                                            type="button"
+                                            onClick={prevStep}
+                                            className="btn-futuristic btn-secondary"
+                                            style={{ flex: '1' }}
+                                        >
+                                            ◀ ATRÁS
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            disabled={!plateValidation.isValid || !isConnected}
+                                            className="btn-futuristic"
+                                            style={{ flex: '2' }}
+                                        >
+                                            {!isConnected ? '❌ SIN CONEXIÓN' : 
+                                             !plateValidation.isValid ? '⏳ PLACA INVÁLIDA' :
+                                             '🚀 CONSULTAR VEHÍCULO'}
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        );
+                    
+                    case 3:
+                        return (
+                            <div className="progress-container">
+                                <div className="progress-circle">
+                                    <div className="progress-text">{Math.round(progress)}%</div>
+                                </div>
+                                
+                                <h2 className="neon-text" style={{ fontSize: '2rem', marginBottom: '1rem', fontFamily: 'Orbitron, monospace' }}>
+                                    PROCESANDO CONSULTA
+                                </h2>
+                                
+                                <div className="message-info" style={{ marginBottom: '2rem', textAlign: 'center' }}>
+                                    <strong>Placa consultada: {plateData}</strong>
+                                </div>
+                                
+                                <p style={{ fontSize: '1.2rem', marginBottom: '2rem', textAlign: 'center' }}>{progressMessage}</p>
+                                
+                                <div className="futuristic-card" style={{ textAlign: 'center' }}>
+                                    <h3 className="neon-text" style={{ marginBottom: '1rem' }}>Sistema ECPlacas 2.0</h3>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', textAlign: 'center' }}>
+                                        <div>
+                                            <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🏛️</div>
+                                            <div>Datos ANT</div>
+                                            <div style={{ fontSize: '0.9rem', color: '#99ccff' }}>Información oficial</div>
+                                        </div>
+                                        <div>
+                                            <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🔧</div>
+                                            <div>Análisis Técnico</div>
+                                            <div style={{ fontSize: '0.9rem', color: '#99ccff' }}>Estado del vehículo</div>
+                                        </div>
+                                        <div>
+                                            <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>💎</div>
+                                            <div>Estimación</div>
+                                            <div style={{ fontSize: '0.9rem', color: '#99ccff' }}>Valor de mercado</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    
+                    case 4:
+                        if (!vehicleData) return null;
+                        
+                        return (
+                            <div className="vehicle-results">
+                                <div className="vehicle-header">
+                                    <div className="vehicle-title">{vehicleData.numero_placa}</div>
+                                    <div className="vehicle-subtitle">
+                                        {vehicleData.marca} {vehicleData.modelo} • {vehicleData.anio_fabricacion}
+                                    </div>
+                                </div>
+                                
+                                <div className="data-grid">
+                                    <div className="data-card">
+                                        <div className="data-card-title">🔑 Identificación</div>
+                                        <div className="data-row">
+                                            <span className="data-label">VIN/Chasis:</span>
+                                            <span className="data-value">{vehicleData.vin_chasis}</span>
+                                        </div>
+                                        <div className="data-row">
+                                            <span className="data-label">Motor:</span>
+                                            <span className="data-value">{vehicleData.numero_motor}</span>
+                                        </div>
+                                        <div className="data-row">
+                                            <span className="data-label">Marca:</span>
+                                            <span className="data-value">{vehicleData.marca}</span>
+                                        </div>
+                                        <div className="data-row">
+                                            <span className="data-label">Modelo:</span>
+                                            <span className="data-value">{vehicleData.modelo}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="data-card">
+                                        <div className="data-card-title">📋 Características</div>
+                                        <div className="data-row">
+                                            <span className="data-label">Año:</span>
+                                            <span className="data-value">{vehicleData.anio_fabricacion}</span>
+                                        </div>
+                                        <div className="data-row">
+                                            <span className="data-label">País:</span>
+                                            <span className="data-value">{vehicleData.pais_fabricacion}</span>
+                                        </div>
+                                        <div className="data-row">
+                                            <span className="data-label">Clase:</span>
+                                            <span className="data-value">{vehicleData.clase_vehiculo}</span>
+                                        </div>
+                                        <div className="data-row">
+                                            <span className="data-label">Color:</span>
+                                            <span className="data-value">{vehicleData.color_primario}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="data-card">
+                                        <div className="data-card-title">📅 Matrícula</div>
+                                        <div className="data-row">
+                                            <span className="data-label">Estado:</span>
+                                            <span className="data-value">
+                                                <span className={`status-badge status-${vehicleData.estado_matricula.toLowerCase()}`}>
+                                                    {vehicleData.estado_matricula}
+                                                </span>
+                                            </span>
+                                        </div>
+                                        <div className="data-row">
+                                            <span className="data-label">Desde:</span>
+                                            <span className="data-value">{vehicleData.matricula_desde?.split(' ')[0]}</span>
+                                        </div>
+                                        <div className="data-row">
+                                            <span className="data-label">Hasta:</span>
+                                            <span className="data-value">{vehicleData.matricula_hasta?.split(' ')[0]}</span>
+                                        </div>
+                                        <div className="data-row">
+                                            <span className="data-label">Servicio:</span>
+                                            <span className="data-value">{vehicleData.servicio}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="data-card">
+                                        <div className="data-card-title">💰 Estimación</div>
+                                        <div className="data-row">
+                                            <span className="data-label">Valor estimado:</span>
+                                            <span className="data-value" style={{ color: 'var(--neon-blue)', fontWeight: 'bold' }}>
+                                                ${vehicleData.estimacion_valor?.toLocaleString()} USD
+                                            </span>
+                                        </div>
+                                        <div className="data-row">
+                                            <span className="data-label">Última actualización:</span>
+                                            <span className="data-value">{vehicleData.ultima_actualizacion?.split(' ')[0]}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div className="futuristic-card">
+                                    <div className="data-card-title">🎯 Recomendaciones</div>
+                                    <p style={{ fontSize: '1.1rem', lineHeight: '1.6', color: '#99ffcc' }}>
+                                        {vehicleData.recomendacion}
+                                    </p>
+                                </div>
+                                
+                                <div style={{ textAlign: 'center', marginTop: '3rem' }}>
+                                    <button
+                                        onClick={handleNewConsult}
+                                        className="btn-futuristic"
+                                        style={{ marginRight: '1rem' }}
+                                    >
+                                        🔄 NUEVA CONSULTA
+                                    </button>
+                                    <button
+                                        onClick={() => alert('Funcionalidad próximamente')}
+                                        className="btn-futuristic btn-secondary"
+                                    >
+                                        📄 GENERAR REPORTE
+                                    </button>
+                                </div>
+                            </div>
+                        );
+                    
+                    default:
+                        return null;
+                }
+            };
+
+            if (isChecking) {
+                return (
+                    <div className="app-container">
+                        <div className="progress-container">
+                            <div className="progress-circle">
+                                <div className="progress-text">
+                                    <div className="loading-dots">
+                                        <div className="loading-dot"></div>
+                                        <div className="loading-dot"></div>
+                                        <div className="loading-dot"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <h2 className="neon-text" style={{ fontFamily: 'Orbitron, monospace' }}>
+                                Conectando con ECPlacas 2.0
+                            </h2>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="app-container">
+                    {/* Header */}
+                    <header className="header">
+                        <div className="header-content">
+                            <div>
+                                <div className="logo glitch-text">ECPlacas 2.0</div>
+                                <div className="subtitle">Sistema de Consulta Vehicular • Erick Costa</div>
+                            </div>
+                            <div className="status-indicator">
+                                <div className="status-dot"></div>
+                                <span>{isConnected ? 'Conectado' : 'Desconectado'}</span>
+                                {responseTime && <span>({responseTime}ms)</span>}
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Contenido principal */}
+                    <main className="main-content">
+                        {/* Indicador de pasos */}
+                        <div className="steps-indicator">
+                            {[1, 2, 3, 4].map(step => (
+                                <React.Fragment key={step}>
+                                    <div className={`step ${currentStep >= step ? 'active' : ''} ${currentStep > step ? 'completed' : ''}`}>
+                                        {step === 1 && '👤'}
+                                        {step === 2 && '🚗'}
+                                        {step === 3 && '⚡'}
+                                        {step === 4 && '📊'}
+                                    </div>
+                                    {step < 4 && (
+                                        <div className={`step-connector ${currentStep > step ? 'active' : ''}`}></div>
+                                    )}
+                                </React.Fragment>
+                            ))}
+                        </div>
+
+                        {/* Contenido del paso actual */}
+                        {renderCurrentStep()}
+
+                        {/* Mensaje de sin conexión */}
+                        {!isConnected && currentStep !== 3 && (
+                            <div className="message-error" style={{ margin: '2rem 0', textAlign: 'center' }}>
+                                ⚠️ Sin conexión con el servidor ECPlacas 2.0
+                                <button 
+                                    onClick={retry}
+                                    className="btn-futuristic btn-secondary"
+                                    style={{ marginLeft: '1rem', minWidth: 'auto', padding: '0.5rem 1rem' }}
+                                >
+                                    🔄 Reintentar
+                                </button>
+                            </div>
+                        )}
+                    </main>
+
+                    {/* Footer */}
+                    <footer style={{ textAlign: 'center', padding: '2rem', color: '#666', borderTop: '1px solid rgba(0, 255, 255, 0.1)' }}>
+                        <p>ECPlacas 2.0 • Desarrollado por <span className="neon-text">Erick Costa</span></p>
+                        <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>Proyecto: Construcción de Software • Temática Futurista</p>
+                    </footer>
+                </div>
+            );
+        };
+
+        // Renderizar aplicación
+        ReactDOM.render(<ECPlacasApp />, document.getElementById('root'));
+    </script>
+</body>
+</html>

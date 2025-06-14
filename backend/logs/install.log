@@ -1,0 +1,3 @@
+2025-06-14 08:00:15,935 - ERROR - ❌ Instalación de ECPlacas 2.0 falló
+2025-06-14 08:00:36,428 - INFO - ✅ Sistema de logging inicializado correctamente
+2025-06-14 08:00:36,430 - ERROR - ❌ Error crítico durante la instalación: name 'time' is not defined

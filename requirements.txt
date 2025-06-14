@@ -1,0 +1,103 @@
+# ECPlacas 2.0 - Dependencias
+# Proyecto: Construcción de Software
+# Desarrollado por: Erick Costa
+# Temática: Futurista - Azul Neon
+
+# ==================== FRAMEWORK WEB ====================
+Flask==3.0.0
+Flask-CORS==4.0.0
+
+# ==================== HTTP Y REQUESTS ====================
+requests==2.31.0
+aiohttp==3.9.1
+urllib3==2.1.0
+
+# ==================== BASE DE DATOS ====================
+# SQLite viene incluido con Python
+
+# ==================== FECHA Y TIEMPO ====================
+python-dateutil==2.8.2
+
+# ==================== LOGGING Y MONITOREO ====================
+colorlog==6.8.0
+
+# ==================== VALIDACIÓN Y SERIALIZACIÓN ====================
+dataclasses-json==0.6.3
+
+# ==================== PROCESAMIENTO DE DATOS ====================
+pandas==2.1.4
+numpy==1.26.2
+
+# ==================== GENERACIÓN DE PDFs Y REPORTES ====================
+reportlab==4.0.7
+qrcode[pil]==7.4.2
+Pillow==10.1.0
+
+# ==================== EMAIL Y COMUNICACIONES ====================
+# smtplib viene incluido con Python
+email-validator==2.1.0
+
+# ==================== CRIPTOGRAFÍA Y SEGURIDAD ====================
+cryptography==41.0.8
+PyJWT==2.8.0
+bcrypt==4.1.2
+
+# ==================== CONFIGURACIÓN ====================
+python-dotenv==1.0.0
+
+# ==================== TESTING ====================
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+
+# ==================== DESARROLLO Y LINTING ====================
+black==23.11.0
+flake8==6.1.0
+isort==5.12.0
+
+# ==================== DEPLOYMENT Y PRODUCCIÓN ====================
+gunicorn==21.2.0
+waitress==2.1.2
+
+# ==================== UTILIDADES ADICIONALES ====================
+click==8.1.7
+rich==13.7.0
+tqdm==4.66.1
+
+# ==================== CACHE Y PERFORMANCE ====================
+# Implementado internamente con SQLite
+
+# ==================== NOTIFICACIONES ====================
+# Preparado para futuras integraciones
+
+# ==================== APIs EXTERNAS ====================
+# Usando requests para APIs de ANT
+
+# ==================== MONITOREO ====================
+psutil==5.9.6
+
+# ==================== DESARROLLO LOCAL ====================
+# Opcional para desarrollo
+# jupyter==1.0.0
+# ipython==8.17.2
+
+# ==================== NOTAS DE INSTALACIÓN ====================
+# Para instalar todas las dependencias:
+# pip install -r requirements.txt
+#
+# Para desarrollo:
+# pip install -r requirements.txt
+# pip install jupyter ipython
+#
+# Para producción:
+# pip install --no-dev -r requirements.txt
+#
+# Dependencias del sistema (Ubuntu/Debian):
+# sudo apt-get update
+# sudo apt-get install python3-dev build-essential
+#
+# Dependencias del sistema (CentOS/RHEL):
+# sudo yum install python3-devel gcc gcc-c++
+#
+# Dependencias del sistema (Windows):
+# Visual Studio Build Tools o Visual Studio Community

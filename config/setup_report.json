@@ -1,0 +1,22 @@
+{
+  "sistema": {
+    "version": "2.0.0",
+    "autor": "Erick Costa",
+    "proyecto": "Construcción de Software",
+    "fecha_configuracion": "2025-06-14T00:35:41.065736"
+  },
+  "base_datos": {
+    "archivo": "C:\\Users\\Erick\\Desktop\\WEBS\\Placas\\database\\ecplacas.sqlite",
+    "tamaño_bytes": 212992,
+    "tamaño_mb": 0.2,
+    "tablas": 10,
+    "usuarios": 0,
+    "configuraciones": 27
+  },
+  "configuracion": {
+    "variables_entorno": 69,
+    "cache_habilitado": "True",
+    "api_timeout": "30",
+    "puerto": "5000"
+  }
+}

@@ -1,0 +1,109 @@
+2025-06-14 05:36:54,468 - __main__ - INFO - 🛑 ECPlacas 2.0 detenido
+2025-06-14 13:01:47,156 - backend.app - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-14 13:01:47,168 - __main__ - INFO - 🚀 ECPlacas 2.0 iniciando...
+2025-06-14 13:01:47,168 - __main__ - INFO - Servidor: 0.0.0.0:5000
+2025-06-14 13:01:47,169 - __main__ - INFO - Modo: Desarrollo
+2025-06-14 13:01:47,171 - __main__ - INFO - 💓 Sistema funcionando - Uptime: 0m 0s
+2025-06-14 13:01:47,524 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.100.73:5000
+2025-06-14 13:01:47,525 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-06-14 13:02:09,319 - __main__ - INFO - Señal 2 recibida. Iniciando cierre limpio...
+2025-06-14 13:02:09,370 - backend.db - ERROR - Error en transacción de base de datos: no such column: ultimo_acceso
+2025-06-14 13:02:09,371 - backend.db - ERROR - ❌ Error inicializando base de datos: no such column: ultimo_acceso
+2025-06-14 13:02:09,372 - __main__ - ERROR - Error guardando log de cierre: no such column: ultimo_acceso
+2025-06-14 13:02:09,373 - __main__ - INFO - 🛑 ECPlacas 2.0 detenido
+2025-06-14 08:50:59,830 - app - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-14 08:50:59,835 - ECPlacas - ERROR - ❌ Error importando app: cannot import name 'create_app' from 'app' (C:\Users\Erick\Desktop\WEBS\Placas\backend\app.py)
+2025-06-14 08:50:59,836 - ECPlacas - ERROR - 💡 Ejecuta primero: python ECPlacas.py --setup
+2025-06-14 08:51:46,958 - app - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-14 08:51:46,965 - ECPlacas - ERROR - ❌ Error importando app: cannot import name 'create_app' from 'app' (C:\Users\Erick\Desktop\WEBS\Placas\backend\app.py)
+2025-06-14 08:51:46,965 - ECPlacas - ERROR - 💡 Ejecuta primero: python ECPlacas.py --setup
+2025-06-14 08:52:32,253 - app - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-14 08:52:32,258 - ECPlacas - ERROR - ❌ Error importando app: cannot import name 'create_app' from 'app' (C:\Users\Erick\Desktop\WEBS\Placas\backend\app.py)
+2025-06-14 08:52:32,259 - ECPlacas - ERROR - 💡 Ejecuta primero: python ECPlacas.py --setup
+2025-06-14 09:28:34 - ecplacas - INFO - app.py:570 - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-14 09:28:34 - ecplacas - INFO - app.py:1787 - 🚀 ECPlacas 2.0 - Aplicación Flask inicializada exitosamente
+2025-06-14 09:28:34 - ecplacas - INFO - app.py:1788 - 📁 Backend: C:\Users\Erick\Desktop\WEBS\Placas\backend
+2025-06-14 09:28:34 - ecplacas - INFO - app.py:1789 - 🎨 Frontend: C:\Users\Erick\Desktop\WEBS\Placas\frontend
+2025-06-14 09:28:34 - ecplacas - INFO - app.py:1790 - 🗄️ Database: C:\Users\Erick\Desktop\WEBS\Placas\backend\database
+2025-06-14 09:28:34 - ecplacas - INFO - app.py:1791 - ⚙️ Configuración: production
+2025-06-14 09:28:34 - ecplacas - INFO - app.py:1792 - 🐍 Python: 3.13.2
+2025-06-14 09:28:34 - ecplacas - INFO - app.py:1787 - 🚀 ECPlacas 2.0 - Aplicación Flask inicializada exitosamente
+2025-06-14 09:28:34 - ecplacas - INFO - app.py:1788 - 📁 Backend: C:\Users\Erick\Desktop\WEBS\Placas\backend
+2025-06-14 09:28:34 - ecplacas - INFO - app.py:1789 - 🎨 Frontend: C:\Users\Erick\Desktop\WEBS\Placas\frontend
+2025-06-14 09:28:34 - ecplacas - INFO - app.py:1790 - 🗄️ Database: C:\Users\Erick\Desktop\WEBS\Placas\backend\database
+2025-06-14 09:28:34 - ecplacas - INFO - app.py:1791 - ⚙️ Configuración: production
+2025-06-14 09:28:34 - ecplacas - INFO - app.py:1792 - 🐍 Python: 3.13.2
+2025-06-14 09:28:34 - ECPlacas - INFO - ECPlacas.py:350 - 🌐 Servidor iniciado en http://localhost:5000
+2025-06-14 09:28:34 - ECPlacas - INFO - ECPlacas.py:351 - 🎯 Panel Admin: http://localhost:5000/admin
+2025-06-14 09:28:34 - ECPlacas - INFO - ECPlacas.py:352 - ⚡ API Health: http://localhost:5000/api/health
+2025-06-14 09:28:34 - werkzeug - INFO - _internal.py:97 - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.100.73:5000
+2025-06-14 09:28:34 - werkzeug - INFO - _internal.py:97 - [33mPress CTRL+C to quit[0m
+2025-06-14 09:28:41 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:28:41] "GET / HTTP/1.1" 200 -
+2025-06-14 09:28:43 - ecplacas - ERROR - app.py:748 - ❌ Error obteniendo estadísticas: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 20444 and this is thread id 5716.
+2025-06-14 09:28:43 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:28:43] "GET /api/health HTTP/1.1" 200 -
+2025-06-14 09:28:43 - ecplacas - INFO - app.py:1349 - Request 1749911323619: GET /favicon.ico -> 404 (0.000s)
+2025-06-14 09:28:43 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:28:43] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-06-14 09:29:13 - ecplacas - ERROR - app.py:748 - ❌ Error obteniendo estadísticas: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 20444 and this is thread id 3552.
+2025-06-14 09:29:13 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:29:13] "GET /api/health HTTP/1.1" 200 -
+2025-06-14 09:29:43 - ecplacas - ERROR - app.py:748 - ❌ Error obteniendo estadísticas: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 20444 and this is thread id 3580.
+2025-06-14 09:29:43 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:29:43] "GET /api/health HTTP/1.1" 200 -
+2025-06-14 09:30:12 - ecplacas - INFO - app.py:1349 - Request 1749911412619: GET /.well-known/appspecific/com.chrome.devtools.json -> 404 (0.000s)
+2025-06-14 09:30:12 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:30:12] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-06-14 09:30:13 - ecplacas - ERROR - app.py:748 - ❌ Error obteniendo estadísticas: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 20444 and this is thread id 6604.
+2025-06-14 09:30:13 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:30:13] "GET /api/health HTTP/1.1" 200 -
+2025-06-14 09:30:14 - ecplacas - ERROR - app.py:748 - ❌ Error obteniendo estadísticas: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 20444 and this is thread id 19068.
+2025-06-14 09:30:14 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:30:14] "GET /api/health HTTP/1.1" 200 -
+2025-06-14 09:30:43 - ecplacas - ERROR - app.py:748 - ❌ Error obteniendo estadísticas: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 20444 and this is thread id 18440.
+2025-06-14 09:30:43 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:30:43] "GET /api/health HTTP/1.1" 200 -
+2025-06-14 09:31:13 - ecplacas - ERROR - app.py:748 - ❌ Error obteniendo estadísticas: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 20444 and this is thread id 20416.
+2025-06-14 09:31:13 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:31:13] "GET /api/health HTTP/1.1" 200 -
+2025-06-14 09:31:43 - ecplacas - ERROR - app.py:748 - ❌ Error obteniendo estadísticas: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 20444 and this is thread id 1700.
+2025-06-14 09:31:43 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:31:43] "GET /api/health HTTP/1.1" 200 -
+2025-06-14 09:32:13 - ecplacas - ERROR - app.py:748 - ❌ Error obteniendo estadísticas: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 20444 and this is thread id 13868.
+2025-06-14 09:32:13 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:32:13] "GET /api/health HTTP/1.1" 200 -
+2025-06-14 09:32:43 - ecplacas - ERROR - app.py:748 - ❌ Error obteniendo estadísticas: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 20444 and this is thread id 16784.
+2025-06-14 09:32:43 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:32:43] "GET /api/health HTTP/1.1" 200 -
+2025-06-14 09:33:13 - ecplacas - ERROR - app.py:748 - ❌ Error obteniendo estadísticas: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 20444 and this is thread id 7768.
+2025-06-14 09:33:13 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:33:13] "GET /api/health HTTP/1.1" 200 -
+2025-06-14 09:33:43 - ecplacas - ERROR - app.py:748 - ❌ Error obteniendo estadísticas: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 20444 and this is thread id 18416.
+2025-06-14 09:33:43 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:33:43] "GET /api/health HTTP/1.1" 200 -
+2025-06-14 09:34:13 - ecplacas - ERROR - app.py:748 - ❌ Error obteniendo estadísticas: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 20444 and this is thread id 19640.
+2025-06-14 09:34:13 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:34:13] "GET /api/health HTTP/1.1" 200 -
+2025-06-14 09:34:43 - ecplacas - ERROR - app.py:748 - ❌ Error obteniendo estadísticas: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 20444 and this is thread id 13384.
+2025-06-14 09:34:43 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:34:43] "GET /api/health HTTP/1.1" 200 -
+2025-06-14 09:35:13 - ecplacas - ERROR - app.py:748 - ❌ Error obteniendo estadísticas: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 20444 and this is thread id 8988.
+2025-06-14 09:35:13 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:35:13] "GET /api/health HTTP/1.1" 200 -
+2025-06-14 09:35:43 - ecplacas - ERROR - app.py:748 - ❌ Error obteniendo estadísticas: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 20444 and this is thread id 12372.
+2025-06-14 09:35:43 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:35:43] "GET /api/health HTTP/1.1" 200 -
+2025-06-14 09:36:13 - ecplacas - ERROR - app.py:748 - ❌ Error obteniendo estadísticas: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 20444 and this is thread id 18980.
+2025-06-14 09:36:13 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:36:13] "GET /api/health HTTP/1.1" 200 -
+2025-06-14 09:36:43 - ecplacas - ERROR - app.py:748 - ❌ Error obteniendo estadísticas: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 20444 and this is thread id 9560.
+2025-06-14 09:36:43 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:36:43] "GET /api/health HTTP/1.1" 200 -
+2025-06-14 09:37:13 - ecplacas - ERROR - app.py:748 - ❌ Error obteniendo estadísticas: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 20444 and this is thread id 14444.
+2025-06-14 09:37:13 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:37:13] "GET /api/health HTTP/1.1" 200 -
+2025-06-14 09:37:43 - ecplacas - ERROR - app.py:748 - ❌ Error obteniendo estadísticas: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 20444 and this is thread id 12172.
+2025-06-14 09:37:43 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:37:43] "GET /api/health HTTP/1.1" 200 -
+2025-06-14 09:38:13 - ecplacas - ERROR - app.py:748 - ❌ Error obteniendo estadísticas: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 20444 and this is thread id 9056.
+2025-06-14 09:38:13 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:38:13] "GET /api/health HTTP/1.1" 200 -
+2025-06-14 09:38:43 - ecplacas - ERROR - app.py:748 - ❌ Error obteniendo estadísticas: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 20444 and this is thread id 3064.
+2025-06-14 09:38:43 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:38:43] "GET /api/health HTTP/1.1" 200 -
+2025-06-14 09:39:44 - ecplacas - ERROR - app.py:748 - ❌ Error obteniendo estadísticas: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 20444 and this is thread id 6332.
+2025-06-14 09:39:44 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:39:44] "GET /api/health HTTP/1.1" 200 -
+2025-06-14 09:40:45 - ecplacas - ERROR - app.py:748 - ❌ Error obteniendo estadísticas: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 20444 and this is thread id 19564.
+2025-06-14 09:40:45 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:40:45] "GET /api/health HTTP/1.1" 200 -
+2025-06-14 09:41:46 - ecplacas - ERROR - app.py:748 - ❌ Error obteniendo estadísticas: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 20444 and this is thread id 2628.
+2025-06-14 09:41:46 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:41:46] "GET /api/health HTTP/1.1" 200 -
+2025-06-14 09:42:47 - ecplacas - ERROR - app.py:748 - ❌ Error obteniendo estadísticas: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 20444 and this is thread id 7204.
+2025-06-14 09:42:47 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:42:47] "GET /api/health HTTP/1.1" 200 -
+2025-06-14 09:43:48 - ecplacas - ERROR - app.py:748 - ❌ Error obteniendo estadísticas: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 20444 and this is thread id 19388.
+2025-06-14 09:43:48 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:43:48] "GET /api/health HTTP/1.1" 200 -
+2025-06-14 09:44:49 - ecplacas - ERROR - app.py:748 - ❌ Error obteniendo estadísticas: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 20444 and this is thread id 16040.
+2025-06-14 09:44:49 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:44:49] "GET /api/health HTTP/1.1" 200 -
+2025-06-14 09:45:50 - ecplacas - ERROR - app.py:748 - ❌ Error obteniendo estadísticas: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 20444 and this is thread id 20748.
+2025-06-14 09:45:50 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [14/Jun/2025 09:45:50] "GET /api/health HTTP/1.1" 200 -

@@ -1,0 +1,18 @@
+2025-06-14 13:02:29,198 - __main__ - INFO - start_ecplacas_fixed.py:531 - 🚀 ECPlacas 2.0 iniciando con optimizaciones...
+2025-06-14 13:02:29,199 - __main__ - INFO - start_ecplacas_fixed.py:532 - Servidor: 0.0.0.0:5000
+2025-06-14 13:02:29,200 - __main__ - INFO - start_ecplacas_fixed.py:533 - Modo: Desarrollo
+2025-06-14 13:02:29,202 - __main__ - INFO - start_ecplacas_fixed.py:534 - Threads: 4
+2025-06-14 13:02:29,203 - __main__ - INFO - start_ecplacas_fixed.py:535 - Python optimizado: No
+2025-06-14 13:02:29,520 - backend.app - INFO - app.py:334 - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-14 13:02:29,537 - __main__ - INFO - start_ecplacas_fixed.py:667 - 💓 Sistema funcionando - Uptime: 0m 0s
+2025-06-14 13:02:29,544 - performance - INFO - start_ecplacas_fixed.py:668 - Métricas: {"uptime_seconds": 0, "memory_percent": 43.6, "cpu_percent": 0.0, "disk_free_gb": 320.4461250305176}
+2025-06-14 13:02:30,631 - werkzeug - INFO - _internal.py:97 - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.100.73:5000
+2025-06-14 13:02:30,632 - werkzeug - INFO - _internal.py:97 - [33mPress CTRL+C to quit[0m
+2025-06-14 13:07:27,167 - __main__ - INFO - start_ecplacas_fixed.py:697 - Señal 2 recibida. Iniciando cierre limpio...
+2025-06-14 13:07:27,168 - __main__ - INFO - start_ecplacas_fixed.py:705 - Tiempo total de ejecución: 303.40 segundos
+2025-06-14 13:07:27,171 - backend.app - INFO - app.py:334 - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-14 13:07:27,187 - performance - INFO - start_ecplacas_fixed.py:743 - Shutdown metrics: {"timestamp": "2025-06-14T13:07:27.187411", "uptime_seconds": 303.39604115486145, "final_memory_percent": 43.0, "final_disk_free_gb": 320.12682723999023, "version": "2.0.0", "shutdown_clean": true}
+2025-06-14 13:07:27,188 - __main__ - INFO - start_ecplacas_fixed.py:602 - 🛑 ECPlacas 2.0 detenido
