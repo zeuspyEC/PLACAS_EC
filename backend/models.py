@@ -1,927 +1,906 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-ECPlacas 2.0 - Modelos de Datos
+==========================================
+ECPlacas 2.0 SRI COMPLETO - Modelos de Datos
+==========================================
 Proyecto: Construcción de Software
-Desarrollado por: Erick Costa
+Desarrollado por: Erick Costa - ZeusPy
+Versión: 2.0.1
+==========================================
 
-Modelos de datos y validadores para ECPlacas 2.0
+Modelos de datos optimizados para sistema SRI COMPLETO + Propietario
+Compatible con app.py y base de datos SQLite
 """
 
-import re
 import json
-from datetime import datetime, date
+import time
+from datetime import datetime
 from typing import Dict, List, Optional, Any, Union
 from dataclasses import dataclass, field, asdict
 from enum import Enum
-import logging
 
-logger = logging.getLogger(__name__)
+# ==========================================
+# ENUMS PARA CLASIFICACIÓN
+# ==========================================
 
-# ==================== ENUMS ====================
+class TipoConsulta(Enum):
+    SRI_COMPLETO = "sri_completo"
+    SRI_BASICO = "sri_basico"
+    PROPIETARIO_SOLO = "propietario_solo"
+    COMPLETO_PROPIETARIO = "completo_propietario"
 
-class EstadoMatricula(Enum):
-    """Estados posibles de matrícula vehicular"""
-    VIGENTE = "VIGENTE"
-    POR_VENCER = "POR VENCER"
-    VENCIDA = "VENCIDA"
-    INDETERMINADO = "INDETERMINADO"
+class EstadoConsulta(Enum):
+    INICIANDO = "iniciando"
+    CONSULTANDO_PROPIETARIO = "consultando_propietario"
+    CONSULTANDO_BASE_SRI = "consultando_base_sri"
+    CONSULTANDO_RUBROS = "consultando_rubros_sri"
+    CONSULTANDO_COMPONENTES = "consultando_componentes_sri"
+    CONSULTANDO_PAGOS = "consultando_pagos_sri"
+    CONSULTANDO_IACV = "consultando_iacv"
+    ANALIZANDO_COMPLETO = "analizando_completo"
+    COMPLETADO = "completado"
+    ERROR = "error"
 
-class TipoVehiculo(Enum):
-    """Tipos de vehículos"""
-    AUTOMOVIL = "AUTOMÓVIL"
-    CAMIONETA = "CAMIONETA"
-    JEEP = "JEEP"
-    MOTOCICLETA = "MOTOCICLETA"
-    CAMION = "CAMIÓN"
-    BUS = "BUS"
-    TAXI = "TAXI"
+class TipoComponente(Enum):
+    IMPUESTO = "IMPUESTO"
+    TASA = "TASA"
+    INTERES = "INTERES"
+    MULTA = "MULTA"
+    PRESCRIPCION = "PRESCRIPCION"
     OTRO = "OTRO"
 
-class TipoServicio(Enum):
-    """Tipos de servicio vehicular"""
-    PARTICULAR = "USO PARTICULAR"
-    PUBLICO = "SERVICIO PÚBLICO"
-    COMERCIAL = "COMERCIAL"
-    OFICIAL = "OFICIAL"
-    DIPLOMATICO = "DIPLOMÁTICO"
-    OTRO = "OTRO"
+class EstadoLegalSRI(Enum):
+    EXCELENTE = "EXCELENTE - SIN DEUDAS"
+    BUENO = "BUENO - DEUDAS MENORES"
+    REGULAR = "REGULAR - DEUDAS MODERADAS"
+    MALO = "MALO - DEUDAS ALTAS"
+    CRITICO = "CRÍTICO - MÚLTIPLES DEUDAS"
 
-class NivelLog(Enum):
-    """Niveles de logging"""
-    DEBUG = "DEBUG"
-    INFO = "INFO"
-    WARNING = "WARNING"
-    ERROR = "ERROR"
-    CRITICAL = "CRITICAL"
+class RiesgoTributario(Enum):
+    MUY_BAJO = "MUY BAJO"
+    BAJO = "BAJO"
+    MODERADO = "MODERADO"
+    ALTO = "ALTO"
+    CRITICO = "CRÍTICO"
 
-# ==================== VALIDADORES ====================
-
-class ValidadorEcuatoriano:
-    """Validadores específicos para datos ecuatorianos"""
-    
-    # Códigos de provincia válidos en Ecuador
-    PROVINCE_CODES = {
-        '01': 'Azuay', '02': 'Bolívar', '03': 'Cañar', '04': 'Carchi',
-        '05': 'Cotopaxi', '06': 'Chimborazo', '07': 'El Oro', '08': 'Esmeraldas',
-        '09': 'Guayas', '10': 'Imbabura', '11': 'Loja', '12': 'Los Ríos',
-        '13': 'Manabí', '14': 'Morona Santiago', '15': 'Napo', '16': 'Pastaza',
-        '17': 'Pichincha', '18': 'Tungurahua', '19': 'Zamora Chinchipe',
-        '20': 'Galápagos', '21': 'Sucumbíos', '22': 'Orellana',
-        '23': 'Santo Domingo', '24': 'Santa Elena', '30': 'Exterior'
-    }
-    
-    @staticmethod
-    def validar_cedula(cedula: str) -> tuple[bool, str]:
-        """
-        Valida cédula ecuatoriana con algoritmo oficial
-        Returns: (es_valida, mensaje_error)
-        """
-        try:
-            if not cedula or not isinstance(cedula, str):
-                return False, "Cédula requerida"
-            
-            # Limpiar y validar formato
-            cedula_clean = re.sub(r'\D', '', cedula)
-            if len(cedula_clean) != 10:
-                return False, "Cédula debe tener exactamente 10 dígitos"
-            
-            # Verificar código de provincia
-            province_code = cedula_clean[:2]
-            if province_code not in ValidadorEcuatoriano.PROVINCE_CODES:
-                return False, f"Código de provincia inválido: {province_code}"
-            
-            # Verificar tercer dígito (debe ser menor a 6 para personas naturales)
-            if int(cedula_clean[2]) >= 6:
-                return False, "Cédula corresponde a persona jurídica o extranjero"
-            
-            # Algoritmo de validación del dígito verificador
-            digits = [int(d) for d in cedula_clean]
-            coefficients = [2, 1, 2, 1, 2, 1, 2, 1, 2]
-            total = 0
-            
-            for i in range(9):
-                result = digits[i] * coefficients[i]
-                if result > 9:
-                    result -= 9
-                total += result
-            
-            check_digit = (10 - (total % 10)) % 10
-            
-            if check_digit != digits[9]:
-                return False, "Dígito verificador de cédula inválido"
-            
-            return True, ""
-            
-        except Exception as e:
-            logger.error(f"Error validando cédula: {e}")
-            return False, "Error en validación de cédula"
-    
-    @staticmethod
-    def validar_placa(placa: str) -> tuple[bool, str, str]:
-        """
-        Valida y normaliza placa vehicular ecuatoriana
-        Returns: (es_valida, placa_normalizada, mensaje_error)
-        """
-        try:
-            if not placa or not isinstance(placa, str):
-                return False, "", "Placa requerida"
-            
-            # Limpiar placa
-            placa_clean = re.sub(r'[^A-Z0-9]', '', placa.upper())
-            
-            if len(placa_clean) < 6 or len(placa_clean) > 7:
-                return False, "", "Placa debe tener entre 6 y 7 caracteres"
-            
-            # Patrones válidos para placas ecuatorianas
-            patterns = [
-                r'^[A-Z]{2,3}\d{3,4}$',  # ABC1234 o AB1234
-                r'^[A-Z]{3}\d{3}$',      # ABC123 (se normaliza)
-            ]
-            
-            is_valid = any(re.match(pattern, placa_clean) for pattern in patterns)
-            
-            if not is_valid:
-                return False, "", "Formato de placa inválido (ej: ABC1234)"
-            
-            # Normalización automática para placas de 6 caracteres
-            if len(placa_clean) == 6 and re.match(r'^[A-Z]{3}\d{3}$', placa_clean):
-                letters = placa_clean[:3]
-                numbers = placa_clean[3:]
-                placa_normalizada = f"{letters}0{numbers}"
-                logger.info(f"Placa normalizada: {placa_clean} → {placa_normalizada}")
-                return True, placa_normalizada, ""
-            
-            return True, placa_clean, ""
-            
-        except Exception as e:
-            logger.error(f"Error validando placa: {e}")
-            return False, "", "Error en validación de placa"
-    
-    @staticmethod
-    def validar_telefono(telefono: str, codigo_pais: str = "+593") -> tuple[bool, str]:
-        """
-        Valida número telefónico según país
-        Returns: (es_valido, mensaje_error)
-        """
-        try:
-            if not telefono:
-                return False, "Teléfono requerido"
-            
-            # Limpiar número
-            telefono_clean = re.sub(r'\D', '', telefono)
-            
-            # Validaciones según código de país
-            if codigo_pais == "+593":  # Ecuador
-                if len(telefono_clean) == 9 and telefono_clean.startswith('9'):
-                    return True, ""  # Móvil
-                elif len(telefono_clean) == 8 and telefono_clean[0] in '234567':
-                    return True, ""  # Fijo
-                else:
-                    return False, "Formato inválido para Ecuador (9XXXXXXXX o 2XXXXXXX)"
-            elif codigo_pais == "+57":  # Colombia
-                if len(telefono_clean) == 10:
-                    return True, ""
-                else:
-                    return False, "Teléfono colombiano debe tener 10 dígitos"
-            elif codigo_pais == "+51":  # Perú
-                if len(telefono_clean) == 9:
-                    return True, ""
-                else:
-                    return False, "Teléfono peruano debe tener 9 dígitos"
-            else:
-                # Validación genérica
-                if 7 <= len(telefono_clean) <= 15:
-                    return True, ""
-                else:
-                    return False, "Teléfono debe tener entre 7 y 15 dígitos"
-                    
-        except Exception as e:
-            logger.error(f"Error validando teléfono: {e}")
-            return False, "Error en validación de teléfono"
-
-class ValidadorFormatos:
-    """Validadores de formatos generales"""
-    
-    @staticmethod
-    def validar_email(email: str) -> tuple[bool, str]:
-        """Valida formato de correo electrónico"""
-        if not email:
-            return False, "Correo requerido"
-        
-        pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-        if re.match(pattern, email.lower()):
-            return True, ""
-        else:
-            return False, "Formato de correo inválido"
-    
-    @staticmethod
-    def validar_nombre(nombre: str) -> tuple[bool, str]:
-        """Valida formato de nombre completo"""
-        if not nombre:
-            return False, "Nombre requerido"
-        
-        if len(nombre.strip()) < 2:
-            return False, "Nombre muy corto"
-        
-        # Solo letras, espacios y acentos
-        pattern = r'^[a-zA-ZáéíóúñÁÉÍÓÚÑ\s]+$'
-        if re.match(pattern, nombre):
-            return True, ""
-        else:
-            return False, "Nombre solo puede contener letras y espacios"
-
-# ==================== MODELOS DE DATOS ====================
+# ==========================================
+# MODELO DE USUARIO
+# ==========================================
 
 @dataclass
-class UsuarioModel:
-    """Modelo de datos de usuario"""
-    id: Optional[int] = None
+class UsuarioECPlacas:
+    """Modelo de usuario del sistema ECPlacas 2.0"""
+    
     nombre: str = ""
     cedula: str = ""
     telefono: str = ""
     correo: str = ""
     country_code: str = "+593"
+    acepta_terminos: bool = False
     ip_address: str = ""
     user_agent: str = ""
     total_consultas: int = 0
     ultimo_acceso: Optional[datetime] = None
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
-    
-    def validar(self) -> tuple[bool, List[str]]:
-        """Valida todos los campos del usuario"""
-        errores = []
-        
-        # Validar nombre
-        valid_nombre, error_nombre = ValidadorFormatos.validar_nombre(self.nombre)
-        if not valid_nombre:
-            errores.append(f"Nombre: {error_nombre}")
-        
-        # Validar cédula
-        valid_cedula, error_cedula = ValidadorEcuatoriano.validar_cedula(self.cedula)
-        if not valid_cedula:
-            errores.append(f"Cédula: {error_cedula}")
-        
-        # Validar teléfono
-        valid_telefono, error_telefono = ValidadorEcuatoriano.validar_telefono(self.telefono, self.country_code)
-        if not valid_telefono:
-            errores.append(f"Teléfono: {error_telefono}")
-        
-        # Validar correo
-        valid_correo, error_correo = ValidadorFormatos.validar_email(self.correo)
-        if not valid_correo:
-            errores.append(f"Correo: {error_correo}")
-        
-        return len(errores) == 0, errores
+    created_at: datetime = field(default_factory=datetime.now)
     
     def to_dict(self) -> Dict[str, Any]:
-        """Convierte a diccionario para API"""
+        """Convertir a diccionario"""
         data = asdict(self)
-        # Convertir datetime a string
-        for key, value in data.items():
-            if isinstance(value, datetime):
-                data[key] = value.isoformat()
+        if self.ultimo_acceso:
+            data['ultimo_acceso'] = self.ultimo_acceso.isoformat()
+        data['created_at'] = self.created_at.isoformat()
         return data
     
-    @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> 'UsuarioModel':
-        """Crea instancia desde diccionario"""
-        # Filtrar campos válidos
-        valid_fields = {f.name for f in cls.__dataclass_fields__.values()}
-        filtered_data = {k: v for k, v in data.items() if k in valid_fields}
-        
-        # Convertir strings de fecha a datetime
-        for field in ['ultimo_acceso', 'created_at', 'updated_at']:
-            if field in filtered_data and isinstance(filtered_data[field], str):
-                try:
-                    filtered_data[field] = datetime.fromisoformat(filtered_data[field])
-                except:
-                    filtered_data[field] = None
-        
-        return cls(**filtered_data)
+    def es_valido(self) -> bool:
+        """Validar datos básicos del usuario"""
+        return (
+            len(self.nombre.strip()) >= 2 and
+            len(self.cedula) == 10 and
+            self.cedula.isdigit() and
+            self.acepta_terminos
+        )
+
+# ==========================================
+# MODELO DE PROPIETARIO VEHICULAR
+# ==========================================
 
 @dataclass
-class DatosIdentificacionVehicular:
-    """Datos de identificación del vehículo"""
-    vin_chasis: str = ""
-    numero_motor: str = ""
-    placa_actual: str = ""
-    placa_anterior: str = ""
+class PropietarioVehiculo:
+    """Información del propietario del vehículo"""
     
-    def es_completo(self) -> bool:
-        """Verifica si los datos de identificación están completos"""
-        return bool(self.vin_chasis and self.numero_motor and self.placa_actual)
-
-@dataclass
-class DatosModeloVehicular:
-    """Datos del modelo del vehículo"""
-    marca: str = ""
-    modelo: str = ""
-    anio_fabricacion: int = 0
-    pais_fabricacion: str = ""
+    nombre: str = ""
+    cedula: str = ""
+    encontrado: bool = False
+    fuente_api: str = ""  # primary, backup, manual
+    timestamp_consulta: datetime = field(default_factory=datetime.now)
     
-    def es_completo(self) -> bool:
-        """Verifica si los datos del modelo están completos"""
-        return bool(self.marca and self.modelo and self.anio_fabricacion > 1950)
-    
-    def get_antiguedad(self) -> int:
-        """Calcula la antigüedad del vehículo"""
-        if self.anio_fabricacion > 0:
-            return datetime.now().year - self.anio_fabricacion
-        return 0
-
-@dataclass
-class CaracteristicasVehiculares:
-    """Características físicas del vehículo"""
-    clase_vehiculo: str = ""
-    tipo_vehiculo: str = ""
-    color_primario: str = ""
-    color_secundario: str = ""
-    peso_vehiculo: str = ""
-    tipo_carroceria: str = ""
-    
-    def es_completo(self) -> bool:
-        """Verifica si las características están completas"""
-        return bool(self.clase_vehiculo and self.tipo_vehiculo and self.color_primario)
-
-@dataclass
-class DatosMatricula:
-    """Datos de matrícula y revisión técnica"""
-    matricula_desde: str = ""
-    matricula_hasta: str = ""
-    ano_ultima_revision: str = ""
-    ultima_revision_desde: str = ""
-    ultima_revision_hasta: str = ""
-    servicio: str = ""
-    ultima_actualizacion: str = ""
-    
-    def get_estado_matricula(self) -> tuple[EstadoMatricula, int]:
-        """
-        Calcula el estado de la matrícula
-        Returns: (estado, dias_hasta_vencimiento)
-        """
-        try:
-            if not self.matricula_hasta:
-                return EstadoMatricula.INDETERMINADO, 0
-            
-            # Parsear fecha de vencimiento
-            fecha_vencimiento = datetime.strptime(self.matricula_hasta.split(' ')[0], '%d-%m-%Y')
-            today = datetime.now()
-            dias_diferencia = (fecha_vencimiento - today).days
-            
-            if dias_diferencia > 30:
-                return EstadoMatricula.VIGENTE, dias_diferencia
-            elif dias_diferencia > 0:
-                return EstadoMatricula.POR_VENCER, dias_diferencia
-            else:
-                return EstadoMatricula.VENCIDA, dias_diferencia
-                
-        except Exception as e:
-            logger.error(f"Error calculando estado de matrícula: {e}")
-            return EstadoMatricula.INDETERMINADO, 0
-    
-    def es_completo(self) -> bool:
-        """Verifica si los datos de matrícula están completos"""
-        return bool(self.matricula_desde and self.matricula_hasta)
-
-@dataclass
-class DatosCRV:
-    """Datos del Centro de Retención Vehicular"""
-    indicador_crv: str = ""
-    orden_crv: str = ""
-    centro_retencion: str = ""
-    tipo_retencion: str = ""
-    motivo_retencion: str = ""
-    fecha_inicio_retencion: str = ""
-    dias_retencion: str = ""
-    grua: str = ""
-    area_ubicacion: str = ""
-    columna: str = ""
-    fila: str = ""
-    
-    def esta_retenido(self) -> bool:
-        """Verifica si el vehículo está retenido"""
-        return self.indicador_crv.upper() == 'S'
-    
-    def get_info_retencion(self) -> Dict[str, str]:
-        """Obtiene información completa de retención"""
-        if not self.esta_retenido():
-            return {}
-        
+    def to_dict(self) -> Dict[str, Any]:
+        """Convertir a diccionario"""
         return {
-            'centro': self.centro_retencion,
-            'tipo': self.tipo_retencion,
-            'motivo': self.motivo_retencion,
-            'fecha_inicio': self.fecha_inicio_retencion,
-            'dias': self.dias_retencion,
-            'ubicacion': f"{self.area_ubicacion} - Columna {self.columna}, Fila {self.fila}"
+            'nombre': self.nombre,
+            'cedula': self.cedula,
+            'encontrado': self.encontrado,
+            'fuente_api': self.fuente_api,
+            'timestamp_consulta': self.timestamp_consulta.isoformat()
         }
 
-@dataclass
-class AnalisisVehicular:
-    """Análisis inteligente del vehículo"""
-    estado_matricula: EstadoMatricula = EstadoMatricula.INDETERMINADO
-    dias_hasta_vencimiento: int = 0
-    estimacion_valor: float = 0.0
-    categoria_riesgo: str = "BAJO"
-    recomendaciones: List[str] = field(default_factory=list)
-    puntuacion_general: int = 0  # 0-100
-    
-    def agregar_recomendacion(self, recomendacion: str):
-        """Agrega una recomendación al análisis"""
-        if recomendacion and recomendacion not in self.recomendaciones:
-            self.recomendaciones.append(recomendacion)
-    
-    def get_recomendacion_texto(self) -> str:
-        """Obtiene todas las recomendaciones como texto"""
-        return " | ".join(self.recomendaciones) if self.recomendaciones else "Sin recomendaciones específicas"
+# ==========================================
+# MODELO DE RUBRO SRI
+# ==========================================
 
 @dataclass
-class VehiculoCompleto:
-    """Modelo completo de datos vehiculares ECPlacas 2.0"""
+class RubroSRI:
+    """Rubro de deuda SRI detallado"""
     
-    # Metadatos de consulta
-    session_id: str = ""
+    codigo_rubro: str = ""
+    descripcion_rubro: str = ""
+    nombre_corto_beneficiario: str = ""
+    valor_rubro: float = 0.0
+    anio_desde_pago: int = 0
+    anio_hasta_pago: int = 0
+    categoria: str = "OTRO"  # IMPUESTO, TASA, MULTA, OTRO
+    prioridad: str = "MEDIA"  # ALTA, MEDIA, BAJA
+    periodo_deuda: str = ""
+    anos_deuda: int = 0
+    
+    def __post_init__(self):
+        """Procesamiento post-inicialización"""
+        if self.anio_desde_pago and self.anio_hasta_pago:
+            self.anos_deuda = self.anio_hasta_pago - self.anio_desde_pago + 1
+            self.periodo_deuda = f"{self.anio_desde_pago} - {self.anio_hasta_pago}"
+        
+        # Clasificar categoría automáticamente
+        if not self.categoria or self.categoria == "OTRO":
+            descripcion_upper = self.descripcion_rubro.upper()
+            if 'IMPUESTO' in descripcion_upper:
+                self.categoria = 'IMPUESTO'
+            elif 'TASA' in descripcion_upper:
+                self.categoria = 'TASA'
+            elif 'MULTA' in descripcion_upper:
+                self.categoria = 'MULTA'
+        
+        # Determinar prioridad por valor
+        if not self.prioridad or self.prioridad == "MEDIA":
+            if self.valor_rubro > 500:
+                self.prioridad = 'ALTA'
+            elif self.valor_rubro > 100:
+                self.prioridad = 'MEDIA'
+            else:
+                self.prioridad = 'BAJA'
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convertir a diccionario"""
+        return asdict(self)
+
+# ==========================================
+# MODELO DE COMPONENTE SRI
+# ==========================================
+
+@dataclass
+class ComponenteSRI:
+    """Componente fiscal SRI detallado"""
+    
+    codigo_componente: str = ""
+    descripcion_componente: str = ""
+    valor_componente: float = 0.0
+    tipo_componente: str = TipoComponente.OTRO.value
+    rubro_padre: Optional[Dict] = None
+    
+    def __post_init__(self):
+        """Clasificar tipo de componente automáticamente"""
+        if self.tipo_componente == TipoComponente.OTRO.value:
+            codigo_upper = self.codigo_componente.upper()
+            descripcion_upper = self.descripcion_componente.upper()
+            
+            if 'IMPUESTO' in codigo_upper or 'IMPUESTO' in descripcion_upper:
+                self.tipo_componente = TipoComponente.IMPUESTO.value
+            elif 'TASA' in codigo_upper or 'TASA' in descripcion_upper:
+                self.tipo_componente = TipoComponente.TASA.value
+            elif 'INTERES' in codigo_upper or 'INTERES' in descripcion_upper:
+                self.tipo_componente = TipoComponente.INTERES.value
+            elif 'MULTA' in codigo_upper or 'MULTA' in descripcion_upper:
+                self.tipo_componente = TipoComponente.MULTA.value
+            elif 'PRESCRIPCION' in codigo_upper or 'PRESCRIPCION' in descripcion_upper:
+                self.tipo_componente = TipoComponente.PRESCRIPCION.value
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convertir a diccionario"""
+        return asdict(self)
+
+# ==========================================
+# MODELO DE PAGO SRI
+# ==========================================
+
+@dataclass
+class PagoSRI:
+    """Pago registrado en el SRI"""
+    
+    codigo_recaudacion: str = ""
+    fecha_pago: str = ""
+    fecha_pago_formateada: str = ""
+    monto: float = 0.0
+    descripcion_forma_pago: str = ""
+    descripcion_estado: str = ""
+    detalles_adicionales: Optional[List[Dict]] = None
+    
+    def __post_init__(self):
+        """Formatear fecha si es necesario"""
+        if self.fecha_pago and not self.fecha_pago_formateada:
+            try:
+                if len(self.fecha_pago) >= 10:
+                    fecha_parte = self.fecha_pago.split(' ')[0]
+                    if '-' in fecha_parte:
+                        año, mes, dia = fecha_parte.split('-')
+                        self.fecha_pago_formateada = f"{dia}/{mes}/{año}"
+                    else:
+                        self.fecha_pago_formateada = self.fecha_pago
+            except:
+                self.fecha_pago_formateada = self.fecha_pago
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convertir a diccionario"""
+        return asdict(self)
+
+# ==========================================
+# MODELO DE CUOTA IACV
+# ==========================================
+
+@dataclass
+class CuotaIACV:
+    """Cuota del plan IACV (Impuesto Ambiental)"""
+    
+    numero_cuota: str = ""
+    periodo_fiscal: str = ""
+    total_cuota: float = 0.0
+    estado_pago: str = "PENDIENTE"  # PAGADO, PENDIENTE, VENCIDO
+    fecha_vencimiento_estimada: str = ""
+    descripcion_cuota: str = ""
+    
+    def __post_init__(self):
+        """Generar descripción y fecha de vencimiento"""
+        if not self.descripcion_cuota and self.numero_cuota and self.periodo_fiscal:
+            self.descripcion_cuota = f"Cuota {self.numero_cuota} - {self.periodo_fiscal}"
+        
+        if not self.fecha_vencimiento_estimada and self.periodo_fiscal:
+            self.fecha_vencimiento_estimada = self._estimar_fecha_vencimiento()
+    
+    def _estimar_fecha_vencimiento(self) -> str:
+        """Estimar fecha de vencimiento"""
+        try:
+            if '-' in self.periodo_fiscal:
+                año_inicio = int(self.periodo_fiscal.split('-')[0])
+            else:
+                año_inicio = int(self.periodo_fiscal)
+            
+            cuota_num = 1
+            if 'Cuota' in self.numero_cuota:
+                try:
+                    cuota_num = int(self.numero_cuota.split('Cuota')[-1].strip())
+                except:
+                    cuota_num = 1
+            
+            mes_vencimiento = (cuota_num - 1) * 3 + 3
+            if mes_vencimiento > 12:
+                año_inicio += (mes_vencimiento - 1) // 12
+                mes_vencimiento = ((mes_vencimiento - 1) % 12) + 1
+            
+            return f"31/{mes_vencimiento:02d}/{año_inicio}"
+        except:
+            return "Fecha no disponible"
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convertir a diccionario"""
+        return asdict(self)
+
+# ==========================================
+# MODELO DE ANÁLISIS SRI
+# ==========================================
+
+@dataclass
+class AnalisisSRI:
+    """Análisis consolidado SRI"""
+    
+    estado_legal_sri: str = EstadoLegalSRI.EXCELENTE.value
+    riesgo_tributario: str = RiesgoTributario.BAJO.value
+    puntuacion_sri: int = 100
+    puntuacion_general: int = 100
+    recomendacion_tributaria: str = ""
+    recomendacion_general: str = ""
+    estimacion_valor: float = 0.0
+    categoria_riesgo: str = "BAJO"
+    
+    def calcular_puntuacion(self, total_deudas: float, total_multas: float, 
+                          total_intereses: float, cuotas_vencidas: float,
+                          total_pagos: float, prohibido_enajenar: str) -> int:
+        """Calcular puntuación SRI basada en factores"""
+        puntuacion = 100
+        
+        # Penalizaciones por deudas
+        if total_deudas > 2000:
+            puntuacion -= 50
+        elif total_deudas > 1000:
+            puntuacion -= 40
+        elif total_deudas > 500:
+            puntuacion -= 25
+        elif total_deudas > 100:
+            puntuacion -= 15
+        elif total_deudas > 0:
+            puntuacion -= 5
+        
+        # Penalizaciones específicas
+        if total_multas > 100:
+            puntuacion -= 20
+        elif total_multas > 0:
+            puntuacion -= 10
+        
+        if total_intereses > 50:
+            puntuacion -= 15
+        elif total_intereses > 0:
+            puntuacion -= 5
+        
+        # IACV vencidas
+        if cuotas_vencidas > 100:
+            puntuacion -= 25
+        elif cuotas_vencidas > 50:
+            puntuacion -= 20
+        elif cuotas_vencidas > 0:
+            puntuacion -= 10
+        
+        # Bonificaciones por pagos
+        if total_pagos > 2000:
+            puntuacion += 10
+        elif total_pagos > 1000:
+            puntuacion += 5
+        
+        # Prohibición de enajenar
+        if prohibido_enajenar and prohibido_enajenar.upper() in ['SI', 'SÍ', 'YES']:
+            puntuacion -= 30
+        
+        self.puntuacion_sri = max(0, min(100, puntuacion))
+        return self.puntuacion_sri
+    
+    def determinar_estado_legal(self):
+        """Determinar estado legal basado en puntuación"""
+        if self.puntuacion_sri >= 95:
+            self.estado_legal_sri = EstadoLegalSRI.EXCELENTE.value
+            self.riesgo_tributario = RiesgoTributario.MUY_BAJO.value
+            self.recomendacion_tributaria = "Vehículo con situación tributaria óptima para transferencia"
+        elif self.puntuacion_sri >= 80:
+            self.estado_legal_sri = EstadoLegalSRI.BUENO.value
+            self.riesgo_tributario = RiesgoTributario.BAJO.value
+            self.recomendacion_tributaria = "Regularizar deudas menores antes de transferencia"
+        elif self.puntuacion_sri >= 60:
+            self.estado_legal_sri = EstadoLegalSRI.REGULAR.value
+            self.riesgo_tributario = RiesgoTributario.MODERADO.value
+            self.recomendacion_tributaria = "Negociar descuento por deudas pendientes en precio final"
+        elif self.puntuacion_sri >= 40:
+            self.estado_legal_sri = EstadoLegalSRI.MALO.value
+            self.riesgo_tributario = RiesgoTributario.ALTO.value
+            self.recomendacion_tributaria = "Verificar costos de regularización antes de compra"
+        else:
+            self.estado_legal_sri = EstadoLegalSRI.CRITICO.value
+            self.riesgo_tributario = RiesgoTributario.CRITICO.value
+            self.recomendacion_tributaria = "NO RECOMENDADO - Evaluar otras alternativas"
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convertir a diccionario"""
+        return asdict(self)
+
+# ==========================================
+# MODELO PRINCIPAL DE DATOS VEHICULARES SRI COMPLETO
+# ==========================================
+
+@dataclass
+class DatosVehicularesCompletos:
+    """Modelo principal de datos vehiculares SRI COMPLETO + Propietario"""
+    
+    # Identificación básica
     numero_placa: str = ""
     placa_original: str = ""
     placa_normalizada: str = ""
-    consulta_exitosa: bool = False
-    tiempo_consulta: float = 0.0
-    mensaje_error: str = ""
+    codigo_vehiculo: int = 0
+    numero_camv_cpn: str = ""
+    session_id: str = ""
+    
+    # Propietario del vehículo
+    propietario: PropietarioVehiculo = field(default_factory=PropietarioVehiculo)
+    
+    # Información básica del vehículo
+    vin_chasis: str = ""
+    numero_motor: str = ""
+    descripcion_marca: str = ""
+    descripcion_modelo: str = ""
+    anio_auto: int = 0
+    descripcion_pais: str = ""
+    color_vehiculo1: str = ""
+    color_vehiculo2: str = ""
+    cilindraje: str = ""
+    nombre_clase: str = ""
+    
+    # Información de matrícula
+    fecha_ultima_matricula: str = ""
+    fecha_caducidad_matricula: str = ""
+    fecha_compra_registro: str = ""
+    fecha_revision: str = ""
+    descripcion_canton: str = ""
+    descripcion_servicio: str = ""
+    ultimo_anio_pagado: int = 0
+    
+    # Estados legales
+    prohibido_enajenar: str = ""
+    estado_exoneracion: str = ""
+    observacion: str = ""
+    aplica_cuota: bool = False
+    mensaje_motivo_auto: str = ""
+    
+    # Datos SRI completos
+    rubros_deuda: List[RubroSRI] = field(default_factory=list)
+    componentes_deuda: List[ComponenteSRI] = field(default_factory=list)
+    historial_pagos: List[PagoSRI] = field(default_factory=list)
+    plan_iacv: List[CuotaIACV] = field(default_factory=list)
+    
+    # Análisis financiero
+    total_deudas_sri: float = 0.0
+    total_impuestos: float = 0.0
+    total_tasas: float = 0.0
+    total_intereses: float = 0.0
+    total_multas: float = 0.0
+    total_prescripciones: float = 0.0
+    total_pagos_realizados: float = 0.0
+    pagos_ultimo_ano: float = 0.0
+    promedio_pago_anual: float = 0.0
+    total_cuotas_vencidas: float = 0.0
+    
+    # Agrupaciones
+    rubros_agrupados_por_beneficiario: Dict[str, Dict] = field(default_factory=dict)
+    totales_por_beneficiario: Dict[str, float] = field(default_factory=dict)
+    componentes_por_rubro: Dict[str, List] = field(default_factory=dict)
+    cuotas_por_estado: Dict[str, int] = field(default_factory=dict)
+    
+    # Análisis consolidado
+    analisis: AnalisisSRI = field(default_factory=AnalisisSRI)
+    
+    # Estados de matrícula
+    estado_matricula: str = "INDETERMINADO"
+    dias_hasta_vencimiento: int = 0
+    
+    # Metadatos
     timestamp_consulta: datetime = field(default_factory=datetime.now)
+    tiempo_consulta: float = 0.0
+    consulta_exitosa: bool = False
+    mensaje_error: str = ""
+    tipo_consulta: str = TipoConsulta.COMPLETO_PROPIETARIO.value
     
-    # Datos estructurados del vehículo
-    identificacion: DatosIdentificacionVehicular = field(default_factory=DatosIdentificacionVehicular)
-    modelo: DatosModeloVehicular = field(default_factory=DatosModeloVehicular)
-    caracteristicas: CaracteristicasVehiculares = field(default_factory=CaracteristicasVehiculares)
-    matricula: DatosMatricula = field(default_factory=DatosMatricula)
-    crv: DatosCRV = field(default_factory=DatosCRV)
-    analisis: AnalisisVehicular = field(default_factory=AnalisisVehicular)
+    def procesar_datos_completos(self):
+        """Procesar y analizar todos los datos"""
+        self._agrupar_rubros_por_beneficiario()
+        self._analizar_componentes_por_tipo()
+        self._analizar_plan_iacv()
+        self._calcular_totales_pagos()
+        self._realizar_analisis_consolidado()
+        self._analizar_matricula()
     
-    def procesar_datos_api(self, api_response: Dict[str, Any]):
-        """Procesa respuesta de API y llena los datos estructurados"""
-        try:
-            campos = api_response.get('campos', {})
-            
-            # Procesar datos de identificación
-            identificacion_data = campos.get('lsDatosIdentificacion', [])
-            for item in identificacion_data:
-                etiqueta = item.get('etiqueta', '').lower()
-                valor = item.get('valor', '')
-                
-                if 'vin' in etiqueta:
-                    self.identificacion.vin_chasis = valor
-                elif 'motor' in etiqueta:
-                    self.identificacion.numero_motor = valor
-                elif 'placa anterior' in etiqueta:
-                    self.identificacion.placa_anterior = valor
-            
-            self.identificacion.placa_actual = self.numero_placa
-            
-            # Procesar datos del modelo
-            modelo_data = campos.get('lsDatosModelo', [])
-            for item in modelo_data:
-                etiqueta = item.get('etiqueta', '').lower()
-                valor = item.get('valor', '')
-                
-                if 'marca' in etiqueta:
-                    self.modelo.marca = valor
-                elif 'modelo' in etiqueta:
-                    self.modelo.modelo = valor
-                elif 'año fabricación' in etiqueta:
-                    try:
-                        self.modelo.anio_fabricacion = int(valor) if valor else 0
-                    except:
-                        self.modelo.anio_fabricacion = 0
-                elif 'país fabricación' in etiqueta:
-                    self.modelo.pais_fabricacion = valor
-            
-            # Procesar características
-            caracteristicas_data = campos.get('lsOtrasCaracteristicas', [])
-            for item in caracteristicas_data:
-                etiqueta = item.get('etiqueta', '').lower()
-                valor = item.get('valor', '')
-                
-                if 'clase' in etiqueta:
-                    self.caracteristicas.clase_vehiculo = valor
-                elif 'tipo' in etiqueta:
-                    self.caracteristicas.tipo_vehiculo = valor
-                elif 'color 1' in etiqueta:
-                    self.caracteristicas.color_primario = valor
-                elif 'color 2' in etiqueta:
-                    self.caracteristicas.color_secundario = valor
-                elif 'peso' in etiqueta:
-                    self.caracteristicas.peso_vehiculo = valor
-                elif 'carrocería' in etiqueta:
-                    self.caracteristicas.tipo_carroceria = valor
-            
-            # Procesar datos de matrícula
-            revision_data = campos.get('lsRevision', [])
-            for item in revision_data:
-                etiqueta = item.get('etiqueta', '').lower()
-                valor = item.get('valor', '')
-                
-                if 'matrícula desde' in etiqueta:
-                    self.matricula.matricula_desde = valor
-                elif 'matrícula hasta' in etiqueta:
-                    self.matricula.matricula_hasta = valor
-                elif 'año última revisión' in etiqueta:
-                    self.matricula.ano_ultima_revision = valor
-                elif 'última revisión desde' in etiqueta:
-                    self.matricula.ultima_revision_desde = valor
-                elif 'última revisión hasta' in etiqueta:
-                    self.matricula.ultima_revision_hasta = valor
-            
-            # Procesar datos CRV
-            crv_data = campos.get('lsCrv', [])
-            for item in crv_data:
-                etiqueta = item.get('etiqueta', '').lower()
-                valor = item.get('valor', '')
-                
-                if 'indicador crv' in etiqueta:
-                    self.crv.indicador_crv = valor
-                elif 'orden crv' in etiqueta:
-                    self.crv.orden_crv = valor
-                elif 'centro retención' in etiqueta:
-                    self.crv.centro_retencion = valor
-                elif 'tipo retención' in etiqueta:
-                    self.crv.tipo_retencion = valor
-                elif 'motivo retención' in etiqueta:
-                    self.crv.motivo_retencion = valor
-                elif 'fecha inicio retención' in etiqueta:
-                    self.crv.fecha_inicio_retencion = valor
-                elif 'días retención' in etiqueta:
-                    self.crv.dias_retencion = valor
-                elif 'grúa' in etiqueta:
-                    self.crv.grua = valor
-                elif 'área ubicación' in etiqueta:
-                    self.crv.area_ubicacion = valor
-                elif 'columna' in etiqueta:
-                    self.crv.columna = valor
-                elif 'fila' in etiqueta:
-                    self.crv.fila = valor
-            
-            # Datos adicionales
-            self.matricula.servicio = campos.get('lsServicio', '')
-            self.matricula.ultima_actualizacion = campos.get('lsUltimaActualizacion', '')
-            
-            # Realizar análisis
-            self.realizar_analisis()
-            
-            logger.info(f"✅ Datos vehiculares procesados exitosamente para {self.numero_placa}")
-            
-        except Exception as e:
-            logger.error(f"❌ Error procesando datos vehiculares: {e}")
-            raise
-    
-    def realizar_analisis(self):
-        """Realiza análisis inteligente del vehículo"""
-        try:
-            # Analizar estado de matrícula
-            estado_matricula, dias_hasta_vencimiento = self.matricula.get_estado_matricula()
-            self.analisis.estado_matricula = estado_matricula
-            self.analisis.dias_hasta_vencimiento = dias_hasta_vencimiento
-            
-            # Generar recomendaciones
-            self._generar_recomendaciones()
-            
-            # Calcular estimación de valor
-            self._calcular_estimacion_valor()
-            
-            # Calcular puntuación general
-            self._calcular_puntuacion_general()
-            
-            logger.info(f"✅ Análisis vehicular completado para {self.numero_placa}")
-            
-        except Exception as e:
-            logger.error(f"❌ Error en análisis vehicular: {e}")
-    
-    def _generar_recomendaciones(self):
-        """Genera recomendaciones basadas en el estado del vehículo"""
-        # Recomendaciones por estado CRV
-        if self.crv.esta_retenido():
-            self.analisis.agregar_recomendacion("⚠️ VEHÍCULO RETENIDO - Verificar estado legal urgente")
-            self.analisis.categoria_riesgo = "ALTO"
+    def _agrupar_rubros_por_beneficiario(self):
+        """Agrupar rubros por beneficiario"""
+        agrupados = {}
+        totales = {}
         
-        # Recomendaciones por matrícula
-        if self.analisis.estado_matricula == EstadoMatricula.VENCIDA:
-            self.analisis.agregar_recomendacion("🔴 Matrícula vencida - Renovar URGENTE")
-            if self.analisis.categoria_riesgo == "BAJO":
-                self.analisis.categoria_riesgo = "ALTO"
-        elif self.analisis.estado_matricula == EstadoMatricula.POR_VENCER:
-            if self.analisis.dias_hasta_vencimiento <= 7:
-                self.analisis.agregar_recomendacion("🟠 Matrícula vence en menos de 7 días - Renovar PRONTO")
-            else:
-                self.analisis.agregar_recomendacion("🟡 Matrícula por vencer - Planificar renovación")
-        elif self.analisis.estado_matricula == EstadoMatricula.VIGENTE:
-            self.analisis.agregar_recomendacion("✅ Matrícula vigente - Documento en regla")
+        for rubro in self.rubros_deuda:
+            beneficiario = rubro.nombre_corto_beneficiario or 'DESCONOCIDO'
+            valor = rubro.valor_rubro or 0
+            
+            if beneficiario not in agrupados:
+                agrupados[beneficiario] = {
+                    'rubros': [],
+                    'total_valor': 0,
+                    'cantidad_rubros': 0,
+                    'tipos_deuda': set()
+                }
+            
+            agrupados[beneficiario]['rubros'].append(rubro.to_dict())
+            agrupados[beneficiario]['total_valor'] += valor
+            agrupados[beneficiario]['cantidad_rubros'] += 1
+            agrupados[beneficiario]['tipos_deuda'].add(rubro.descripcion_rubro)
+            
+            totales[beneficiario] = agrupados[beneficiario]['total_valor']
         
-        # Recomendaciones por antigüedad
-        antiguedad = self.modelo.get_antiguedad()
-        if antiguedad > 25:
-            self.analisis.agregar_recomendacion("🔧 Vehículo muy antiguo - Revisar estado mecánico y emisiones")
-        elif antiguedad > 15:
-            self.analisis.agregar_recomendacion("🔧 Vehículo antiguo - Mantenimiento preventivo recomendado")
-        elif antiguedad < 3:
-            self.analisis.agregar_recomendacion("⭐ Vehículo relativamente nuevo - Mantener historial de mantenimiento")
+        # Convertir sets a listas para serialización
+        for beneficiario in agrupados:
+            agrupados[beneficiario]['tipos_deuda'] = list(agrupados[beneficiario]['tipos_deuda'])
         
-        # Recomendaciones por marca
-        marca_upper = self.modelo.marca.upper()
-        if marca_upper in ['TOYOTA', 'HONDA', 'NISSAN', 'MAZDA']:
-            self.analisis.agregar_recomendacion("🏆 Marca reconocida por confiabilidad y repuestos disponibles")
-        elif marca_upper in ['CHEVROLET', 'HYUNDAI', 'KIA', 'FORD']:
-            self.analisis.agregar_recomendacion("👍 Marca con buen soporte local y repuestos accesibles")
+        self.rubros_agrupados_por_beneficiario = agrupados
+        self.totales_por_beneficiario = totales
+    
+    def _analizar_componentes_por_tipo(self):
+        """Analizar componentes por tipo"""
+        totales = {
+            'impuestos': 0.0,
+            'tasas': 0.0,
+            'intereses': 0.0,
+            'multas': 0.0,
+            'prescripciones': 0.0
+        }
         
-        # Si no hay recomendaciones específicas
-        if not self.analisis.recomendaciones:
-            self.analisis.agregar_recomendacion("📋 Vehículo sin observaciones especiales")
+        total_general = 0.0
+        
+        for componente in self.componentes_deuda:
+            valor = componente.valor_componente or 0
+            tipo = componente.tipo_componente
+            
+            if tipo == TipoComponente.IMPUESTO.value and valor > 0:
+                totales['impuestos'] += valor
+            elif tipo == TipoComponente.TASA.value and valor > 0:
+                totales['tasas'] += valor
+            elif tipo == TipoComponente.INTERES.value and valor > 0:
+                totales['intereses'] += valor
+            elif tipo == TipoComponente.MULTA.value and valor > 0:
+                totales['multas'] += valor
+            elif tipo == TipoComponente.PRESCRIPCION.value:
+                totales['prescripciones'] += valor  # Puede ser negativo
+            
+            # Solo sumar valores positivos al total
+            if valor > 0:
+                total_general += valor
+        
+        self.total_impuestos = totales['impuestos']
+        self.total_tasas = totales['tasas']
+        self.total_intereses = totales['intereses']
+        self.total_multas = totales['multas']
+        self.total_prescripciones = totales['prescripciones']
+        self.total_deudas_sri = total_general
     
-    def _calcular_estimacion_valor(self):
-        """Calcula estimación básica de valor de mercado"""
-        try:
-            if self.modelo.anio_fabricacion <= 0:
-                self.analisis.estimacion_valor = 0
-                return
+    def _analizar_plan_iacv(self):
+        """Analizar plan IACV"""
+        total_vencidas = 0.0
+        estados_count = {}
+        
+        for cuota in self.plan_iacv:
+            estado = cuota.estado_pago
+            estados_count[estado] = estados_count.get(estado, 0) + 1
             
-            # Valor base según tipo de vehículo
-            tipo_vehiculo = self.caracteristicas.tipo_vehiculo.upper()
-            if tipo_vehiculo in ['JEEP', 'CAMIONETA']:
-                valor_base = 18000
-            elif tipo_vehiculo in ['AUTOMÓVIL', 'AUTOMOVIL']:
-                valor_base = 15000
-            elif tipo_vehiculo == 'MOTOCICLETA':
-                valor_base = 5000
-            elif tipo_vehiculo in ['CAMIÓN', 'CAMION', 'BUS']:
-                valor_base = 25000
-            else:
-                valor_base = 12000
-            
-            # Factor por marca
-            marca_upper = self.modelo.marca.upper()
-            factor_marca = 1.0
-            
-            if marca_upper in ['TOYOTA', 'HONDA', 'NISSAN', 'LEXUS', 'BMW', 'MERCEDES']:
-                factor_marca = 1.3
-            elif marca_upper in ['CHEVROLET', 'HYUNDAI', 'KIA', 'MAZDA', 'FORD']:
-                factor_marca = 1.1
-            elif marca_upper in ['CHERY', 'GREAT WALL', 'BYD', 'JAC']:
-                factor_marca = 0.8
-            
-            # Depreciación por año
-            antiguedad = self.modelo.get_antiguedad()
-            depreciacion_anual = 0.08  # 8% anual
-            factor_depreciacion = max(0.1, (1 - depreciacion_anual) ** antiguedad)
-            
-            # Factor por estado de matrícula
-            factor_matricula = 1.0
-            if self.analisis.estado_matricula == EstadoMatricula.VENCIDA:
-                factor_matricula = 0.85
-            elif self.crv.esta_retenido():
-                factor_matricula = 0.75
-            
-            # Cálculo final
-            self.analisis.estimacion_valor = max(
-                valor_base * factor_marca * factor_depreciacion * factor_matricula,
-                1000  # Valor mínimo
-            )
-            
-            logger.info(f"💰 Estimación de valor calculada: ${self.analisis.estimacion_valor:,.2f}")
-            
-        except Exception as e:
-            logger.error(f"❌ Error calculando estimación de valor: {e}")
-            self.analisis.estimacion_valor = 0
+            if estado == 'VENCIDO':
+                total_vencidas += cuota.total_cuota or 0
+        
+        self.total_cuotas_vencidas = total_vencidas
+        self.cuotas_por_estado = estados_count
     
-    def _calcular_puntuacion_general(self):
-        """Calcula puntuación general del vehículo (0-100)"""
-        try:
-            puntuacion = 100
+    def _calcular_totales_pagos(self):
+        """Calcular totales de pagos"""
+        total_pagos = 0.0
+        pagos_ultimo_ano = 0.0
+        ano_actual = datetime.now().year
+        
+        for pago in self.historial_pagos:
+            monto = pago.monto or 0
+            total_pagos += monto
             
-            # Penalizaciones por problemas
-            if self.crv.esta_retenido():
-                puntuacion -= 40
-            
-            if self.analisis.estado_matricula == EstadoMatricula.VENCIDA:
-                puntuacion -= 25
-            elif self.analisis.estado_matricula == EstadoMatricula.POR_VENCER:
-                if self.analisis.dias_hasta_vencimiento <= 7:
-                    puntuacion -= 15
-                else:
-                    puntuacion -= 5
-            
-            # Penalización por antigüedad
-            antiguedad = self.modelo.get_antiguedad()
-            if antiguedad > 25:
-                puntuacion -= 20
-            elif antiguedad > 15:
-                puntuacion -= 10
-            elif antiguedad > 10:
-                puntuacion -= 5
-            
-            # Bonificaciones por marca reconocida
-            marca_upper = self.modelo.marca.upper()
-            if marca_upper in ['TOYOTA', 'HONDA', 'NISSAN']:
-                puntuacion += 5
-            
-            # Asegurar rango válido
-            self.analisis.puntuacion_general = max(0, min(100, puntuacion))
-            
-        except Exception as e:
-            logger.error(f"❌ Error calculando puntuación general: {e}")
-            self.analisis.puntuacion_general = 50
+            # Pagos del último año
+            if pago.fecha_pago and str(ano_actual) in pago.fecha_pago:
+                pagos_ultimo_ano += monto
+        
+        self.total_pagos_realizados = total_pagos
+        self.pagos_ultimo_ano = pagos_ultimo_ano
+        
+        # Calcular promedio anual
+        if len(self.historial_pagos) > 0:
+            anos_con_pagos = len(set(p.fecha_pago[:4] for p in self.historial_pagos if p.fecha_pago and len(p.fecha_pago) >= 4))
+            if anos_con_pagos > 0:
+                self.promedio_pago_anual = total_pagos / anos_con_pagos
     
-    def es_datos_completos(self) -> bool:
-        """Verifica si todos los datos importantes están completos"""
-        return (
-            self.identificacion.es_completo() and
-            self.modelo.es_completo() and
-            self.caracteristicas.es_completo() and
-            self.matricula.es_completo()
+    def _realizar_analisis_consolidado(self):
+        """Realizar análisis consolidado SRI"""
+        self.analisis.calcular_puntuacion(
+            self.total_deudas_sri,
+            self.total_multas,
+            self.total_intereses,
+            self.total_cuotas_vencidas,
+            self.total_pagos_realizados,
+            self.prohibido_enajenar
         )
+        
+        self.analisis.determinar_estado_legal()
+        
+        # Estimación de valor
+        if self.anio_auto > 0:
+            ano_actual = datetime.now().year
+            antiguedad = ano_actual - self.anio_auto
+            
+            valor_base = 15000
+            factor_depreciacion = max(0.1, (1 - 0.08) ** antiguedad)
+            valor_estimado = valor_base * factor_depreciacion
+            
+            if self.total_deudas_sri > 0:
+                valor_estimado *= 0.9
+            
+            self.analisis.estimacion_valor = max(valor_estimado, 1000)
+    
+    def _analizar_matricula(self):
+        """Analizar estado de matrícula"""
+        if self.fecha_caducidad_matricula:
+            try:
+                fecha_vencimiento = datetime.strptime(
+                    self.fecha_caducidad_matricula.split(' ')[0], 
+                    '%d-%m-%Y'
+                )
+                today = datetime.now()
+                dias_diferencia = (fecha_vencimiento - today).days
+                
+                self.dias_hasta_vencimiento = dias_diferencia
+                
+                if dias_diferencia > 30:
+                    self.estado_matricula = "VIGENTE"
+                elif dias_diferencia > 0:
+                    self.estado_matricula = "POR VENCER"
+                else:
+                    self.estado_matricula = "VENCIDA"
+            except:
+                self.estado_matricula = "INDETERMINADO"
+    
+    def get_resumen_completo(self) -> Dict[str, Any]:
+        """Obtener resumen completo optimizado para frontend"""
+        return {
+            'propietario': self.propietario.to_dict(),
+            'vehiculo_basico': {
+                'placa': self.numero_placa,
+                'marca': self.descripcion_marca,
+                'modelo': self.descripcion_modelo,
+                'anio': self.anio_auto,
+                'clase': self.nombre_clase,
+                'color_primario': self.color_vehiculo1,
+                'color_secundario': self.color_vehiculo2,
+                'cilindraje': self.cilindraje,
+                'pais': self.descripcion_pais
+            },
+            'deudas_sri_completas': {
+                'total_general': self.total_deudas_sri,
+                'desglose': {
+                    'impuestos': self.total_impuestos,
+                    'tasas': self.total_tasas,
+                    'multas': self.total_multas,
+                    'intereses': self.total_intereses,
+                    'prescripciones': self.total_prescripciones
+                },
+                'rubros_count': len(self.rubros_deuda),
+                'componentes_count': len(self.componentes_deuda),
+                'beneficiarios': list(self.totales_por_beneficiario.keys()),
+                'rubros_detallados': [r.to_dict() for r in self.rubros_deuda],
+                'componentes_detallados': [c.to_dict() for c in self.componentes_deuda],
+                'agrupado_beneficiarios': self.rubros_agrupados_por_beneficiario
+            },
+            'pagos_sri_completos': {
+                'total_pagado': self.total_pagos_realizados,
+                'pagos_ultimo_ano': self.pagos_ultimo_ano,
+                'promedio_anual': self.promedio_pago_anual,
+                'historial_completo': [p.to_dict() for p in self.historial_pagos],
+                'total_transacciones': len(self.historial_pagos)
+            },
+            'iacv_completo': {
+                'cuotas_vencidas': self.total_cuotas_vencidas,
+                'total_cuotas': len(self.plan_iacv),
+                'estados_cuotas': self.cuotas_por_estado,
+                'plan_detallado': [c.to_dict() for c in self.plan_iacv]
+            },
+            'estados_legales': {
+                'matricula': {
+                    'ultima': self.fecha_ultima_matricula,
+                    'vencimiento': self.fecha_caducidad_matricula,
+                    'estado': self.estado_matricula,
+                    'dias_vencimiento': self.dias_hasta_vencimiento,
+                    'ultimo_anio_pagado': self.ultimo_anio_pagado
+                },
+                'prohibiciones': {
+                    'enajenar': self.prohibido_enajenar,
+                    'exoneracion': self.estado_exoneracion,
+                    'observaciones': self.observacion
+                },
+                'ubicacion': {
+                    'canton': self.descripcion_canton,
+                    'servicio': self.descripcion_servicio
+                }
+            },
+            'analisis_completo': self.analisis.to_dict(),
+            'metadatos': {
+                'session_id': self.session_id,
+                'tiempo_consulta': self.tiempo_consulta,
+                'timestamp': self.timestamp_consulta.isoformat(),
+                'consulta_exitosa': self.consulta_exitosa,
+                'tipo_consulta': self.tipo_consulta
+            }
+        }
     
     def to_dict(self) -> Dict[str, Any]:
-        """Convierte todo el modelo a diccionario para API"""
-        try:
-            data = {
-                # Metadatos
-                'session_id': self.session_id,
-                'numero_placa': self.numero_placa,
-                'placa_original': self.placa_original,
-                'placa_normalizada': self.placa_normalizada,
-                'consulta_exitosa': self.consulta_exitosa,
-                'tiempo_consulta': self.tiempo_consulta,
-                'mensaje_error': self.mensaje_error,
-                'timestamp_consulta': self.timestamp_consulta.isoformat(),
-                
-                # Datos del vehículo (para compatibilidad)
-                'vin_chasis': self.identificacion.vin_chasis,
-                'numero_motor': self.identificacion.numero_motor,
-                'placa_anterior': self.identificacion.placa_anterior,
-                'marca': self.modelo.marca,
-                'modelo': self.modelo.modelo,
-                'anio_fabricacion': self.modelo.anio_fabricacion,
-                'pais_fabricacion': self.modelo.pais_fabricacion,
-                'clase_vehiculo': self.caracteristicas.clase_vehiculo,
-                'tipo_vehiculo': self.caracteristicas.tipo_vehiculo,
-                'color_primario': self.caracteristicas.color_primario,
-                'color_secundario': self.caracteristicas.color_secundario,
-                'peso_vehiculo': self.caracteristicas.peso_vehiculo,
-                'tipo_carroceria': self.caracteristicas.tipo_carroceria,
-                'matricula_desde': self.matricula.matricula_desde,
-                'matricula_hasta': self.matricula.matricula_hasta,
-                'ano_ultima_revision': self.matricula.ano_ultima_revision,
-                'servicio': self.matricula.servicio,
-                'ultima_actualizacion': self.matricula.ultima_actualizacion,
-                'indicador_crv': self.crv.indicador_crv,
-                
-                # Análisis
-                'estado_matricula': self.analisis.estado_matricula.value,
-                'dias_hasta_vencimiento': self.analisis.dias_hasta_vencimiento,
-                'estimacion_valor': self.analisis.estimacion_valor,
-                'categoria_riesgo': self.analisis.categoria_riesgo,
-                'recomendacion': self.analisis.get_recomendacion_texto(),
-                'puntuacion_general': self.analisis.puntuacion_general,
-                
-                # Datos estructurados completos
-                'datos_estructurados': {
-                    'identificacion': asdict(self.identificacion),
-                    'modelo': asdict(self.modelo),
-                    'caracteristicas': asdict(self.caracteristicas),
-                    'matricula': asdict(self.matricula),
-                    'crv': asdict(self.crv),
-                    'analisis': asdict(self.analisis)
-                }
-            }
+        """Convertir todo el modelo a diccionario"""
+        data = {
+            # Datos básicos
+            'numero_placa': self.numero_placa,
+            'placa_original': self.placa_original,
+            'placa_normalizada': self.placa_normalizada,
+            'codigo_vehiculo': self.codigo_vehiculo,
+            'numero_camv_cpn': self.numero_camv_cpn,
+            'session_id': self.session_id,
             
-            return data
+            # Propietario
+            'propietario_nombre': self.propietario.nombre,
+            'propietario_cedula': self.propietario.cedula,
+            'propietario_encontrado': self.propietario.encontrado,
             
-        except Exception as e:
-            logger.error(f"❌ Error convirtiendo a diccionario: {e}")
-            return {}
-    
-    @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> 'VehiculoCompleto':
-        """Crea instancia desde diccionario"""
-        try:
-            instance = cls()
+            # Información del vehículo
+            'vin_chasis': self.vin_chasis,
+            'numero_motor': self.numero_motor,
+            'descripcion_marca': self.descripcion_marca,
+            'descripcion_modelo': self.descripcion_modelo,
+            'anio_auto': self.anio_auto,
+            'descripcion_pais': self.descripcion_pais,
+            'color_vehiculo1': self.color_vehiculo1,
+            'color_vehiculo2': self.color_vehiculo2,
+            'cilindraje': self.cilindraje,
+            'nombre_clase': self.nombre_clase,
             
-            # Cargar metadatos básicos
-            instance.session_id = data.get('session_id', '')
-            instance.numero_placa = data.get('numero_placa', '')
-            instance.placa_original = data.get('placa_original', '')
-            instance.placa_normalizada = data.get('placa_normalizada', '')
-            instance.consulta_exitosa = data.get('consulta_exitosa', False)
-            instance.tiempo_consulta = data.get('tiempo_consulta', 0.0)
-            instance.mensaje_error = data.get('mensaje_error', '')
+            # Matrícula
+            'fecha_ultima_matricula': self.fecha_ultima_matricula,
+            'fecha_caducidad_matricula': self.fecha_caducidad_matricula,
+            'descripcion_canton': self.descripcion_canton,
+            'descripcion_servicio': self.descripcion_servicio,
+            'ultimo_anio_pagado': self.ultimo_anio_pagado,
+            'estado_matricula': self.estado_matricula,
+            'dias_hasta_vencimiento': self.dias_hasta_vencimiento,
             
-            # Timestamp
-            timestamp_str = data.get('timestamp_consulta')
-            if timestamp_str:
-                try:
-                    instance.timestamp_consulta = datetime.fromisoformat(timestamp_str)
-                except:
-                    instance.timestamp_consulta = datetime.now()
+            # Estados legales
+            'prohibido_enajenar': self.prohibido_enajenar,
+            'estado_exoneracion': self.estado_exoneracion,
+            'observacion': self.observacion,
             
-            # Si hay datos estructurados, cargarlos
-            datos_estructurados = data.get('datos_estructurados', {})
-            if datos_estructurados:
-                if 'identificacion' in datos_estructurados:
-                    instance.identificacion = DatosIdentificacionVehicular(**datos_estructurados['identificacion'])
-                if 'modelo' in datos_estructurados:
-                    instance.modelo = DatosModeloVehicular(**datos_estructurados['modelo'])
-                if 'caracteristicas' in datos_estructurados:
-                    instance.caracteristicas = CaracteristicasVehiculares(**datos_estructurados['caracteristicas'])
-                if 'matricula' in datos_estructurados:
-                    instance.matricula = DatosMatricula(**datos_estructurados['matricula'])
-                if 'crv' in datos_estructurados:
-                    instance.crv = DatosCRV(**datos_estructurados['crv'])
-                if 'analisis' in datos_estructurados:
-                    analisis_data = datos_estructurados['analisis']
-                    # Convertir enum
-                    if 'estado_matricula' in analisis_data:
-                        try:
-                            analisis_data['estado_matricula'] = EstadoMatricula(analisis_data['estado_matricula'])
-                        except:
-                            analisis_data['estado_matricula'] = EstadoMatricula.INDETERMINADO
-                    instance.analisis = AnalisisVehicular(**analisis_data)
-            else:
-                # Cargar desde formato plano (compatibilidad)
-                instance._cargar_desde_formato_plano(data)
+            # Datos SRI
+            'rubros_deuda': [r.to_dict() for r in self.rubros_deuda],
+            'componentes_deuda': [c.to_dict() for c in self.componentes_deuda],
+            'historial_pagos': [p.to_dict() for p in self.historial_pagos],
+            'plan_excepcional_iacv': [c.to_dict() for c in self.plan_iacv],
             
-            return instance
+            # Totales
+            'total_deudas_sri': self.total_deudas_sri,
+            'total_impuestos': self.total_impuestos,
+            'total_tasas': self.total_tasas,
+            'total_intereses': self.total_intereses,
+            'total_multas': self.total_multas,
+            'total_prescripciones': self.total_prescripciones,
+            'total_pagos_realizados': self.total_pagos_realizados,
+            'pagos_ultimo_ano': self.pagos_ultimo_ano,
+            'promedio_pago_anual': self.promedio_pago_anual,
+            'total_cuotas_vencidas': self.total_cuotas_vencidas,
             
-        except Exception as e:
-            logger.error(f"❌ Error creando instancia desde diccionario: {e}")
-            return cls()
-    
-    def _cargar_desde_formato_plano(self, data: Dict[str, Any]):
-        """Carga datos desde formato plano para compatibilidad"""
-        # Identificación
-        self.identificacion.vin_chasis = data.get('vin_chasis', '')
-        self.identificacion.numero_motor = data.get('numero_motor', '')
-        self.identificacion.placa_anterior = data.get('placa_anterior', '')
-        self.identificacion.placa_actual = self.numero_placa
+            # Agrupaciones
+            'rubros_agrupados_por_beneficiario': self.rubros_agrupados_por_beneficiario,
+            'totales_por_beneficiario': self.totales_por_beneficiario,
+            'cuotas_por_estado': self.cuotas_por_estado,
+            
+            # Análisis
+            'estado_legal_sri': self.analisis.estado_legal_sri,
+            'riesgo_tributario': self.analisis.riesgo_tributario,
+            'puntuacion_sri': self.analisis.puntuacion_sri,
+            'recomendacion_tributaria': self.analisis.recomendacion_tributaria,
+            'estimacion_valor': self.analisis.estimacion_valor,
+            
+            # Metadatos
+            'timestamp_consulta': self.timestamp_consulta.isoformat(),
+            'tiempo_consulta': self.tiempo_consulta,
+            'consulta_exitosa': self.consulta_exitosa,
+            'mensaje_error': self.mensaje_error,
+            'tipo_consulta': self.tipo_consulta
+        }
         
-        # Modelo
-        self.modelo.marca = data.get('marca', '')
-        self.modelo.modelo = data.get('modelo', '')
-        self.modelo.anio_fabricacion = data.get('anio_fabricacion', 0)
-        self.modelo.pais_fabricacion = data.get('pais_fabricacion', '')
-        
-        # Características
-        self.caracteristicas.clase_vehiculo = data.get('clase_vehiculo', '')
-        self.caracteristicas.tipo_vehiculo = data.get('tipo_vehiculo', '')
-        self.caracteristicas.color_primario = data.get('color_primario', '')
-        self.caracteristicas.color_secundario = data.get('color_secundario', '')
-        self.caracteristicas.peso_vehiculo = data.get('peso_vehiculo', '')
-        self.caracteristicas.tipo_carroceria = data.get('tipo_carroceria', '')
-        
-        # Matrícula
-        self.matricula.matricula_desde = data.get('matricula_desde', '')
-        self.matricula.matricula_hasta = data.get('matricula_hasta', '')
-        self.matricula.ano_ultima_revision = data.get('ano_ultima_revision', '')
-        self.matricula.servicio = data.get('servicio', '')
-        self.matricula.ultima_actualizacion = data.get('ultima_actualizacion', '')
-        
-        # CRV
-        self.crv.indicador_crv = data.get('indicador_crv', '')
-        
-        # Análisis básico
-        estado_str = data.get('estado_matricula', 'INDETERMINADO')
-        try:
-            self.analisis.estado_matricula = EstadoMatricula(estado_str)
-        except:
-            self.analisis.estado_matricula = EstadoMatricula.INDETERMINADO
-        
-        self.analisis.dias_hasta_vencimiento = data.get('dias_hasta_vencimiento', 0)
-        self.analisis.estimacion_valor = data.get('estimacion_valor', 0.0)
-        self.analisis.categoria_riesgo = data.get('categoria_riesgo', 'BAJO')
+        return data
 
-# Crear instancia de validador para uso global
-validador = ValidadorEcuatoriano()
+# ==========================================
+# MODELO DE SESIÓN DE CONSULTA
+# ==========================================
 
-if __name__ == "__main__":
-    # Pruebas básicas
-    print("🧪 Probando modelos ECPlacas 2.0...")
+@dataclass
+class SesionConsulta:
+    """Sesión de consulta activa"""
     
-    # Probar validación de cédula
-    cedula_test = "1234567890"
-    valida, error = ValidadorEcuatoriano.validar_cedula(cedula_test)
-    print(f"Cédula {cedula_test}: {'✅ Válida' if valida else f'❌ {error}'}")
+    session_id: str = ""
+    usuario: Optional[UsuarioECPlacas] = None
+    placa_consultada: str = ""
+    estado: str = EstadoConsulta.INICIANDO.value
+    progreso: int = 0
+    mensaje_estado: str = ""
+    datos_vehiculares: Optional[DatosVehicularesCompletos] = None
+    started_at: datetime = field(default_factory=datetime.now)
+    last_activity: datetime = field(default_factory=datetime.now)
+    completed_at: Optional[datetime] = None
     
-    # Probar validación de placa
-    placa_test = "ABC123"
-    valida, normalizada, error = ValidadorEcuatoriano.validar_placa(placa_test)
-    print(f"Placa {placa_test}: {'✅ Válida' if valida else f'❌ {error}'}")
-    if valida:
-        print(f"Normalizada: {normalizada}")
+    def actualizar_estado(self, nuevo_estado: EstadoConsulta, progreso: int, mensaje: str):
+        """Actualizar estado de la sesión"""
+        self.estado = nuevo_estado.value
+        self.progreso = progreso
+        self.mensaje_estado = mensaje
+        self.last_activity = datetime.now()
+        
+        if nuevo_estado in [EstadoConsulta.COMPLETADO, EstadoConsulta.ERROR]:
+            self.completed_at = datetime.now()
     
-    # Probar modelo de vehículo
-    vehiculo = VehiculoCompleto()
-    vehiculo.numero_placa = "TBX0160"
-    vehiculo.session_id = "test_123"
+    def to_dict(self) -> Dict[str, Any]:
+        """Convertir a diccionario para API"""
+        return {
+            'session_id': self.session_id,
+            'placa_consultada': self.placa_consultada,
+            'estado': self.estado,
+            'progreso': self.progreso,
+            'mensaje_estado': self.mensaje_estado,
+            'started_at': self.started_at.isoformat(),
+            'last_activity': self.last_activity.isoformat(),
+            'completed_at': self.completed_at.isoformat() if self.completed_at else None,
+            'usuario': self.usuario.to_dict() if self.usuario else None,
+            'datos_disponibles': self.datos_vehiculares is not None
+        }
+
+# ==========================================
+# FUNCIONES DE UTILIDAD
+# ==========================================
+
+def crear_vehiculo_desde_dict(data: Dict[str, Any]) -> DatosVehicularesCompletos:
+    """Crear modelo de vehículo desde diccionario"""
+    vehiculo = DatosVehicularesCompletos()
     
-    print(f"Vehículo creado: {vehiculo.numero_placa}")
-    print(f"Datos completos: {vehiculo.es_datos_completos()}")
+    # Mapear campos básicos
+    for field_name, field_value in data.items():
+        if hasattr(vehiculo, field_name):
+            setattr(vehiculo, field_name, field_value)
     
-    print("✅ Pruebas de modelos completadas exitosamente")
+    # Crear propietario si existe
+    if 'propietario_nombre' in data or 'propietario_cedula' in data:
+        vehiculo.propietario = PropietarioVehiculo(
+            nombre=data.get('propietario_nombre', ''),
+            cedula=data.get('propietario_cedula', ''),
+            encontrado=data.get('propietario_encontrado', False)
+        )
+    
+    # Procesar rubros
+    if 'rubros_deuda' in data and isinstance(data['rubros_deuda'], list):
+        vehiculo.rubros_deuda = [
+            RubroSRI(**rubro) if isinstance(rubro, dict) else rubro
+            for rubro in data['rubros_deuda']
+        ]
+    
+    # Procesar componentes
+    if 'componentes_deuda' in data and isinstance(data['componentes_deuda'], list):
+        vehiculo.componentes_deuda = [
+            ComponenteSRI(**comp) if isinstance(comp, dict) else comp
+            for comp in data['componentes_deuda']
+        ]
+    
+    # Procesar pagos
+    if 'historial_pagos' in data and isinstance(data['historial_pagos'], list):
+        vehiculo.historial_pagos = [
+            PagoSRI(**pago) if isinstance(pago, dict) else pago
+            for pago in data['historial_pagos']
+        ]
+    
+    # Procesar IACV
+    if 'plan_excepcional_iacv' in data and isinstance(data['plan_excepcional_iacv'], list):
+        vehiculo.plan_iacv = [
+            CuotaIACV(**cuota) if isinstance(cuota, dict) else cuota
+            for cuota in data['plan_excepcional_iacv']
+        ]
+    
+    return vehiculo
+
+# Exportar modelos principales
+__all__ = [
+    'UsuarioECPlacas',
+    'PropietarioVehiculo', 
+    'RubroSRI',
+    'ComponenteSRI',
+    'PagoSRI',
+    'CuotaIACV',
+    'AnalisisSRI',
+    'DatosVehicularesCompletos',
+    'SesionConsulta',
+    'TipoConsulta',
+    'EstadoConsulta',
+    'TipoComponente',
+    'EstadoLegalSRI',
+    'RiesgoTributario',
+    'crear_vehiculo_desde_dict'
+]

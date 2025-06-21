@@ -1,0 +1,29 @@
+2025-06-20 08:34:52,808 - INFO - ================================================================================
+2025-06-20 08:34:52,811 - INFO - ================================================================================
+2025-06-20 08:34:52,819 - INFO - ================================================================================
+2025-06-20 08:34:52,834 - INFO - ================================================================================
+2025-06-20 08:34:52,836 - INFO -    • POST /api/consultar-vehiculo - Consulta SRI COMPLETA
+2025-06-20 08:34:52,837 - INFO -    • GET  /api/estado-consulta/<session_id> - Estado consulta
+2025-06-20 08:34:52,837 - INFO -    • GET  /api/resultado/<session_id> - Resultado completo
+2025-06-20 08:34:52,838 - INFO -    • GET  /api/estadisticas - Estadísticas sistema
+2025-06-20 08:34:52,838 - INFO -    • GET  /api/test-sri-completo - Test APIs SRI
+2025-06-20 08:34:52,838 - INFO -    • POST /api/validar-placa - Validar placa
+2025-06-20 08:34:52,838 - INFO -    • POST /api/validar-cedula - Validar cédula
+2025-06-20 08:34:52,839 - INFO -    • POST /api/limpiar-cache - Limpiar cache
+2025-06-20 08:34:52,839 - INFO - ================================================================================
+2025-06-20 08:34:52,850 - INFO - ================================================================================
+2025-06-20 08:34:52,852 - INFO - ================================================================================
+2025-06-20 08:34:52,897 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.29.80.206:5000
+2025-06-20 08:34:52,898 - INFO - [33mPress CTRL+C to quit[0m
+2025-06-20 08:34:56,001 - INFO - 127.0.0.1 - - [20/Jun/2025 08:34:56] "GET /api/health HTTP/1.1" 200 -
+2025-06-20 08:35:08,996 - INFO - 127.0.0.1 - - [20/Jun/2025 08:35:08] "POST /api/consultar-vehiculo HTTP/1.1" 200 -
+2025-06-20 08:35:11,009 - INFO - 127.0.0.1 - - [20/Jun/2025 08:35:11] "GET /api/estado-consulta/ecplacas_def_1750426506_38f629d1 HTTP/1.1" 200 -
+2025-06-20 08:35:11,019 - INFO - 127.0.0.1 - - [20/Jun/2025 08:35:11] "GET /api/resultado/ecplacas_def_1750426506_38f629d1 HTTP/1.1" 200 -
+2025-06-20 08:35:25,971 - INFO - 127.0.0.1 - - [20/Jun/2025 08:35:25] "GET /api/health HTTP/1.1" 200 -
+2025-06-20 08:35:56,339 - INFO - 127.0.0.1 - - [20/Jun/2025 08:35:56] "GET /api/health HTTP/1.1" 200 -
+2025-06-20 08:36:26,340 - INFO - 127.0.0.1 - - [20/Jun/2025 08:36:26] "GET /api/health HTTP/1.1" 200 -
+2025-06-20 08:36:56,343 - INFO - 127.0.0.1 - - [20/Jun/2025 08:36:56] "GET /api/health HTTP/1.1" 200 -
+2025-06-20 08:37:26,343 - INFO - 127.0.0.1 - - [20/Jun/2025 08:37:26] "GET /api/health HTTP/1.1" 200 -

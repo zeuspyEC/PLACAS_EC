@@ -3,12 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ECPlacas 2.0 - Sistema de Consulta Vehicular</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <title>ECPlacas 2.0 SRI COMPLETO - Sistema de Consulta Vehicular + Propietario</title>
+    
+    <!-- Meta tags optimizados -->
+    <meta name="description" content="ECPlacas 2.0 SRI COMPLETO - Sistema completo de consulta vehicular con datos del SRI Ecuador y propietario. Desarrollado por Erick Costa.">
+    <meta name="keywords" content="placas, ecuador, vehiculos, sri, consulta, matricula, deudas, impuestos, propietario">
+    <meta name="author" content="Erick Costa">
+    
+    <!-- PWA y Mobile optimizado -->
+    <meta name="theme-color" content="#0066ff">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <!-- Fonts optimizados -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS COMPLETO optimizado -->
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+        /* ==========================================
+           CSS COMPLETO PARA MOSTRAR TODOS LOS DATOS
+           ========================================== */
+        
+        :root {
+            --primary-bg: #000;
+            --secondary-bg: #001122;
+            --tertiary-bg: #000033;
+            --neon-blue: #00ffff;
+            --electric-blue: #0066ff;
+            --deep-blue: #003366;
+            --glow-blue: rgba(0, 255, 255, 0.5);
+            --glow-electric: rgba(0, 102, 255, 0.5);
+            --success-color: #00ff66;
+            --error-color: #ff6666;
+            --warning-color: #ffaa00;
+            --purple-accent: #9966ff;
+            --green-accent: #66ff99;
+        }
         
         * {
             margin: 0;
@@ -17,83 +48,44 @@
         }
         
         body {
-            font-family: 'Rajdhani', sans-serif;
-            background: #000;
+            font-family: 'Exo 2', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--primary-bg) 0%, var(--secondary-bg) 50%, var(--tertiary-bg) 100%);
             color: #fff;
-            overflow-x: hidden;
             min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
         }
         
-        /* Fondo futurista con partículas */
-        .futuristic-bg {
+        /* Loading inicial optimizado */
+        .loading-initial {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -2;
-            background: 
-                radial-gradient(circle at 20% 20%, rgba(0, 150, 255, 0.3) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(0, 255, 255, 0.2) 0%, transparent 50%),
-                radial-gradient(circle at 40% 60%, rgba(0, 100, 255, 0.1) 0%, transparent 50%),
-                linear-gradient(135deg, #000 0%, #001122 50%, #000033 100%);
+            background: linear-gradient(135deg, #000 0%, #001122 50%, #000033 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
         }
         
-        /* Líneas de circuito futuristas */
-        .circuit-lines {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            opacity: 0.1;
-            background-image: 
-                linear-gradient(90deg, #00ffff 1px, transparent 1px),
-                linear-gradient(0deg, #00ffff 1px, transparent 1px);
-            background-size: 50px 50px;
-            animation: circuitFlow 20s linear infinite;
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(0, 255, 255, 0.3);
+            border-top: 3px solid var(--neon-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
         
-        @keyframes circuitFlow {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(50px, 50px); }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
-        /* Paleta de colores neon */
-        :root {
-            --neon-blue: #00ffff;
-            --neon-blue-dark: #0099cc;
-            --electric-blue: #0066ff;
-            --deep-blue: #003366;
-            --glow-blue: rgba(0, 255, 255, 0.5);
-            --glow-electric: rgba(0, 102, 255, 0.5);
-        }
-        
-        /* Efectos de brillo neon */
-        .neon-glow {
-            box-shadow: 
-                0 0 10px var(--neon-blue),
-                0 0 20px var(--neon-blue),
-                0 0 40px var(--neon-blue);
-        }
-        
-        .neon-text {
-            color: var(--neon-blue);
-            text-shadow: 
-                0 0 10px var(--neon-blue),
-                0 0 20px var(--neon-blue),
-                0 0 40px var(--neon-blue);
-        }
-        
-        .electric-glow {
-            box-shadow: 
-                0 0 10px var(--electric-blue),
-                0 0 20px var(--electric-blue),
-                0 0 40px var(--electric-blue);
-        }
-        
-        /* Contenedor principal */
+        /* Layout principal */
         .app-container {
             min-height: 100vh;
             display: flex;
@@ -118,11 +110,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
         
         .logo {
             font-family: 'Orbitron', monospace;
-            font-size: 2rem;
+            font-size: clamp(1.5rem, 4vw, 2rem);
             font-weight: 900;
             color: var(--neon-blue);
             text-shadow: 0 0 20px var(--glow-blue);
@@ -130,7 +124,7 @@
         }
         
         .subtitle {
-            font-size: 0.9rem;
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
             color: #99ccff;
             margin-top: 0.2rem;
             letter-spacing: 1px;
@@ -144,6 +138,7 @@
             padding: 0.5rem 1rem;
             border-radius: 20px;
             border: 1px solid var(--neon-blue);
+            font-size: 0.9rem;
         }
         
         .status-dot {
@@ -154,9 +149,13 @@
             animation: pulse 2s ease-in-out infinite;
         }
         
+        .status-dot.disconnected {
+            background: var(--error-color);
+        }
+        
         @keyframes pulse {
             0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.2); }
+            50% { opacity: 0.5; transform: scale(0.8); }
         }
         
         /* Main content */
@@ -168,233 +167,41 @@
             width: 100%;
         }
         
-        /* Cards futuristas */
-        .futuristic-card {
-            background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 51, 102, 0.3) 100%);
-            backdrop-filter: blur(20px);
-            border: 2px solid transparent;
-            border-radius: 20px;
-            padding: 2rem;
-            margin: 2rem 0;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .futuristic-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, var(--neon-blue) 0%, var(--electric-blue) 100%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            z-index: -1;
-            border-radius: 18px;
-        }
-        
-        .futuristic-card:hover::before {
-            opacity: 0.1;
-        }
-        
-        .futuristic-card:hover {
-            border-color: var(--neon-blue);
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
-        }
-        
-        /* Indicadores de progreso */
-        .progress-container {
-            text-align: center;
-            padding: 3rem;
-        }
-        
-        .progress-circle {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: conic-gradient(var(--neon-blue) 0deg, var(--electric-blue) 180deg, rgba(0, 0, 0, 0.3) 360deg);
+        /* Progress steps */
+        .progress-steps {
             display: flex;
-            align-items: center;
             justify-content: center;
-            margin: 0 auto 2rem;
-            position: relative;
-            animation: rotate 3s linear infinite;
-        }
-        
-        .progress-circle::before {
-            content: '';
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            background: rgba(0, 0, 0, 0.9);
-            position: absolute;
-        }
-        
-        .progress-text {
-            position: relative;
-            z-index: 1;
-            font-family: 'Orbitron', monospace;
-            font-weight: 700;
-            font-size: 1.2rem;
-            color: var(--neon-blue);
-        }
-        
-        @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* Formularios futuristas */
-        .form-group {
+            align-items: center;
             margin-bottom: 2rem;
-        }
-        
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--neon-blue);
-            font-weight: 600;
-            font-size: 1.1rem;
-            letter-spacing: 1px;
-        }
-        
-        .form-input {
-            width: 100%;
-            padding: 1rem 1.5rem;
-            background: rgba(0, 0, 0, 0.6);
-            border: 2px solid rgba(0, 255, 255, 0.3);
-            border-radius: 10px;
-            color: #fff;
-            font-size: 1.1rem;
-            font-family: 'Rajdhani', sans-serif;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: var(--neon-blue);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
-            background: rgba(0, 51, 102, 0.2);
-        }
-        
-        .form-input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-        
-        .form-input.error {
-            border-color: #ff0066;
-            box-shadow: 0 0 20px rgba(255, 0, 102, 0.4);
-        }
-        
-        .form-input.success {
-            border-color: #00ff66;
-            box-shadow: 0 0 20px rgba(0, 255, 102, 0.4);
-        }
-        
-        /* Botones futuristas */
-        .btn-futuristic {
-            background: linear-gradient(135deg, var(--electric-blue) 0%, var(--neon-blue) 100%);
-            border: none;
-            border-radius: 25px;
-            padding: 1rem 2rem;
-            color: #000;
-            font-family: 'Orbitron', monospace;
-            font-weight: 700;
-            font-size: 1.1rem;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            min-width: 200px;
-        }
-        
-        .btn-futuristic:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0, 255, 255, 0.5);
-        }
-        
-        .btn-futuristic:active {
-            transform: translateY(-1px);
-        }
-        
-        .btn-futuristic:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        .btn-futuristic::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.5s;
-        }
-        
-        .btn-futuristic:hover::before {
-            left: 100%;
-        }
-        
-        .btn-secondary {
-            background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 51, 102, 0.6) 100%);
-            border: 2px solid var(--neon-blue);
-            color: var(--neon-blue);
-        }
-        
-        .btn-secondary:hover {
-            background: linear-gradient(135deg, var(--neon-blue) 0%, var(--electric-blue) 100%);
-            color: #000;
-        }
-        
-        /* Indicadores de pasos */
-        .steps-indicator {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 3rem 0;
             gap: 1rem;
+            flex-wrap: wrap;
         }
         
         .step {
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 255, 255, 0.2);
             border: 2px solid rgba(0, 255, 255, 0.3);
             display: flex;
-            align-items: center;
             justify-content: center;
-            font-family: 'Orbitron', monospace;
-            font-weight: 700;
+            align-items: center;
+            font-size: 1.2rem;
+            color: var(--neon-blue);
+            font-weight: bold;
             transition: all 0.3s ease;
             position: relative;
         }
         
         .step.active {
-            background: linear-gradient(135deg, var(--neon-blue) 0%, var(--electric-blue) 100%);
+            background: linear-gradient(135deg, var(--neon-blue), var(--electric-blue));
             border-color: var(--neon-blue);
             color: #000;
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.6);
-            transform: scale(1.1);
-        }
-        
-        .step.completed {
-            background: linear-gradient(135deg, #00ff66 0%, #00cc55 100%);
-            border-color: #00ff66;
-            color: #000;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
         }
         
         .step-connector {
-            width: 40px;
+            width: 50px;
             height: 2px;
             background: rgba(0, 255, 255, 0.3);
             transition: all 0.3s ease;
@@ -402,1197 +209,1820 @@
         
         .step-connector.active {
             background: var(--neon-blue);
-            box-shadow: 0 0 10px var(--glow-blue);
         }
         
-        /* Resultados vehiculares */
-        .vehicle-results {
-            animation: slideUp 0.5s ease-out;
-        }
-        
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .vehicle-header {
-            background: linear-gradient(135deg, var(--electric-blue) 0%, var(--neon-blue) 100%);
-            color: #000;
+        /* Cards optimizados */
+        .card {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.05) 0%, rgba(0, 102, 255, 0.05) 100%);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 20px;
             padding: 2rem;
-            border-radius: 15px;
             margin-bottom: 2rem;
-            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
         
-        .vehicle-title {
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 255, 255, 0.2);
+            border-color: var(--neon-blue);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+        }
+        
+        .card-title {
             font-family: 'Orbitron', monospace;
-            font-size: 2.5rem;
-            font-weight: 900;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            font-weight: 700;
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--glow-blue);
+        }
+        
+        /* Formularios */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-label {
             margin-bottom: 0.5rem;
+            color: var(--neon-blue);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
         }
         
-        .vehicle-subtitle {
-            font-size: 1.2rem;
-            opacity: 0.8;
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
         }
         
-        .data-grid {
+        .form-input:focus {
+            outline: none;
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.7);
+        }
+        
+        .form-input::placeholder {
+            color: #666;
+        }
+        
+        /* Botones */
+        .btn {
+            background: linear-gradient(135deg, var(--neon-blue), var(--electric-blue));
+            color: #000;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            min-width: 150px;
+            font-family: inherit;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 255, 255, 0.5);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(0, 102, 255, 0.2));
+            color: var(--neon-blue);
+            border: 2px solid var(--neon-blue);
+        }
+        
+        .btn-secondary:hover:not(:disabled) {
+            background: linear-gradient(135deg, var(--neon-blue), var(--electric-blue));
+            color: #000;
+        }
+        
+        /* Progress bar */
+        .progress-container {
+            margin: 2rem 0;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-blue), var(--electric-blue));
+            transition: width 0.3s ease;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+        
+        .progress-text {
+            text-align: center;
+            margin-top: 0.5rem;
+            color: var(--neon-blue);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        /* Messages */
+        .message {
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .message-success {
+            background: rgba(0, 255, 102, 0.1);
+            border: 1px solid var(--success-color);
+            color: var(--success-color);
+        }
+        
+        .message-error {
+            background: rgba(255, 102, 102, 0.1);
+            border: 1px solid var(--error-color);
+            color: var(--error-color);
+        }
+        
+        .message-info {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+        }
+        
+        .message-warning {
+            background: rgba(255, 170, 0, 0.1);
+            border: 1px solid var(--warning-color);
+            color: var(--warning-color);
+        }
+        
+        /* Results grid para TODOS los datos */
+        .results-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 1.5rem;
             margin: 2rem 0;
         }
         
-        .data-card {
-            background: rgba(0, 0, 0, 0.7);
-            border: 1px solid rgba(0, 255, 255, 0.3);
-            border-radius: 15px;
-            padding: 1.5rem;
-            transition: all 0.3s ease;
+        .results-grid-full {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
         }
         
-        .data-card:hover {
-            border-color: var(--neon-blue);
-            box-shadow: 0 5px 20px rgba(0, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
-        
-        .data-card-title {
-            color: var(--neon-blue);
-            font-family: 'Orbitron', monospace;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            font-size: 1.3rem;
-        }
-        
-        .data-row {
+        .result-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.8rem 0;
+            padding: 0.75rem 0;
             border-bottom: 1px solid rgba(0, 255, 255, 0.1);
         }
         
-        .data-row:last-child {
-            border-bottom: none;
-        }
-        
-        .data-label {
+        .result-label {
             color: #99ccff;
             font-weight: 500;
+            font-size: 0.9rem;
         }
         
-        .data-value {
+        .result-value {
             color: #fff;
             font-weight: 600;
             text-align: right;
+            max-width: 60%;
         }
         
-        /* Status badges */
-        .status-badge {
+        /* Propietario card especial */
+        .owner-card {
+            background: linear-gradient(135deg, rgba(153, 102, 255, 0.1), rgba(102, 255, 153, 0.1));
+            border: 2px solid var(--purple-accent);
+            position: relative;
+        }
+        
+        .owner-card::before {
+            content: '👤';
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 2rem;
+            opacity: 0.3;
+        }
+        
+        /* Deudas card especial */
+        .debts-card {
+            background: linear-gradient(135deg, rgba(255, 102, 102, 0.1), rgba(255, 170, 0, 0.1));
+        }
+        
+        /* Pagos card especial */
+        .payments-card {
+            background: linear-gradient(135deg, rgba(0, 255, 102, 0.1), rgba(102, 255, 153, 0.1));
+        }
+        
+        /* Tablas para rubros y componentes */
+        .data-table {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            margin: 1rem 0;
+        }
+        
+        .data-table th {
+            background: linear-gradient(135deg, var(--electric-blue), var(--neon-blue));
+            color: #000;
+            padding: 1rem;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+        
+        .data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+            color: #fff;
+            font-size: 0.9rem;
+        }
+        
+        .data-table tr:hover {
+            background: rgba(0, 255, 255, 0.05);
+        }
+        
+        /* Badges y etiquetas */
+        .badge {
             padding: 0.3rem 0.8rem;
             border-radius: 15px;
-            font-size: 0.9rem;
-            font-weight: 600;
+            font-size: 0.7rem;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            display: inline-block;
+            margin: 0.2rem;
         }
         
-        .status-vigente {
-            background: linear-gradient(135deg, #00ff66, #00cc55);
+        .badge-success {
+            background: linear-gradient(135deg, var(--success-color), #00cc55);
             color: #000;
         }
         
-        .status-vencida {
-            background: linear-gradient(135deg, #ff0066, #cc0055);
+        .badge-error {
+            background: linear-gradient(135deg, var(--error-color), #cc3333);
             color: #fff;
         }
         
-        .status-por-vencer {
-            background: linear-gradient(135deg, #ffaa00, #ff8800);
+        .badge-warning {
+            background: linear-gradient(135deg, var(--warning-color), #cc8800);
             color: #000;
         }
         
-        /* Mensajes de error y éxito */
-        .message {
-            padding: 1rem 1.5rem;
+        .badge-info {
+            background: linear-gradient(135deg, var(--neon-blue), var(--electric-blue));
+            color: #000;
+        }
+        
+        .badge-purple {
+            background: linear-gradient(135deg, var(--purple-accent), #7744cc);
+            color: #fff;
+        }
+        
+        /* Secciones especiales para cada tipo de dato */
+        .section-owner {
+            border-left: 4px solid var(--purple-accent);
+            padding-left: 1rem;
+        }
+        
+        .section-debts {
+            border-left: 4px solid var(--error-color);
+            padding-left: 1rem;
+        }
+        
+        .section-payments {
+            border-left: 4px solid var(--success-color);
+            padding-left: 1rem;
+        }
+        
+        .section-analysis {
+            border-left: 4px solid var(--neon-blue);
+            padding-left: 1rem;
+        }
+        
+        /* Financial summary cards */
+        .financial-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .financial-card {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .financial-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: conic-gradient(from 0deg, transparent, var(--neon-blue), transparent);
+            animation: rotate 4s linear infinite;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .financial-card:hover::before {
+            opacity: 0.1;
+        }
+        
+        .financial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 255, 255, 0.2);
+        }
+        
+        .financial-value {
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            font-family: 'Orbitron', monospace;
+            text-shadow: 0 0 15px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .financial-label {
+            color: #99ccff;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Collapsible sections para organizar datos */
+        .collapsible {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 255, 255, 0.3);
             border-radius: 10px;
             margin: 1rem 0;
-            font-weight: 500;
+            overflow: hidden;
+        }
+        
+        .collapsible-header {
+            padding: 1rem;
+            cursor: pointer;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 0.5rem;
+            background: rgba(0, 255, 255, 0.05);
+            transition: all 0.3s ease;
         }
         
-        .message-error {
-            background: rgba(255, 0, 102, 0.2);
-            border: 1px solid #ff0066;
-            color: #ff99cc;
+        .collapsible-header:hover {
+            background: rgba(0, 255, 255, 0.1);
         }
         
-        .message-success {
-            background: rgba(0, 255, 102, 0.2);
-            border: 1px solid #00ff66;
-            color: #99ffcc;
+        .collapsible-content {
+            padding: 0 1rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
         }
         
-        .message-info {
-            background: rgba(0, 255, 255, 0.2);
-            border: 1px solid var(--neon-blue);
-            color: #99ffff;
+        .collapsible.active .collapsible-content {
+            max-height: 1000px;
+            padding: 1rem;
         }
         
-        /* Responsivo */
+        .collapsible-toggle {
+            transform: rotate(0deg);
+            transition: transform 0.3s ease;
+        }
+        
+        .collapsible.active .collapsible-toggle {
+            transform: rotate(180deg);
+        }
+        
+        /* Responsive optimizations */
         @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 1rem;
+            .header {
+                padding: 1rem;
             }
             
-            .logo {
-                font-size: 1.5rem;
+            .header-content {
+                flex-direction: column;
+                text-align: center;
             }
             
             .main-content {
                 padding: 1rem;
             }
             
-            .futuristic-card {
+            .card {
                 padding: 1.5rem;
-                margin: 1rem 0;
             }
             
-            .data-grid {
+            .form-grid {
                 grid-template-columns: 1fr;
             }
             
-            .steps-indicator {
+            .progress-steps {
                 gap: 0.5rem;
+                justify-content: space-between;
             }
             
             .step {
                 width: 40px;
                 height: 40px;
-                font-size: 0.9rem;
+                font-size: 1rem;
             }
             
             .step-connector {
-                width: 20px;
+                width: 30px;
+            }
+            
+            .btn {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+            
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .financial-summary {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
         
-        /* Efectos de loading */
-        .loading-dots {
-            display: inline-flex;
-            gap: 0.3rem;
-        }
-        
-        .loading-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--neon-blue);
-            animation: loadingDots 1.4s ease-in-out infinite both;
-        }
-        
-        .loading-dot:nth-child(1) { animation-delay: -0.32s; }
-        .loading-dot:nth-child(2) { animation-delay: -0.16s; }
-        .loading-dot:nth-child(3) { animation-delay: 0s; }
-        
-        @keyframes loadingDots {
-            0%, 80%, 100% { 
-                transform: scale(0);
+        @media (max-width: 480px) {
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
             }
-            40% { 
-                transform: scale(1);
+            
+            .financial-summary {
+                grid-template-columns: 1fr;
             }
         }
         
-        /* Efectos de brillo en texto */
-        .glitch-text {
-            color: var(--neon-blue);
-            font-family: 'Orbitron', monospace;
-            animation: glitch 2s ease-in-out infinite alternate;
-        }
+        /* Utilities */
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .text-success { color: var(--success-color); }
+        .text-error { color: var(--error-color); }
+        .text-warning { color: var(--warning-color); }
+        .text-neon { color: var(--neon-blue); }
+        .text-purple { color: var(--purple-accent); }
         
-        @keyframes glitch {
-            0% {
-                text-shadow: 
-                    0.05em 0 0 #00ffff,
-                    -0.05em -0.025em 0 #ff00ff,
-                    0.025em 0.05em 0 #ffff00;
-            }
-            15% {
-                text-shadow: 
-                    0.05em 0 0 #00ffff,
-                    -0.05em -0.025em 0 #ff00ff,
-                    0.025em 0.05em 0 #ffff00;
-            }
-            16% {
-                text-shadow: 
-                    -0.05em -0.025em 0 #00ffff,
-                    0.025em 0.025em 0 #ff00ff,
-                    -0.05em -0.05em 0 #ffff00;
-            }
-            49% {
-                text-shadow: 
-                    -0.05em -0.025em 0 #00ffff,
-                    0.025em 0.025em 0 #ff00ff,
-                    -0.05em -0.05em 0 #ffff00;
-            }
-            50% {
-                text-shadow: 
-                    0.025em 0.05em 0 #00ffff,
-                    0.05em 0 0 #ff00ff,
-                    0 -0.05em 0 #ffff00;
-            }
-            99% {
-                text-shadow: 
-                    0.025em 0.05em 0 #00ffff,
-                    0.05em 0 0 #ff00ff,
-                    0 -0.05em 0 #ffff00;
-            }
-            100% {
-                text-shadow: 
-                    -0.025em 0 0 #00ffff,
-                    -0.025em -0.025em 0 #ff00ff,
-                    -0.025em -0.05em 0 #ffff00;
-            }
-        }
+        .mt-1 { margin-top: 0.5rem; }
+        .mt-2 { margin-top: 1rem; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .mb-2 { margin-bottom: 1rem; }
         
-        /* Checkbox futurista */
-        .checkbox-container {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin: 1.5rem 0;
-        }
+        .flex { display: flex; }
+        .flex-center { display: flex; justify-content: center; align-items: center; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .gap-1 { gap: 0.5rem; }
+        .gap-2 { gap: 1rem; }
         
-        .checkbox-futuristic {
-            position: relative;
-            width: 20px;
-            height: 20px;
-        }
-        
-        .checkbox-futuristic input {
-            opacity: 0;
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-        }
-        
-        .checkbox-mark {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--neon-blue);
-            border-radius: 4px;
-            transition: all 0.3s ease;
-            background: rgba(0, 0, 0, 0.6);
-        }
-        
-        .checkbox-futuristic input:checked + .checkbox-mark {
-            background: linear-gradient(135deg, var(--neon-blue), var(--electric-blue));
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
-        }
-        
-        .checkbox-mark::after {
-            content: '';
-            position: absolute;
-            display: none;
-            left: 6px;
-            top: 2px;
-            width: 5px;
-            height: 10px;
-            border: solid #000;
-            border-width: 0 2px 2px 0;
-            transform: rotate(45deg);
-        }
-        
-        .checkbox-futuristic input:checked + .checkbox-mark::after {
-            display: block;
-        }
-        
-        /* Select futurista */
-        .select-futuristic {
-            width: 100%;
-            padding: 1rem 1.5rem;
-            background: rgba(0, 0, 0, 0.6);
-            border: 2px solid rgba(0, 255, 255, 0.3);
-            border-radius: 10px;
-            color: #fff;
-            font-size: 1.1rem;
-            font-family: 'Rajdhani', sans-serif;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            cursor: pointer;
-        }
-        
-        .select-futuristic:focus {
-            outline: none;
-            border-color: var(--neon-blue);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
-            background: rgba(0, 51, 102, 0.2);
-        }
-        
-        .select-futuristic option {
-            background: #001122;
-            color: #fff;
-            padding: 0.5rem;
+        /* Performance optimizations */
+        .card, .btn, .form-input, .step {
+            will-change: transform;
         }
     </style>
 </head>
 <body>
-    <div class="futuristic-bg"></div>
-    <div class="circuit-lines"></div>
-    <div id="root"></div>
+    <!-- Loading inicial -->
+    <div id="loading-initial" class="loading-initial">
+        <div class="flex-center" style="flex-direction: column; gap: 1rem;">
+            <div class="loading-spinner"></div>
+            <div style="color: var(--neon-blue); font-weight: 600;">
+                Cargando ECPlacas 2.0 SRI COMPLETO...
+            </div>
+        </div>
+    </div>
 
-    <script type="text/babel">
-        const { useState, useEffect, useCallback } = React;
+    <!-- Contenedor principal -->
+    <div id="app" class="app-container hidden">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div>
+                    <div class="logo">ECPlacas 2.0 SRI COMPLETO</div>
+                    <div class="subtitle">Sistema Completo de Consulta Vehicular + Propietario • Erick Costa</div>
+                </div>
+                <div class="status-indicator">
+                    <div id="status-dot" class="status-dot"></div>
+                    <span id="status-text">Conectando...</span>
+                </div>
+            </div>
+        </header>
 
-        // Configuración de la API
-        const API_CONFIG = {
-            baseUrl: 'http://localhost:5000',
-            endpoints: {
-                health: '/api/health',
-                consultar: '/api/consultar-vehiculo',
-                estado: '/api/estado-consulta',
-                resultado: '/api/resultado'
-            }
-        };
+        <!-- Main content -->
+        <main class="main-content">
+            <!-- Progress Steps -->
+            <div class="progress-steps">
+                <div class="step active" data-step="1">👤</div>
+                <div class="step-connector" data-connector="1"></div>
+                <div class="step" data-step="2">🚗</div>
+                <div class="step-connector" data-connector="2"></div>
+                <div class="step" data-step="3">⚡</div>
+                <div class="step-connector" data-connector="3"></div>
+                <div class="step" data-step="4">📊</div>
+            </div>
 
-        // Códigos de países
-        const COUNTRY_CODES = [
-            { code: '+593', country: 'Ecuador', flag: '🇪🇨' },
-            { code: '+57', country: 'Colombia', flag: '🇨🇴' },
-            { code: '+51', country: 'Perú', flag: '🇵🇪' },
-            { code: '+1', country: 'Estados Unidos', flag: '🇺🇸' },
-            { code: '+34', country: 'España', flag: '🇪🇸' }
-        ];
+            <!-- Step 1: Usuario -->
+            <div id="step-1" class="step-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">👤 Información del Usuario</h2>
+                    </div>
+                    <form id="user-form" class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Nombre Completo *</label>
+                            <input type="text" id="nombre" class="form-input" placeholder="Ingrese su nombre completo" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Cédula de Identidad *</label>
+                            <input type="text" id="cedula" class="form-input" placeholder="1234567890" maxlength="10" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Teléfono</label>
+                            <input type="tel" id="telefono" class="form-input" placeholder="0999999999">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Correo Electrónico</label>
+                            <input type="email" id="correo" class="form-input" placeholder="usuario@email.com">
+                        </div>
+                    </form>
+                    <div class="text-center mt-2">
+                        <button type="button" id="btn-continue-user" class="btn">
+                            Continuar →
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-        // Hook para validación de formularios
-        const useFormValidation = (initialState, validationRules) => {
-            const [formData, setFormData] = useState(initialState);
-            const [errors, setErrors] = useState({});
-            const [isValid, setIsValid] = useState(false);
-
-            const validateField = (name, value) => {
-                const rule = validationRules[name];
-                if (!rule) return null;
-
-                if (rule.required && !value.trim()) {
-                    return rule.message || `${name} es requerido`;
-                }
-
-                if (rule.pattern && !rule.pattern.test(value)) {
-                    return rule.message || `Formato de ${name} inválido`;
-                }
-
-                if (rule.minLength && value.length < rule.minLength) {
-                    return `${name} debe tener al menos ${rule.minLength} caracteres`;
-                }
-
-                if (rule.custom) {
-                    return rule.custom(value);
-                }
-
-                return null;
-            };
-
-            const updateField = (name, value) => {
-                setFormData(prev => ({ ...prev, [name]: value }));
-                
-                const error = validateField(name, value);
-                setErrors(prev => ({
-                    ...prev,
-                    [name]: error
-                }));
-            };
-
-            useEffect(() => {
-                const newErrors = {};
-                let hasErrors = false;
-
-                Object.keys(validationRules).forEach(field => {
-                    const error = validateField(field, formData[field] || '');
-                    if (error) {
-                        newErrors[field] = error;
-                        hasErrors = true;
-                    }
-                });
-
-                setErrors(newErrors);
-                setIsValid(!hasErrors && Object.keys(formData).length > 0);
-            }, [formData]);
-
-            return { formData, errors, isValid, updateField, setFormData };
-        };
-
-        // Hook para conexión API
-        const useApiConnection = () => {
-            const [connectionState, setConnectionState] = useState({
-                isConnected: false,
-                isChecking: true,
-                responseTime: null
-            });
-
-            const checkConnection = async () => {
-                try {
-                    const start = performance.now();
-                    const response = await fetch(`${API_CONFIG.baseUrl}${API_CONFIG.endpoints.health}`);
-                    const end = performance.now();
-                    
-                    if (response.ok) {
-                        setConnectionState({
-                            isConnected: true,
-                            isChecking: false,
-                            responseTime: Math.round(end - start)
-                        });
-                    } else {
-                        setConnectionState({
-                            isConnected: false,
-                            isChecking: false,
-                            responseTime: null
-                        });
-                    }
-                } catch (error) {
-                    setConnectionState({
-                        isConnected: false,
-                        isChecking: false,
-                        responseTime: null
-                    });
-                }
-            };
-
-            useEffect(() => {
-                checkConnection();
-                const interval = setInterval(checkConnection, 30000);
-                return () => clearInterval(interval);
-            }, []);
-
-            return { ...connectionState, retry: checkConnection };
-        };
-
-        // Componente de validación de cédula
-        const validateCedula = (cedula) => {
-            if (!cedula || cedula.length !== 10) return 'Cédula debe tener 10 dígitos';
-            
-            const digits = cedula.split('').map(Number);
-            const provinceCode = cedula.substring(0, 2);
-            
-            // Verificar código de provincia válido
-            const validProvinceCodes = [
-                '01', '02', '03', '04', '05', '06', '07', '08', '09', '10',
-                '11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
-                '21', '22', '23', '24', '30'
-            ];
-            
-            if (!validProvinceCodes.includes(provinceCode)) {
-                return 'Código de provincia inválido';
-            }
-            
-            // Tercer dígito debe ser menor a 6
-            if (digits[2] >= 6) return 'Cédula inválida';
-            
-            // Algoritmo de validación
-            const coefficients = [2, 1, 2, 1, 2, 1, 2, 1, 2];
-            let sum = 0;
-            
-            for (let i = 0; i < 9; i++) {
-                let result = digits[i] * coefficients[i];
-                if (result > 9) result -= 9;
-                sum += result;
-            }
-            
-            const checkDigit = (10 - (sum % 10)) % 10;
-            
-            if (checkDigit !== digits[9]) {
-                return 'Cédula ecuatoriana inválida';
-            }
-            
-            return null;
-        };
-
-        // Componente principal
-        const ECPlacasApp = () => {
-            const [currentStep, setCurrentStep] = useState(1);
-            const [isLoading, setIsLoading] = useState(false);
-            const [sessionId, setSessionId] = useState(null);
-            const [vehicleData, setVehicleData] = useState(null);
-            const [progress, setProgress] = useState(0);
-            const [progressMessage, setProgressMessage] = useState('');
-
-            const { isConnected, isChecking, responseTime, retry } = useApiConnection();
-
-            // Validación de formulario de usuario
-            const userValidationRules = {
-                nombre: {
-                    required: true,
-                    minLength: 2,
-                    pattern: /^[a-zA-ZáéíóúñÁÉÍÓÚÑ\s]+$/,
-                    message: 'Solo letras y espacios permitidos'
-                },
-                cedula: {
-                    required: true,
-                    pattern: /^\d{10}$/,
-                    message: 'Debe tener exactamente 10 dígitos',
-                    custom: validateCedula
-                },
-                telefono: {
-                    required: true,
-                    pattern: /^\d{9,10}$/,
-                    message: 'Formato de teléfono inválido'
-                },
-                correo: {
-                    required: true,
-                    pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                    message: 'Formato de correo inválido'
-                }
-            };
-
-            const { formData: userData, errors: userErrors, isValid: isUserValid, updateField: updateUserField, setFormData: setUserData } = useFormValidation({
-                nombre: '',
-                cedula: '',
-                telefono: '',
-                correo: '',
-                country_code: '+593',
-                acepta_terminos: false
-            }, userValidationRules);
-
-            // Estado de placa
-            const [plateData, setPlateData] = useState('');
-            const [plateValidation, setPlateValidation] = useState({
-                isValid: false,
-                error: '',
-                normalized: ''
-            });
-
-            // Validación de placa
-            const validatePlate = (placa) => {
-                const clean = placa.toUpperCase().replace(/[^A-Z0-9]/g, '');
-                const isValid = /^[A-Z]{2,3}[0-9]{3,4}$/.test(clean);
-                
-                let normalized = clean;
-                if (/^[A-Z]{2,3}[0-9]{3}$/.test(clean)) {
-                    const letters = clean.match(/^[A-Z]{2,3}/)[0];
-                    const numbers = clean.match(/[0-9]{3}$/)[0];
-                    normalized = `${letters}0${numbers}`;
-                }
-
-                setPlateValidation({
-                    isValid,
-                    error: isValid ? '' : 'Formato de placa inválido (ej: ABC1234)',
-                    normalized
-                });
-            };
-
-            // Manejar cambios en formulario de usuario
-            const handleUserChange = (e) => {
-                const { name, value, type, checked } = e.target;
-                
-                if (type === 'checkbox') {
-                    setUserData(prev => ({ ...prev, [name]: checked }));
-                } else {
-                    let processedValue = value;
-                    
-                    if (name === 'nombre') {
-                        processedValue = value.replace(/[^a-zA-ZáéíóúñÁÉÍÓÚÑ\s]/g, '').toUpperCase();
-                    } else if (name === 'cedula') {
-                        processedValue = value.replace(/\D/g, '').slice(0, 10);
-                    } else if (name === 'telefono') {
-                        processedValue = value.replace(/\D/g, '').slice(0, 10);
-                    } else if (name === 'correo') {
-                        processedValue = value.toLowerCase();
-                    }
-                    
-                    updateUserField(name, processedValue);
-                }
-            };
-
-            // Manejar cambios en placa
-            const handlePlateChange = (e) => {
-                const value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 7);
-                setPlateData(value);
-                if (value.length >= 6) {
-                    validatePlate(value);
-                } else {
-                    setPlateValidation({ isValid: false, error: '', normalized: '' });
-                }
-            };
-
-            // Navegar pasos
-            const nextStep = () => {
-                if (currentStep === 1 && isUserValid && userData.acepta_terminos) {
-                    setCurrentStep(2);
-                }
-            };
-
-            const prevStep = () => {
-                if (currentStep > 1) {
-                    setCurrentStep(currentStep - 1);
-                }
-            };
-
-            // Simular progreso
-            const simulateProgress = () => {
-                const messages = [
-                    '🔍 Conectando con sistema ANT...',
-                    '📊 Obteniendo datos vehiculares...',
-                    '🔧 Procesando información técnica...',
-                    '⚖️ Analizando estado legal...',
-                    '💎 Calculando estimaciones...',
-                    '✅ Finalizando consulta...'
-                ];
-
-                let currentProgress = 0;
-                let messageIndex = 0;
-
-                const interval = setInterval(() => {
-                    currentProgress += Math.random() * 20 + 10;
-                    
-                    if (currentProgress >= 100) {
-                        currentProgress = 100;
-                        setProgress(currentProgress);
-                        setProgressMessage('✅ Consulta completada exitosamente');
-                        clearInterval(interval);
-                        
-                        // Simular datos de respuesta
-                        setTimeout(() => {
-                            setVehicleData({
-                                numero_placa: plateData,
-                                marca: 'CHEVROLET',
-                                modelo: 'VITARA 3P STD T/M',
-                                anio_fabricacion: 1993,
-                                vin_chasis: '93100350',
-                                numero_motor: 'G16B524515',
-                                pais_fabricacion: 'ECUADOR',
-                                clase_vehiculo: 'VEHICULO UTILITARIO',
-                                tipo_vehiculo: 'JEEP',
-                                color_primario: 'BLANCO',
-                                tipo_carroceria: 'METALICA',
-                                servicio: 'USO PARTICULAR',
-                                matricula_desde: '10-10-2016 16:36:00',
-                                matricula_hasta: '09-10-2025 16:36:00',
-                                estado_matricula: 'VIGENTE',
-                                estimacion_valor: 8500,
-                                recomendacion: '✅ Matrícula vigente | ⭐ Vehículo en buen estado',
-                                ultima_actualizacion: '01-07-2024 09:29:03'
-                            });
-                            setCurrentStep(4);
-                            setIsLoading(false);
-                        }, 1000);
-                        
-                        return;
-                    }
-                    
-                    setProgress(currentProgress);
-                    
-                    if (messageIndex < messages.length - 1) {
-                        messageIndex++;
-                        setProgressMessage(messages[messageIndex]);
-                    }
-                }, 1500);
-            };
-
-            // Consultar vehículo
-            const handleVehicleConsult = async (e) => {
-                e.preventDefault();
-                
-                if (!isConnected) {
-                    alert('Sin conexión con el servidor');
-                    return;
-                }
-                
-                if (!plateValidation.isValid) {
-                    alert('Formato de placa inválido');
-                    return;
-                }
-                
-                setIsLoading(true);
-                setCurrentStep(3);
-                setProgress(0);
-                setProgressMessage('🚀 Iniciando consulta ECPlacas 2.0...');
-                
-                // Simular consulta real
-                simulateProgress();
-            };
-
-            // Reiniciar consulta
-            const handleNewConsult = () => {
-                setCurrentStep(1);
-                setUserData({
-                    nombre: '',
-                    cedula: '',
-                    telefono: '',
-                    correo: '',
-                    country_code: '+593',
-                    acepta_terminos: false
-                });
-                setPlateData('');
-                setPlateValidation({ isValid: false, error: '', normalized: '' });
-                setVehicleData(null);
-                setIsLoading(false);
-                setProgress(0);
-                setProgressMessage('');
-            };
-
-            // Renderizar paso actual
-            const renderCurrentStep = () => {
-                switch (currentStep) {
-                    case 1:
-                        return (
-                            <div className="futuristic-card">
-                                <h2 className="neon-text" style={{ fontSize: '2rem', marginBottom: '2rem', textAlign: 'center', fontFamily: 'Orbitron, monospace' }}>
-                                    Información del Usuario
-                                </h2>
-                                
-                                {/* Indicador de validación */}
-                                {Object.keys(userData).some(key => userData[key] !== '' && userData[key] !== false) && (
-                                    <div className={`message ${isUserValid && userData.acepta_terminos ? 'message-success' : 'message-info'}`}>
-                                        {isUserValid && userData.acepta_terminos ? '✅ Formulario válido - Puede continuar' : '⏳ Complete todos los campos correctamente'}
-                                    </div>
-                                )}
-                                
-                                <div className="form-group">
-                                    <label className="form-label">Nombre Completo *</label>
-                                    <input
-                                        type="text"
-                                        name="nombre"
-                                        value={userData.nombre}
-                                        onChange={handleUserChange}
-                                        className={`form-input ${userErrors.nombre ? 'error' : userData.nombre && !userErrors.nombre ? 'success' : ''}`}
-                                        placeholder="JUAN PÉREZ GARCÍA"
-                                        maxLength="100"
-                                    />
-                                    {userErrors.nombre && (
-                                        <div className="message-error" style={{ padding: '0.5rem', marginTop: '0.5rem' }}>
-                                            ⚠️ {userErrors.nombre}
-                                        </div>
-                                    )}
-                                </div>
-                                
-                                <div className="form-group">
-                                    <label className="form-label">Cédula de Identidad *</label>
-                                    <input
-                                        type="text"
-                                        name="cedula"
-                                        value={userData.cedula}
-                                        onChange={handleUserChange}
-                                        className={`form-input ${userErrors.cedula ? 'error' : userData.cedula && !userErrors.cedula ? 'success' : ''}`}
-                                        placeholder="1234567890"
-                                        maxLength="10"
-                                    />
-                                    {userErrors.cedula && (
-                                        <div className="message-error" style={{ padding: '0.5rem', marginTop: '0.5rem' }}>
-                                            ⚠️ {userErrors.cedula}
-                                        </div>
-                                    )}
-                                </div>
-                                
-                                <div className="form-group">
-                                    <label className="form-label">Teléfono *</label>
-                                    <div style={{ display: 'flex', gap: '1rem' }}>
-                                        <select
-                                            name="country_code"
-                                            value={userData.country_code}
-                                            onChange={handleUserChange}
-                                            className="select-futuristic"
-                                            style={{ flex: '1' }}
-                                        >
-                                            {COUNTRY_CODES.map(country => (
-                                                <option key={country.code} value={country.code}>
-                                                    {country.flag} {country.country}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        <input
-                                            type="tel"
-                                            name="telefono"
-                                            value={userData.telefono}
-                                            onChange={handleUserChange}
-                                            className={`form-input ${userErrors.telefono ? 'error' : userData.telefono && !userErrors.telefono ? 'success' : ''}`}
-                                            placeholder="993747474"
-                                            style={{ flex: '2' }}
-                                        />
-                                    </div>
-                                    {userErrors.telefono && (
-                                        <div className="message-error" style={{ padding: '0.5rem', marginTop: '0.5rem' }}>
-                                            ⚠️ {userErrors.telefono}
-                                        </div>
-                                    )}
-                                </div>
-                                
-                                <div className="form-group">
-                                    <label className="form-label">Correo Electrónico *</label>
-                                    <input
-                                        type="email"
-                                        name="correo"
-                                        value={userData.correo}
-                                        onChange={handleUserChange}
-                                        className={`form-input ${userErrors.correo ? 'error' : userData.correo && !userErrors.correo ? 'success' : ''}`}
-                                        placeholder="correo@ejemplo.com"
-                                    />
-                                    {userErrors.correo && (
-                                        <div className="message-error" style={{ padding: '0.5rem', marginTop: '0.5rem' }}>
-                                            ⚠️ {userErrors.correo}
-                                        </div>
-                                    )}
-                                </div>
-                                
-                                <div className="checkbox-container">
-                                    <div className="checkbox-futuristic">
-                                        <input
-                                            type="checkbox"
-                                            name="acepta_terminos"
-                                            checked={userData.acepta_terminos}
-                                            onChange={handleUserChange}
-                                        />
-                                        <div className="checkbox-mark"></div>
-                                    </div>
-                                    <label style={{ color: '#99ccff', fontSize: '1rem' }}>
-                                        Acepto los términos y condiciones de uso del sistema ECPlacas 2.0
-                                    </label>
-                                </div>
-                                
-                                <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-                                    <button
-                                        onClick={nextStep}
-                                        disabled={!isUserValid || !userData.acepta_terminos}
-                                        className="btn-futuristic"
-                                    >
-                                        {isUserValid && userData.acepta_terminos ? 'CONTINUAR ▶' : 'COMPLETE EL FORMULARIO'}
-                                    </button>
-                                </div>
-                            </div>
-                        );
-                    
-                    case 2:
-                        return (
-                            <div className="futuristic-card" style={{ maxWidth: '600px', margin: '0 auto' }}>
-                                <h2 className="neon-text" style={{ fontSize: '2rem', marginBottom: '2rem', textAlign: 'center', fontFamily: 'Orbitron, monospace' }}>
-                                    Consulta de Placa
-                                </h2>
-                                
-                                <form onSubmit={handleVehicleConsult}>
-                                    <div className="form-group">
-                                        <label className="form-label">Número de Placa *</label>
-                                        <input
-                                            type="text"
-                                            value={plateData}
-                                            onChange={handlePlateChange}
-                                            className={`form-input ${plateValidation.error ? 'error' : plateValidation.isValid ? 'success' : ''}`}
-                                            placeholder="ABC1234"
-                                            style={{ textAlign: 'center', fontSize: '1.5rem', fontWeight: 'bold', letterSpacing: '2px' }}
-                                            maxLength="7"
-                                        />
-                                        
-                                        {plateValidation.normalized && plateValidation.normalized !== plateData && (
-                                            <div className="message-info" style={{ padding: '0.5rem', marginTop: '0.5rem' }}>
-                                                🔧 Placa normalizada: {plateData} → {plateValidation.normalized}
-                                            </div>
-                                        )}
-                                        
-                                        {plateValidation.error && (
-                                            <div className="message-error" style={{ padding: '0.5rem', marginTop: '0.5rem' }}>
-                                                ⚠️ {plateValidation.error}
-                                            </div>
-                                        )}
-                                        
-                                        {plateValidation.isValid && (
-                                            <div className="message-success" style={{ padding: '0.5rem', marginTop: '0.5rem' }}>
-                                                ✅ Formato de placa válido
-                                            </div>
-                                        )}
-                                    </div>
-                                    
-                                    <div className="message-info" style={{ margin: '1.5rem 0' }}>
-                                        <strong>💡 Formatos válidos:</strong><br/>
-                                        • ABC1234 (formato estándar)<br/>
-                                        • ABC123 (se normaliza automáticamente a ABC0123)<br/>
-                                        • PBA567 → PBA0567
-                                    </div>
-                                    
-                                    <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
-                                        <button
-                                            type="button"
-                                            onClick={prevStep}
-                                            className="btn-futuristic btn-secondary"
-                                            style={{ flex: '1' }}
-                                        >
-                                            ◀ ATRÁS
-                                        </button>
-                                        <button
-                                            type="submit"
-                                            disabled={!plateValidation.isValid || !isConnected}
-                                            className="btn-futuristic"
-                                            style={{ flex: '2' }}
-                                        >
-                                            {!isConnected ? '❌ SIN CONEXIÓN' : 
-                                             !plateValidation.isValid ? '⏳ PLACA INVÁLIDA' :
-                                             '🚀 CONSULTAR VEHÍCULO'}
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        );
-                    
-                    case 3:
-                        return (
-                            <div className="progress-container">
-                                <div className="progress-circle">
-                                    <div className="progress-text">{Math.round(progress)}%</div>
-                                </div>
-                                
-                                <h2 className="neon-text" style={{ fontSize: '2rem', marginBottom: '1rem', fontFamily: 'Orbitron, monospace' }}>
-                                    PROCESANDO CONSULTA
-                                </h2>
-                                
-                                <div className="message-info" style={{ marginBottom: '2rem', textAlign: 'center' }}>
-                                    <strong>Placa consultada: {plateData}</strong>
-                                </div>
-                                
-                                <p style={{ fontSize: '1.2rem', marginBottom: '2rem', textAlign: 'center' }}>{progressMessage}</p>
-                                
-                                <div className="futuristic-card" style={{ textAlign: 'center' }}>
-                                    <h3 className="neon-text" style={{ marginBottom: '1rem' }}>Sistema ECPlacas 2.0</h3>
-                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', textAlign: 'center' }}>
-                                        <div>
-                                            <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🏛️</div>
-                                            <div>Datos ANT</div>
-                                            <div style={{ fontSize: '0.9rem', color: '#99ccff' }}>Información oficial</div>
-                                        </div>
-                                        <div>
-                                            <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🔧</div>
-                                            <div>Análisis Técnico</div>
-                                            <div style={{ fontSize: '0.9rem', color: '#99ccff' }}>Estado del vehículo</div>
-                                        </div>
-                                        <div>
-                                            <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>💎</div>
-                                            <div>Estimación</div>
-                                            <div style={{ fontSize: '0.9rem', color: '#99ccff' }}>Valor de mercado</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    
-                    case 4:
-                        if (!vehicleData) return null;
-                        
-                        return (
-                            <div className="vehicle-results">
-                                <div className="vehicle-header">
-                                    <div className="vehicle-title">{vehicleData.numero_placa}</div>
-                                    <div className="vehicle-subtitle">
-                                        {vehicleData.marca} {vehicleData.modelo} • {vehicleData.anio_fabricacion}
-                                    </div>
-                                </div>
-                                
-                                <div className="data-grid">
-                                    <div className="data-card">
-                                        <div className="data-card-title">🔑 Identificación</div>
-                                        <div className="data-row">
-                                            <span className="data-label">VIN/Chasis:</span>
-                                            <span className="data-value">{vehicleData.vin_chasis}</span>
-                                        </div>
-                                        <div className="data-row">
-                                            <span className="data-label">Motor:</span>
-                                            <span className="data-value">{vehicleData.numero_motor}</span>
-                                        </div>
-                                        <div className="data-row">
-                                            <span className="data-label">Marca:</span>
-                                            <span className="data-value">{vehicleData.marca}</span>
-                                        </div>
-                                        <div className="data-row">
-                                            <span className="data-label">Modelo:</span>
-                                            <span className="data-value">{vehicleData.modelo}</span>
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="data-card">
-                                        <div className="data-card-title">📋 Características</div>
-                                        <div className="data-row">
-                                            <span className="data-label">Año:</span>
-                                            <span className="data-value">{vehicleData.anio_fabricacion}</span>
-                                        </div>
-                                        <div className="data-row">
-                                            <span className="data-label">País:</span>
-                                            <span className="data-value">{vehicleData.pais_fabricacion}</span>
-                                        </div>
-                                        <div className="data-row">
-                                            <span className="data-label">Clase:</span>
-                                            <span className="data-value">{vehicleData.clase_vehiculo}</span>
-                                        </div>
-                                        <div className="data-row">
-                                            <span className="data-label">Color:</span>
-                                            <span className="data-value">{vehicleData.color_primario}</span>
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="data-card">
-                                        <div className="data-card-title">📅 Matrícula</div>
-                                        <div className="data-row">
-                                            <span className="data-label">Estado:</span>
-                                            <span className="data-value">
-                                                <span className={`status-badge status-${vehicleData.estado_matricula.toLowerCase()}`}>
-                                                    {vehicleData.estado_matricula}
-                                                </span>
-                                            </span>
-                                        </div>
-                                        <div className="data-row">
-                                            <span className="data-label">Desde:</span>
-                                            <span className="data-value">{vehicleData.matricula_desde?.split(' ')[0]}</span>
-                                        </div>
-                                        <div className="data-row">
-                                            <span className="data-label">Hasta:</span>
-                                            <span className="data-value">{vehicleData.matricula_hasta?.split(' ')[0]}</span>
-                                        </div>
-                                        <div className="data-row">
-                                            <span className="data-label">Servicio:</span>
-                                            <span className="data-value">{vehicleData.servicio}</span>
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="data-card">
-                                        <div className="data-card-title">💰 Estimación</div>
-                                        <div className="data-row">
-                                            <span className="data-label">Valor estimado:</span>
-                                            <span className="data-value" style={{ color: 'var(--neon-blue)', fontWeight: 'bold' }}>
-                                                ${vehicleData.estimacion_valor?.toLocaleString()} USD
-                                            </span>
-                                        </div>
-                                        <div className="data-row">
-                                            <span className="data-label">Última actualización:</span>
-                                            <span className="data-value">{vehicleData.ultima_actualizacion?.split(' ')[0]}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div className="futuristic-card">
-                                    <div className="data-card-title">🎯 Recomendaciones</div>
-                                    <p style={{ fontSize: '1.1rem', lineHeight: '1.6', color: '#99ffcc' }}>
-                                        {vehicleData.recomendacion}
-                                    </p>
-                                </div>
-                                
-                                <div style={{ textAlign: 'center', marginTop: '3rem' }}>
-                                    <button
-                                        onClick={handleNewConsult}
-                                        className="btn-futuristic"
-                                        style={{ marginRight: '1rem' }}
-                                    >
-                                        🔄 NUEVA CONSULTA
-                                    </button>
-                                    <button
-                                        onClick={() => alert('Funcionalidad próximamente')}
-                                        className="btn-futuristic btn-secondary"
-                                    >
-                                        📄 GENERAR REPORTE
-                                    </button>
-                                </div>
-                            </div>
-                        );
-                    
-                    default:
-                        return null;
-                }
-            };
-
-            if (isChecking) {
-                return (
-                    <div className="app-container">
-                        <div className="progress-container">
-                            <div className="progress-circle">
-                                <div className="progress-text">
-                                    <div className="loading-dots">
-                                        <div className="loading-dot"></div>
-                                        <div className="loading-dot"></div>
-                                        <div className="loading-dot"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <h2 className="neon-text" style={{ fontFamily: 'Orbitron, monospace' }}>
-                                Conectando con ECPlacas 2.0
-                            </h2>
+            <!-- Step 2: Vehículo -->
+            <div id="step-2" class="step-content hidden">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">🚗 Información del Vehículo</h2>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Número de Placa *</label>
+                        <input type="text" id="placa" class="form-input" placeholder="ABC1234" 
+                               style="fontSize: 1.5rem; textAlign: center; letterSpacing: 3px; textTransform: uppercase;">
+                        <div class="mt-1" style="fontSize: 0.9rem; color: #99ccff; textAlign: center;">
+                            Ejemplos válidos: ABC1234, XYZ0123, PSX160
                         </div>
                     </div>
-                );
-            }
-
-            return (
-                <div className="app-container">
-                    {/* Header */}
-                    <header className="header">
-                        <div className="header-content">
-                            <div>
-                                <div className="logo glitch-text">ECPlacas 2.0</div>
-                                <div className="subtitle">Sistema de Consulta Vehicular • Erick Costa</div>
-                            </div>
-                            <div className="status-indicator">
-                                <div className="status-dot"></div>
-                                <span>{isConnected ? 'Conectado' : 'Desconectado'}</span>
-                                {responseTime && <span>({responseTime}ms)</span>}
-                            </div>
-                        </div>
-                    </header>
-
-                    {/* Contenido principal */}
-                    <main className="main-content">
-                        {/* Indicador de pasos */}
-                        <div className="steps-indicator">
-                            {[1, 2, 3, 4].map(step => (
-                                <React.Fragment key={step}>
-                                    <div className={`step ${currentStep >= step ? 'active' : ''} ${currentStep > step ? 'completed' : ''}`}>
-                                        {step === 1 && '👤'}
-                                        {step === 2 && '🚗'}
-                                        {step === 3 && '⚡'}
-                                        {step === 4 && '📊'}
-                                    </div>
-                                    {step < 4 && (
-                                        <div className={`step-connector ${currentStep > step ? 'active' : ''}`}></div>
-                                    )}
-                                </React.Fragment>
-                            ))}
-                        </div>
-
-                        {/* Contenido del paso actual */}
-                        {renderCurrentStep()}
-
-                        {/* Mensaje de sin conexión */}
-                        {!isConnected && currentStep !== 3 && (
-                            <div className="message-error" style={{ margin: '2rem 0', textAlign: 'center' }}>
-                                ⚠️ Sin conexión con el servidor ECPlacas 2.0
-                                <button 
-                                    onClick={retry}
-                                    className="btn-futuristic btn-secondary"
-                                    style={{ marginLeft: '1rem', minWidth: 'auto', padding: '0.5rem 1rem' }}
-                                >
-                                    🔄 Reintentar
-                                </button>
-                            </div>
-                        )}
-                    </main>
-
-                    {/* Footer */}
-                    <footer style={{ textAlign: 'center', padding: '2rem', color: '#666', borderTop: '1px solid rgba(0, 255, 255, 0.1)' }}>
-                        <p>ECPlacas 2.0 • Desarrollado por <span className="neon-text">Erick Costa</span></p>
-                        <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>Proyecto: Construcción de Software • Temática Futurista</p>
-                    </footer>
+                    <div class="flex-center gap-2 mt-2">
+                        <button type="button" id="btn-back-vehicle" class="btn btn-secondary">
+                            ← Atrás
+                        </button>
+                        <button type="button" id="btn-consult" class="btn">
+                            🔍 Consultar SRI COMPLETO
+                        </button>
+                    </div>
                 </div>
-            );
-        };
+            </div>
 
-        // Renderizar aplicación
-        ReactDOM.render(<ECPlacasApp />, document.getElementById('root'));
+            <!-- Step 3: Consultando -->
+            <div id="step-3" class="step-content hidden">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">⚡ Consultando APIs del SRI COMPLETO</h2>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <div id="progress-text" class="progress-text">
+                            Iniciando consulta...
+                        </div>
+                    </div>
+                    <div class="text-center mt-2" style="color: #99ccff;">
+                        <p><strong>Consultando información COMPLETA del SRI + Propietario...</strong></p>
+                        <div class="mt-1" style="fontSize: 0.9rem; lineHeight: 1.8;">
+                            👤 • Propietario del vehículo<br>
+                            🚗 • Datos básicos del vehículo<br>
+                            💰 • Rubros de deuda por beneficiario<br>
+                            🔍 • Componentes fiscales detallados<br>
+                            📊 • Historial completo de pagos<br>
+                            🌱 • Plan IACV (Impuesto Ambiental)<br>
+                            📈 • Análisis consolidado SRI
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Resultados COMPLETOS -->
+            <div id="step-4" class="step-content hidden">
+                <div id="results-container"></div>
+            </div>
+
+            <!-- Messages container -->
+            <div id="messages-container"></div>
+        </main>
+
+        <!-- Footer -->
+        <footer style="textAlign: center; padding: 2rem; color: #666; borderTop: 1px solid rgba(0, 255, 255, 0.1);">
+            <p>ECPlacas 2.0 SRI COMPLETO + PROPIETARIO • Desarrollado por <span class="text-neon">Erick Costa</span></p>
+            <p style="fontSize: 0.9rem; marginTop: 0.5rem;">
+                Proyecto: Construcción de Software • Temática: Futurista
+            </p>
+            <p style="fontSize: 0.8rem; marginTop: 0.5rem; color: #99ccff;">
+                Sistema COMPLETO con: Propietario • Rubros SRI • Componentes fiscales • Historial pagos • Plan IACV • Análisis consolidado
+            </p>
+        </footer>
+    </div>
+
+    <!-- JavaScript COMPLETO optimizado -->
+    <script>
+        // ==========================================
+        // ECPLACAS 2.0 SRI COMPLETO - JAVASCRIPT
+        // ==========================================
+        
+        class ECPlacasCompletaApp {
+            constructor() {
+                this.currentStep = 1;
+                this.isLoading = false;
+                this.isConnected = false;
+                this.sessionId = null;
+                this.userData = {};
+                this.vehicleData = null;
+                this.completeSummary = null;
+                
+                // API Configuration
+                this.API_CONFIG = {
+                    baseUrl: window.location.origin,
+                    endpoints: {
+                        health: '/api/health',
+                        consultar: '/api/consultar-vehiculo',
+                        estado: '/api/estado-consulta',
+                        resultado: '/api/resultado'
+                    },
+                    timeout: 180000,
+                    pollInterval: 2000
+                };
+                
+                this.init();
+            }
+            
+            init() {
+                this.setupEventListeners();
+                this.checkBackendConnection();
+                this.hideLoading();
+                
+                // Auto-verificar conexión cada 30 segundos
+                setInterval(() => this.checkBackendConnection(), 30000);
+            }
+            
+            setupEventListeners() {
+                document.addEventListener('click', this.handleClick.bind(this));
+                document.addEventListener('input', this.handleInput.bind(this));
+                document.addEventListener('keydown', this.handleKeydown.bind(this));
+            }
+            
+            handleClick(e) {
+                const target = e.target;
+                
+                if (target.id === 'btn-continue-user') {
+                    this.validateAndContinueUser();
+                } else if (target.id === 'btn-back-vehicle') {
+                    this.goToStep(1);
+                } else if (target.id === 'btn-consult') {
+                    this.startCompleteConsultation();
+                } else if (target.classList.contains('btn-new-query')) {
+                    this.resetApp();
+                } else if (target.classList.contains('btn-download')) {
+                    this.downloadCompleteData();
+                } else if (target.classList.contains('collapsible-header')) {
+                    this.toggleCollapsible(target.parentElement);
+                }
+            }
+            
+            handleInput(e) {
+                const target = e.target;
+                
+                if (target.id === 'cedula') {
+                    target.value = target.value.replace(/\D/g, '').slice(0, 10);
+                }
+                
+                if (target.id === 'placa') {
+                    target.value = target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                }
+                
+                if (target.id === 'telefono') {
+                    target.value = target.value.replace(/\D/g, '').slice(0, 10);
+                }
+            }
+            
+            handleKeydown(e) {
+                if (e.key === 'Enter') {
+                    if (this.currentStep === 1) {
+                        this.validateAndContinueUser();
+                    } else if (this.currentStep === 2) {
+                        this.startCompleteConsultation();
+                    }
+                }
+            }
+            
+            hideLoading() {
+                setTimeout(() => {
+                    const loading = document.getElementById('loading-initial');
+                    const app = document.getElementById('app');
+                    
+                    loading.style.opacity = '0';
+                    setTimeout(() => {
+                        loading.style.display = 'none';
+                        app.classList.remove('hidden');
+                    }, 500);
+                }, 1000);
+            }
+            
+            async checkBackendConnection() {
+                try {
+                    const response = await this.fetchWithTimeout(this.API_CONFIG.endpoints.health, {
+                        timeout: 5000
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        this.updateConnectionStatus(true, data);
+                    } else {
+                        this.updateConnectionStatus(false);
+                    }
+                } catch (error) {
+                    console.error('❌ Error conectando con backend:', error);
+                    this.updateConnectionStatus(false);
+                }
+            }
+            
+            updateConnectionStatus(connected, data = null) {
+                this.isConnected = connected;
+                const statusDot = document.getElementById('status-dot');
+                const statusText = document.getElementById('status-text');
+                
+                if (connected) {
+                    statusDot.classList.remove('disconnected');
+                    statusText.textContent = 'Sistema SRI COMPLETO Conectado';
+                    if (data && data.features_completas) {
+                        const features = Object.keys(data.features_completas).filter(k => data.features_completas[k]).length;
+                        statusText.textContent = `Sistema COMPLETO Conectado • ${features} características`;
+                    }
+                } else {
+                    statusDot.classList.add('disconnected');
+                    statusText.textContent = 'Sin Conexión';
+                }
+            }
+            
+            validateAndContinueUser() {
+                const nombre = document.getElementById('nombre').value.trim();
+                const cedula = document.getElementById('cedula').value.trim();
+                
+                if (!nombre || !cedula) {
+                    this.showMessage('error', '⚠️ Por favor complete todos los campos requeridos');
+                    return;
+                }
+                
+                if (!this.validateEcuadorianID(cedula)) {
+                    this.showMessage('error', '❌ Cédula ecuatoriana inválida');
+                    return;
+                }
+                
+                this.userData = {
+                    nombre: nombre,
+                    cedula: cedula,
+                    telefono: document.getElementById('telefono').value.trim(),
+                    correo: document.getElementById('correo').value.trim(),
+                    acepta_terminos: true
+                };
+                
+                this.goToStep(2);
+            }
+            
+            validateEcuadorianID(cedula) {
+                if (!cedula || cedula.length !== 10 || !/^\d{10}$/.test(cedula)) {
+                    return false;
+                }
+                
+                const provinceCodes = [
+                    '01', '02', '03', '04', '05', '06', '07', '08', '09', '10',
+                    '11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
+                    '21', '22', '23', '24', '30'
+                ];
+                
+                const provinceCode = cedula.substring(0, 2);
+                if (!provinceCodes.includes(provinceCode)) return false;
+                
+                const thirdDigit = parseInt(cedula.charAt(2));
+                if (thirdDigit >= 6) return false;
+                
+                const digits = cedula.split('').map(Number);
+                const coefficients = [2, 1, 2, 1, 2, 1, 2, 1, 2];
+                let total = 0;
+                
+                for (let i = 0; i < 9; i++) {
+                    let result = digits[i] * coefficients[i];
+                    if (result > 9) result -= 9;
+                    total += result;
+                }
+                
+                const checkDigit = (10 - (total % 10)) % 10;
+                return checkDigit === digits[9];
+            }
+            
+            goToStep(step) {
+                document.querySelectorAll('.step-content').forEach(content => {
+                    content.classList.add('hidden');
+                });
+                
+                document.getElementById(`step-${step}`).classList.remove('hidden');
+                this.updateProgressSteps(step);
+                this.currentStep = step;
+            }
+            
+            updateProgressSteps(activeStep) {
+                document.querySelectorAll('.step').forEach((step, index) => {
+                    const stepNumber = index + 1;
+                    if (stepNumber <= activeStep) {
+                        step.classList.add('active');
+                    } else {
+                        step.classList.remove('active');
+                    }
+                });
+                
+                document.querySelectorAll('.step-connector').forEach((connector, index) => {
+                    const connectorNumber = index + 1;
+                    if (connectorNumber < activeStep) {
+                        connector.classList.add('active');
+                    } else {
+                        connector.classList.remove('active');
+                    }
+                });
+            }
+            
+            async startCompleteConsultation() {
+                const placa = document.getElementById('placa').value.trim().toUpperCase();
+                
+                if (!placa) {
+                    this.showMessage('error', '⚠️ Por favor ingrese el número de placa');
+                    return;
+                }
+                
+                if (!this.validatePlateFormat(placa)) {
+                    this.showMessage('error', '❌ Formato de placa inválido (ej: ABC1234)');
+                    return;
+                }
+                
+                if (!this.isConnected) {
+                    this.showMessage('error', '❌ Sin conexión con el servidor. Verifique su conexión.');
+                    return;
+                }
+                
+                this.isLoading = true;
+                this.goToStep(3);
+                
+                try {
+                    const consultResponse = await this.fetchWithTimeout('/api/consultar-vehiculo', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            placa: placa,
+                            usuario: this.userData
+                        })
+                    });
+                    
+                    const consultData = await consultResponse.json();
+                    
+                    if (!consultData.success) {
+                        throw new Error(consultData.error || 'Error en la consulta');
+                    }
+                    
+                    this.sessionId = consultData.session_id;
+                    
+                    if (consultData.placa_fue_normalizada) {
+                        this.showMessage('info', `🔧 Placa normalizada: ${placa} → ${consultData.placa_normalizada}`);
+                    }
+                    
+                    this.pollConsultationStatus();
+                    
+                } catch (error) {
+                    console.error('Error en consulta:', error);
+                    this.isLoading = false;
+                    this.goToStep(2);
+                    this.updateProgress(0, '');
+                    this.showMessage('error', `❌ Error: ${error.message}`);
+                }
+            }
+            
+            validatePlateFormat(placa) {
+                if (!placa || placa.length < 6 || placa.length > 8) {
+                    return false;
+                }
+                
+                const patterns = [
+                    /^[A-Z]{2,3}\d{3,4}$/,
+                    /^[A-Z]{2,3}-\d{3,4}$/
+                ];
+                
+                return patterns.some(pattern => pattern.test(placa));
+            }
+            
+            async pollConsultationStatus() {
+                if (!this.sessionId) return;
+                
+                const pollInterval = setInterval(async () => {
+                    try {
+                        const statusResponse = await this.fetchWithTimeout(`/api/estado-consulta/${this.sessionId}`);
+                        const statusData = await statusResponse.json();
+                        
+                        if (statusData.success) {
+                            this.updateProgress(statusData.progress || 0, statusData.message || 'Procesando...');
+                            
+                            if (statusData.status === 'completado') {
+                                clearInterval(pollInterval);
+                                await this.getCompleteConsultationResult();
+                            } else if (statusData.status === 'error') {
+                                clearInterval(pollInterval);
+                                throw new Error(statusData.error || 'Error en la consulta SRI');
+                            }
+                        }
+                    } catch (pollError) {
+                        console.error('Error en polling:', pollError);
+                        clearInterval(pollInterval);
+                        this.isLoading = false;
+                        this.goToStep(2);
+                        this.showMessage('error', `❌ Error: ${pollError.message}`);
+                    }
+                }, this.API_CONFIG.pollInterval);
+                
+                setTimeout(() => {
+                    clearInterval(pollInterval);
+                    if (this.isLoading) {
+                        this.isLoading = false;
+                        this.showMessage('error', '⏰ Timeout: La consulta está tomando más tiempo del esperado');
+                    }
+                }, this.API_CONFIG.timeout);
+            }
+            
+            async getCompleteConsultationResult() {
+                try {
+                    const resultResponse = await this.fetchWithTimeout(`/api/resultado/${this.sessionId}`);
+                    const resultData = await resultResponse.json();
+                    
+                    if (resultData.success && resultData.vehicle_data) {
+                        this.vehicleData = resultData.vehicle_data;
+                        this.completeSummary = resultData.complete_summary;
+                        
+                        this.displayCompleteResults(resultData.vehicle_data, resultData.complete_summary, resultData.features_extraidas);
+                        this.goToStep(4);
+                        this.isLoading = false;
+                        this.updateProgress(100, '✅ Consulta SRI COMPLETA + Propietario exitosa');
+                        
+                        const features = resultData.features_extraidas || {};
+                        const stats = `✅ Consulta COMPLETA exitosa: Propietario ${features.propietario_encontrado ? 'encontrado' : 'no encontrado'}, ${features.rubros_deuda || 0} rubros, ${features.componentes_analizados || 0} componentes, $${features.total_deudas_sri || 0} deudas`;
+                        this.showMessage('success', stats);
+                    } else {
+                        throw new Error('No se pudieron obtener los datos completos del vehículo');
+                    }
+                } catch (error) {
+                    console.error('Error obteniendo resultado:', error);
+                    this.isLoading = false;
+                    this.goToStep(2);
+                    this.showMessage('error', `❌ Error: ${error.message}`);
+                }
+            }
+            
+            updateProgress(progress, message) {
+                const progressFill = document.getElementById('progress-fill');
+                const progressText = document.getElementById('progress-text');
+                
+                if (progressFill) progressFill.style.width = `${progress}%`;
+                if (progressText) progressText.textContent = `${progress}% - ${message}`;
+            }
+            
+            displayCompleteResults(vehicleData, completeSummary, featuresExtracted) {
+                const container = document.getElementById('results-container');
+                
+                // Extraer datos organizados
+                const propietario = completeSummary?.propietario || {};
+                const vehiculoBasico = completeSummary?.vehiculo_basico || {};
+                const deudas = completeSummary?.deudas_sri_completas || {};
+                const pagos = completeSummary?.pagos_sri_completos || {};
+                const iacv = completeSummary?.iacv_completo || {};
+                const estados = completeSummary?.estados_legales || {};
+                const analisis = completeSummary?.analisis_completo || {};
+                
+                container.innerHTML = `
+                    <!-- Propietario del Vehículo -->
+                    ${propietario.encontrado ? `
+                        <div class="card owner-card">
+                            <div class="card-header">
+                                <h2 class="card-title">👤 Propietario del Vehículo</h2>
+                                <span class="badge badge-success">ENCONTRADO</span>
+                            </div>
+                            <div class="section-owner">
+                                <div class="results-grid">
+                                    <div class="result-item">
+                                        <span class="result-label">Nombre Completo:</span>
+                                        <span class="result-value text-purple" style="fontSize: 1.1rem; fontWeight: bold;">
+                                            ${propietario.nombre || 'No disponible'}
+                                        </span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">Cédula:</span>
+                                        <span class="result-value text-neon">
+                                            ${propietario.cedula || 'No disponible'}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ` : `
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">👤 Propietario del Vehículo</h2>
+                                <span class="badge badge-warning">NO ENCONTRADO</span>
+                            </div>
+                            <div class="message message-warning" style="margin: 0;">
+                                ℹ️ No se pudo obtener información del propietario para esta placa
+                            </div>
+                        </div>
+                    `}
+
+                    <!-- Información Básica del Vehículo -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">🚗 Información Básica del Vehículo</h2>
+                            <div class="flex gap-1" style="flexWrap: wrap;">
+                                <span class="badge badge-${this.getBadgeClass(analisis.estado_legal)}">
+                                    ${analisis.estado_legal || 'PENDIENTE'}
+                                </span>
+                                <span class="badge badge-${this.getRiskClass(analisis.riesgo_tributario)}">
+                                    Riesgo: ${analisis.riesgo_tributario || 'INDETERMINADO'}
+                                </span>
+                                <span class="badge" style="background: ${this.getScoreColor(analisis.puntuacion_sri)};">
+                                    SRI: ${analisis.puntuacion_sri || 0}/100
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="results-grid">
+                            <div>
+                                <h3 class="text-neon mb-1">📋 Identificación</h3>
+                                <div class="result-item">
+                                    <span class="result-label">Placa:</span>
+                                    <span class="result-value text-neon" style="fontSize: 1.2rem; fontWeight: bold;">
+                                        ${vehiculoBasico.placa || vehicleData.numero_placa}
+                                    </span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Código Vehículo:</span>
+                                    <span class="result-value">${vehicleData.codigo_vehiculo || 'N/A'}</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">CAMV/CPN:</span>
+                                    <span class="result-value">${vehicleData.numero_camv_cpn || 'N/A'}</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">VIN/Chasis:</span>
+                                    <span class="result-value">${vehicleData.vin_chasis || 'N/A'}</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Número Motor:</span>
+                                    <span class="result-value">${vehicleData.numero_motor || 'N/A'}</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-neon mb-1">🏭 Modelo y Características</h3>
+                                <div class="result-item">
+                                    <span class="result-label">Marca/Modelo:</span>
+                                    <span class="result-value" style="fontWeight: bold;">
+                                        ${vehiculoBasico.marca} ${vehiculoBasico.modelo}
+                                    </span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Año:</span>
+                                    <span class="result-value">${vehiculoBasico.anio || 'N/A'}</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">País Fabricación:</span>
+                                    <span class="result-value">${vehiculoBasico.pais || 'N/A'}</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Clase:</span>
+                                    <span class="result-value">${vehiculoBasico.clase || 'N/A'}</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Cilindraje:</span>
+                                    <span class="result-value">${vehiculoBasico.cilindraje || 'N/A'}</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-neon mb-1">🎨 Colores y Ubicación</h3>
+                                <div class="result-item">
+                                    <span class="result-label">Color Primario:</span>
+                                    <span class="result-value">${vehiculoBasico.color_primario || 'N/A'}</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Color Secundario:</span>
+                                    <span class="result-value">${vehiculoBasico.color_secundario || 'N/A'}</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Cantón:</span>
+                                    <span class="result-value">${estados.ubicacion?.canton || 'N/A'}</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Servicio:</span>
+                                    <span class="result-value">${estados.ubicacion?.servicio || 'N/A'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resumen Financiero SRI -->
+                    <div class="card debts-card">
+                        <div class="card-header">
+                            <h3 class="card-title">💰 Resumen Financiero SRI COMPLETO</h3>
+                        </div>
+                        <div class="section-debts">
+                            <div class="financial-summary">
+                                ${this.createFinancialCard('Total Deudas SRI', deudas.total_general, 'error')}
+                                ${this.createFinancialCard('Impuestos', deudas.desglose?.impuestos, 'warning')}
+                                ${this.createFinancialCard('Tasas', deudas.desglose?.tasas, 'info')}
+                                ${this.createFinancialCard('Multas', deudas.desglose?.multas, 'error')}
+                                ${this.createFinancialCard('Intereses', deudas.desglose?.intereses, 'warning')}
+                                ${this.createFinancialCard('Total Pagado', pagos.total_pagado, 'success')}
+                            </div>
+                            
+                            <div class="results-grid">
+                                <div class="result-item">
+                                    <span class="result-label">Total Rubros Pendientes:</span>
+                                    <span class="result-value text-warning">${deudas.rubros_count || 0}</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Componentes Analizados:</span>
+                                    <span class="result-value text-info">${deudas.componentes_count || 0}</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Beneficiarios con Deudas:</span>
+                                    <span class="result-value">${deudas.beneficiarios?.length || 0}</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Transacciones de Pago:</span>
+                                    <span class="result-value text-success">${pagos.total_transacciones || 0}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rubros de Deuda Detallados -->
+                    ${deudas.rubros_detallados && deudas.rubros_detallados.length > 0 ? `
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">📊 Rubros de Deuda Detallados SRI</h3>
+                                <span class="badge badge-info">${deudas.rubros_detallados.length} RUBROS</span>
+                            </div>
+                            ${this.createRubrosTable(deudas.rubros_detallados)}
+                        </div>
+                    ` : ''}
+
+                    <!-- Rubros Agrupados por Beneficiario -->
+                    ${deudas.agrupado_beneficiarios && Object.keys(deudas.agrupado_beneficiarios).length > 0 ? 
+                        this.createBeneficiarySection(deudas.agrupado_beneficiarios) : ''}
+
+                    <!-- Componentes Fiscales Detallados -->
+                    ${deudas.componentes_detallados && deudas.componentes_detallados.length > 0 ? `
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">🔍 Componentes Fiscales Detallados</h3>
+                                <span class="badge badge-purple">${deudas.componentes_detallados.length} COMPONENTES</span>
+                            </div>
+                            ${this.createComponentesTable(deudas.componentes_detallados)}
+                        </div>
+                    ` : ''}
+
+                    <!-- Historial de Pagos -->
+                    ${pagos.historial_completo && pagos.historial_completo.length > 0 ? `
+                        <div class="card payments-card">
+                            <div class="card-header">
+                                <h3 class="card-title">📊 Historial de Pagos SRI</h3>
+                                <span class="badge badge-success">${pagos.historial_completo.length} PAGOS</span>
+                            </div>
+                            <div class="section-payments">
+                                <div class="results-grid">
+                                    <div class="result-item">
+                                        <span class="result-label">Total Pagado Histórico:</span>
+                                        <span class="result-value text-success">${this.formatCurrency(pagos.total_pagado)}</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">Pagos Último Año:</span>
+                                        <span class="result-value text-success">${this.formatCurrency(pagos.pagos_ultimo_ano)}</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">Promedio Anual:</span>
+                                        <span class="result-value">${this.formatCurrency(pagos.promedio_anual)}</span>
+                                    </div>
+                                </div>
+                                ${this.createPagosTable(pagos.historial_completo)}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <!-- Plan IACV (Impuesto Ambiental) -->
+                    ${iacv.plan_detallado && iacv.plan_detallado.length > 0 ? `
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">🌱 Plan IACV (Impuesto Ambiental)</h3>
+                                <span class="badge badge-info">${iacv.total_cuotas} CUOTAS</span>
+                            </div>
+                            <div class="results-grid">
+                                <div class="result-item">
+                                    <span class="result-label">Cuotas Vencidas:</span>
+                                    <span class="result-value text-error">${this.formatCurrency(iacv.cuotas_vencidas)}</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Total Cuotas:</span>
+                                    <span class="result-value">${iacv.total_cuotas}</span>
+                                </div>
+                            </div>
+                            ${this.createIACVTable(iacv.plan_detallado)}
+                        </div>
+                    ` : ''}
+
+                    <!-- Estados Legales -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">⚖️ Estados Legales y Matrícula</h3>
+                        </div>
+                        <div class="results-grid">
+                            <div>
+                                <h4 class="text-neon mb-1">📅 Matrícula</h4>
+                                <div class="result-item">
+                                    <span class="result-label">Última Matrícula:</span>
+                                    <span class="result-value">${estados.matricula?.ultima || 'N/A'}</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Vencimiento:</span>
+                                    <span class="result-value">${estados.matricula?.vencimiento || 'N/A'}</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Estado Matrícula:</span>
+                                    <span class="result-value text-${this.getStatusClass(estados.matricula?.estado)}">
+                                        ${estados.matricula?.estado || 'N/A'}
+                                    </span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Último Año Pagado:</span>
+                                    <span class="result-value">${estados.matricula?.ultimo_anio_pagado || 'N/A'}</span>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h4 class="text-neon mb-1">🚫 Prohibiciones</h4>
+                                <div class="result-item">
+                                    <span class="result-label">Prohibido Enajenar:</span>
+                                    <span class="result-value text-${estados.prohibiciones?.enajenar === 'SI' ? 'error' : 'success'}">
+                                        ${estados.prohibiciones?.enajenar || 'NO'}
+                                    </span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Estado Exoneración:</span>
+                                    <span class="result-value">${estados.prohibiciones?.exoneracion || 'N/A'}</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Observaciones:</span>
+                                    <span class="result-value" style="maxWidth: 200px; fontSize: 0.8rem;">
+                                        ${estados.prohibiciones?.observaciones || 'Sin observaciones'}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Análisis Consolidado -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">📈 Análisis Consolidado SRI</h3>
+                        </div>
+                        <div class="section-analysis">
+                            <div class="results-grid">
+                                <div class="result-item">
+                                    <span class="result-label">Estado Legal SRI:</span>
+                                    <span class="result-value text-${this.getStatusClass(analisis.estado_legal)}">
+                                        ${analisis.estado_legal}
+                                    </span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Riesgo Tributario:</span>
+                                    <span class="result-value text-${this.getRiskClass(analisis.riesgo_tributario)}">
+                                        ${analisis.riesgo_tributario}
+                                    </span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Puntuación SRI:</span>
+                                    <span class="result-value" style="color: ${this.getScoreColor(analisis.puntuacion_sri)}; fontWeight: bold;">
+                                        ${analisis.puntuacion_sri}/100
+                                    </span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Estimación Valor:</span>
+                                    <span class="result-value text-neon">${this.formatCurrency(analisis.estimacion_valor)}</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Tiempo de Consulta:</span>
+                                    <span class="result-value">${(vehicleData.tiempo_consulta || 0).toFixed(2)}s</span>
+                                </div>
+                            </div>
+                            
+                            ${analisis.recomendacion_tributaria ? `
+                                <div class="mt-2">
+                                    <h4 class="text-neon mb-1">💡 Recomendación Tributaria SRI</h4>
+                                    <div class="message message-${this.getRecommendationClass(analisis.puntuacion_sri)}" style="margin: 0;">
+                                        ${analisis.recomendacion_tributaria}
+                                    </div>
+                                </div>
+                            ` : ''}
+                            
+                            ${analisis.recomendacion_general ? `
+                                <div class="mt-2">
+                                    <h4 class="text-neon mb-1">📋 Recomendación General</h4>
+                                    <div class="message message-info" style="margin: 0;">
+                                        ${analisis.recomendacion_general}
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="text-center mt-2">
+                        <button type="button" class="btn btn-new-query" style="marginRight: 1rem;">
+                            🔄 Nueva Consulta
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-download">
+                            💾 Descargar Datos Completos
+                        </button>
+                    </div>
+                `;
+            }
+            
+            createFinancialCard(title, value, type) {
+                const colors = {
+                    'success': 'var(--success-color)',
+                    'error': 'var(--error-color)',
+                    'warning': 'var(--warning-color)',
+                    'info': 'var(--neon-blue)'
+                };
+                
+                const color = colors[type] || 'var(--neon-blue)';
+                
+                return `
+                    <div class="financial-card" style="border: 1px solid ${color};">
+                        <div class="financial-value" style="color: ${color};">
+                            ${this.formatCurrency(value || 0)}
+                        </div>
+                        <div class="financial-label">
+                            ${title}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            createRubrosTable(rubros) {
+                const rows = rubros.slice(0, 10).map(rubro => `
+                    <tr>
+                        <td style="fontWeight: bold; color: var(--neon-blue);">${rubro.codigoRubro || 'N/A'}</td>
+                        <td style="maxWidth: 200px; fontSize: 0.8rem;">${rubro.descripcionRubro || 'N/A'}</td>
+                        <td style="fontWeight: bold;">${rubro.nombreCortoBeneficiario || 'N/A'}</td>
+                        <td style="fontWeight: bold; color: var(--error-color);">${this.formatCurrency(rubro.valorRubro || 0)}</td>
+                        <td>${rubro.periodo_deuda || 'N/A'}</td>
+                        <td><span class="badge badge-${rubro.prioridad === 'ALTA' ? 'error' : rubro.prioridad === 'MEDIA' ? 'warning' : 'info'}">${rubro.prioridad || 'MEDIA'}</span></td>
+                    </tr>
+                `).join('');
+                
+                return `
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Descripción</th>
+                                <th>Beneficiario</th>
+                                <th>Valor</th>
+                                <th>Período</th>
+                                <th>Prioridad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rows}
+                        </tbody>
+                    </table>
+                    ${rubros.length > 10 ? `
+                        <div style="textAlign: center; color: #666; fontStyle: italic; marginTop: 1rem;">
+                            Mostrando 10 de ${rubros.length} rubros. Descargue los datos completos para ver todos.
+                        </div>
+                    ` : ''}
+                `;
+            }
+            
+            createComponentesTable(componentes) {
+                const rows = componentes.slice(0, 15).map(comp => `
+                    <tr>
+                        <td style="fontWeight: bold; color: var(--purple-accent);">${comp.codigoComponente || 'N/A'}</td>
+                        <td style="maxWidth: 180px; fontSize: 0.8rem;">${comp.descripcionComponente || 'N/A'}</td>
+                        <td><span class="badge badge-${this.getComponentTypeBadge(comp.tipo_componente)}">${comp.tipo_componente || 'OTRO'}</span></td>
+                        <td style="fontWeight: bold; color: ${comp.valorComponente >= 0 ? 'var(--error-color)' : 'var(--success-color)'};">${this.formatCurrency(comp.valorComponente || 0)}</td>
+                        <td style="fontSize: 0.8rem;">${comp.rubro_padre?.descripcionRubro || 'N/A'}</td>
+                    </tr>
+                `).join('');
+                
+                return `
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Descripción</th>
+                                <th>Tipo</th>
+                                <th>Valor</th>
+                                <th>Rubro Padre</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rows}
+                        </tbody>
+                    </table>
+                    ${componentes.length > 15 ? `
+                        <div style="textAlign: center; color: #666; fontStyle: italic; marginTop: 1rem;">
+                            Mostrando 15 de ${componentes.length} componentes. Descargue los datos completos para ver todos.
+                        </div>
+                    ` : ''}
+                `;
+            }
+            
+            createBeneficiarySection(beneficiarios) {
+                const cards = Object.entries(beneficiarios).map(([beneficiario, datos]) => `
+                    <div class="collapsible">
+                        <div class="collapsible-header">
+                            <div>
+                                <h4 class="text-neon" style="margin: 0;">${beneficiario}</h4>
+                                <div style="color: #99ccff; fontSize: 0.9rem;">
+                                    ${datos.cantidad_rubros} rubros • ${this.formatCurrency(datos.total_valor)}
+                                </div>
+                            </div>
+                            <div class="flex" style="alignItems: center; gap: 1rem;">
+                                <span style="color: ${datos.total_valor > 0 ? 'var(--error-color)' : 'var(--success-color)'}; fontWeight: bold; fontSize: 1.2rem;">
+                                    ${this.formatCurrency(datos.total_valor)}
+                                </span>
+                                <span class="collapsible-toggle" style="fontSize: 1.2rem; cursor: pointer;">▼</span>
+                            </div>
+                        </div>
+                        <div class="collapsible-content">
+                            ${datos.rubros.slice(0, 5).map(rubro => `
+                                <div style="background: rgba(0, 0, 0, 0.3); borderRadius: 8px; padding: 1rem; marginBottom: 0.5rem; borderLeft: 3px solid var(--neon-blue);">
+                                    <div style="fontWeight: 600; color: #fff; marginBottom: 0.3rem;">
+                                        ${rubro.descripcionRubro}
+                                    </div>
+                                    <div style="display: flex; justifyContent: space-between; alignItems: center;">
+                                        <div style="color: var(--error-color); fontWeight: 700; fontSize: 1.1rem;">
+                                            ${this.formatCurrency(rubro.valorRubro)}
+                                        </div>
+                                        <div style="color: #99ccff; fontSize: 0.8rem;">
+                                            ${rubro.periodo_deuda || 'N/A'}
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                            ${datos.rubros.length > 5 ? `
+                                <div style="textAlign: center; color: #666; fontStyle: italic; marginTop: 0.5rem;">
+                                    ... y ${datos.rubros.length - 5} rubros más
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('');
+                
+                return `
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">📊 Rubros Agrupados por Beneficiario</h3>
+                            <span class="badge badge-info">${Object.keys(beneficiarios).length} BENEFICIARIOS</span>
+                        </div>
+                        ${cards}
+                    </div>
+                `;
+            }
+            
+            createPagosTable(pagos) {
+                const rows = pagos.slice(0, 10).map(pago => `
+                    <tr>
+                        <td style="fontWeight: bold; color: var(--success-color);">${pago.codigoRecaudacion || 'N/A'}</td>
+                        <td>${pago.fechaDePagoFormateada || pago.fechaDePago || 'N/A'}</td>
+                        <td style="fontWeight: bold; color: var(--success-color);">${this.formatCurrency(pago.monto || 0)}</td>
+                        <td style="fontSize: 0.8rem;">${pago.descripcionFormaPago || 'N/A'}</td>
+                        <td style="fontSize: 0.8rem;">${pago.descripcionEstado || 'N/A'}</td>
+                    </tr>
+                `).join('');
+                
+                return `
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Fecha</th>
+                                <th>Monto</th>
+                                <th>Forma Pago</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rows}
+                        </tbody>
+                    </table>
+                    ${pagos.length > 10 ? `
+                        <div style="textAlign: center; color: #666; fontStyle: italic; marginTop: 1rem;">
+                            Mostrando 10 de ${pagos.length} pagos. Descargue los datos completos para ver todos.
+                        </div>
+                    ` : ''}
+                `;
+            }
+            
+            createIACVTable(cuotas) {
+                const rows = cuotas.slice(0, 8).map(cuota => `
+                    <tr>
+                        <td style="fontWeight: bold; color: var(--green-accent);">${cuota.numeroCuota || 'N/A'}</td>
+                        <td>${cuota.periodoFiscal || 'N/A'}</td>
+                        <td style="fontWeight: bold;">${this.formatCurrency(cuota.totalCuota || 0)}</td>
+                        <td><span class="badge badge-${cuota.estadoPago === 'PAGADO' ? 'success' : cuota.estadoPago === 'VENCIDO' ? 'error' : 'warning'}">${cuota.estadoPago || 'PENDIENTE'}</span></td>
+                        <td style="fontSize: 0.8rem;">${cuota.fechaVencimientoEstimada || 'N/A'}</td>
+                    </tr>
+                `).join('');
+                
+                return `
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Cuota</th>
+                                <th>Período</th>
+                                <th>Monto</th>
+                                <th>Estado</th>
+                                <th>Vencimiento</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rows}
+                        </tbody>
+                    </table>
+                    ${cuotas.length > 8 ? `
+                        <div style="textAlign: center; color: #666; fontStyle: italic; marginTop: 1rem;">
+                            Mostrando 8 de ${cuotas.length} cuotas. Descargue los datos completos para ver todas.
+                        </div>
+                    ` : ''}
+                `;
+            }
+            
+            getBadgeClass(status) {
+                if (!status) return 'info';
+                const upper = status.toUpperCase();
+                if (upper.includes('EXCELENTE') || upper.includes('VIGENTE')) return 'success';
+                if (upper.includes('CRÍTICO') || upper.includes('VENCIDA')) return 'error';
+                return 'warning';
+            }
+            
+            getStatusClass(status) {
+                return this.getBadgeClass(status);
+            }
+            
+            getRiskClass(risk) {
+                if (!risk) return 'warning';
+                const upper = risk.toUpperCase();
+                if (upper.includes('BAJO')) return 'success';
+                if (upper.includes('CRÍTICO')) return 'error';
+                return 'warning';
+            }
+            
+            getComponentTypeBadge(type) {
+                const types = {
+                    'IMPUESTO': 'error',
+                    'TASA': 'warning',
+                    'MULTA': 'error',
+                    'INTERES': 'warning',
+                    'PRESCRIPCION': 'success'
+                };
+                return types[type] || 'info';
+            }
+            
+            getScoreColor(score) {
+                if (score >= 80) return 'var(--success-color)';
+                if (score >= 60) return 'var(--warning-color)';
+                return 'var(--error-color)';
+            }
+            
+            getRecommendationClass(score) {
+                if (score >= 80) return 'success';
+                if (score >= 60) return 'warning';
+                return 'error';
+            }
+            
+            toggleCollapsible(element) {
+                element.classList.toggle('active');
+            }
+            
+            formatCurrency(amount) {
+                return new Intl.NumberFormat('es-EC', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: 2
+                }).format(amount || 0);
+            }
+            
+            showMessage(type, text) {
+                const container = document.getElementById('messages-container');
+                const messageId = `message-${Date.now()}`;
+                
+                const messageEl = document.createElement('div');
+                messageEl.id = messageId;
+                messageEl.className = `message message-${type}`;
+                
+                const icon = {
+                    'success': '✅',
+                    'error': '❌',
+                    'warning': '⚠️',
+                    'info': 'ℹ️'
+                }[type] || 'ℹ️';
+                
+                messageEl.innerHTML = `${icon} ${text}`;
+                
+                container.appendChild(messageEl);
+                
+                setTimeout(() => {
+                    const el = document.getElementById(messageId);
+                    if (el) {
+                        el.style.opacity = '0';
+                        el.style.transform = 'translateX(-20px)';
+                        setTimeout(() => el.remove(), 300);
+                    }
+                }, 7000);
+            }
+            
+            async fetchWithTimeout(url, options = {}) {
+                const { timeout = this.API_CONFIG.timeout, ...fetchOptions } = options;
+                
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), timeout);
+                
+                try {
+                    const response = await fetch(url, {
+                        ...fetchOptions,
+                        signal: controller.signal
+                    });
+                    clearTimeout(timeoutId);
+                    return response;
+                } catch (error) {
+                    clearTimeout(timeoutId);
+                    if (error.name === 'AbortError') {
+                        throw new Error('Timeout: La solicitud tardó demasiado tiempo');
+                    }
+                    throw error;
+                }
+            }
+            
+            downloadCompleteData() {
+                if (!this.vehicleData || !this.completeSummary) return;
+                
+                const exportData = {
+                    informacion_general: {
+                        sesion: this.sessionId,
+                        placa: this.vehicleData.numero_placa,
+                        timestamp: new Date().toISOString(),
+                        tiempo_consulta: this.vehicleData.tiempo_consulta
+                    },
+                    propietario: this.completeSummary.propietario,
+                    vehiculo_completo: this.completeSummary.vehiculo_basico,
+                    datos_sri_completos: {
+                        deudas: this.completeSummary.deudas_sri_completas,
+                        pagos: this.completeSummary.pagos_sri_completos,
+                        iacv: this.completeSummary.iacv_completo
+                    },
+                    estados_legales: this.completeSummary.estados_legales,
+                    analisis_consolidado: this.completeSummary.analisis_completo,
+                    datos_raw_completos: this.vehicleData
+                };
+                
+                const dataStr = JSON.stringify(exportData, null, 2);
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `ECPlacas_SRI_COMPLETO_${this.vehicleData.numero_placa}_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                
+                this.showMessage('success', '💾 Datos COMPLETOS descargados exitosamente');
+            }
+            
+            resetApp() {
+                this.currentStep = 1;
+                this.isLoading = false;
+                this.sessionId = null;
+                this.userData = {};
+                this.vehicleData = null;
+                this.completeSummary = null;
+                
+                document.getElementById('user-form').reset();
+                document.getElementById('placa').value = '';
+                document.getElementById('messages-container').innerHTML = '';
+                this.updateProgress(0, '');
+                this.goToStep(1);
+            }
+        }
+        
+        // Inicializar aplicación
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                window.ecplacasCompletaApp = new ECPlacasCompletaApp();
+            });
+        } else {
+            window.ecplacasCompletaApp = new ECPlacasCompletaApp();
+        }
     </script>
 </body>
 </html>

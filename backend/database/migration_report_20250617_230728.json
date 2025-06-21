@@ -1,0 +1,8 @@
+{
+  "timestamp": "2025-06-17T23:07:28.243037",
+  "database_path": "C:\\Users\\Erick\\Desktop\\WEBS\\PLACAS_EC\\backend\\database\\ecplacas.sqlite",
+  "backup_path": "C:\\Users\\Erick\\Desktop\\WEBS\\PLACAS_EC\\backend\\database\\backups\\ecplacas_pre_migration_20250617_230657.sqlite",
+  "migration_successful": true,
+  "ecplacas_version": "2.0.1 SRI COMPLETO",
+  "migration_type": "Schema Update for Propietario Support"
+}

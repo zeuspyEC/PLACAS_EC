@@ -1,452 +1,487 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-ECPlacas 2.0 - Rutas de API
+==========================================
+ECPlacas 2.0 SRI COMPLETO - Rutas de API
+==========================================
 Proyecto: Construcción de Software
 Desarrollado por: Erick Costa
+Versión: 2.0.1
+==========================================
 
-Rutas principales de la API ECPlacas 2.0
+Rutas adicionales de API que complementan app.py
+Estas rutas se integran con las principales del sistema
 """
 
-import asyncio
-import time
-import uuid
-import threading
+import json
+import logging
 from datetime import datetime
 from flask import Blueprint, request, jsonify, current_app
-import logging
+from werkzeug.exceptions import BadRequest, NotFound
 
-from ..models import UsuarioModel, VehiculoCompleto, ValidadorEcuatoriano
-from ..scraper import vehicle_scraper
-from ..db import db
+# Crear blueprint para rutas de API adicionales
+api_bp = Blueprint('api_additional', __name__)
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('ecplacas.api')
 
-# Crear blueprint para rutas de API
-api_bp = Blueprint('api', __name__, url_prefix='/api')
+# ==========================================
+# MIDDLEWARE Y DECORADORES
+# ==========================================
 
-# Almacenamiento temporal para consultas en progreso
-active_consultations = {}
-
-@api_bp.route('/health', methods=['GET'])
-def health_check():
-    """Verificación de salud del sistema"""
-    try:
-        start_time = time.time()
-        
-        # Verificar base de datos
-        db_stats = db.get_system_stats()
-        
-        # Verificar scraper
-        scraper_stats = vehicle_scraper.get_statistics()
-        
-        response_time = round((time.time() - start_time) * 1000, 2)
-        
-        return jsonify({
-            'success': True,
-            'status': 'healthy',
-            'service': 'ECPlacas 2.0',
-            'version': '2.0.0',
-            'author': 'Erick Costa',
-            'project': 'Construcción de Software',
-            'theme': 'Futurista - Azul Neon',
-            'timestamp': datetime.now().isoformat(),
-            'response_time_ms': response_time,
-            'database': {
-                'status': 'online',
-                'total_consultas': db_stats.get('total_consultas', 0),
-                'total_usuarios': db_stats.get('total_usuarios', 0)
-            },
-            'scraper': {
-                'status': 'online',
-                'success_rate': scraper_stats.get('success_rate', {}).get('percentage', 0),
-                'cache_entries': scraper_stats.get('cache_stats', {}).get('valid_entries', 0) if scraper_stats.get('cache_stats') else 0
-            }
-        })
-        
-    except Exception as e:
-        logger.error(f"Error en health check: {e}")
-        return jsonify({
-            'success': False,
-            'status': 'unhealthy',
-            'service': 'ECPlacas 2.0',
-            'error': str(e),
-            'timestamp': datetime.now().isoformat()
-        }), 500
-
-@api_bp.route('/consultar-vehiculo', methods=['POST'])
-def consultar_vehiculo():
-    """Endpoint principal para consultar vehículo"""
-    try:
-        if not request.is_json:
+@api_bp.before_request
+def before_api_request():
+    """Middleware para todas las rutas de API"""
+    # Log de todas las requests API
+    logger.info(f"API Request: {request.method} {request.path} from {request.remote_addr}")
+    
+    # Verificar Content-Type para requests POST/PUT
+    if request.method in ['POST', 'PUT'] and request.content_type:
+        if not request.content_type.startswith('application/json'):
             return jsonify({
                 'success': False,
                 'error': 'Content-Type debe ser application/json'
             }), 400
-        
-        data = request.get_json()
-        
-        # Validar datos de entrada
-        placa = data.get('placa', '').strip().upper()
-        usuario_data = data.get('usuario', {})
-        
-        if not placa:
-            return jsonify({
-                'success': False,
-                'error': 'Número de placa es requerido'
-            }), 400
-        
-        # Validar formato de placa
-        es_valida, placa_normalizada, error_placa = ValidadorEcuatoriano.validar_placa(placa)
-        if not es_valida:
-            return jsonify({
-                'success': False,
-                'error': f'Formato de placa inválido: {error_placa}',
-                'formato_esperado': 'ABC1234 o ABC123'
-            }), 400
-        
-        # Crear y validar modelo de usuario
-        try:
-            usuario = UsuarioModel(
-                nombre=usuario_data.get('nombre', '').strip().upper(),
-                cedula=usuario_data.get('cedula', '').strip(),
-                telefono=usuario_data.get('telefono', '').strip(),
-                correo=usuario_data.get('correo', '').strip().lower(),
-                country_code=usuario_data.get('country_code', '+593'),
-                ip_address=request.remote_addr,
-                user_agent=request.headers.get('User-Agent', '')
-            )
-            
-            is_valid, errors = usuario.validar()
-            if not is_valid:
-                return jsonify({
-                    'success': False,
-                    'error': 'Datos de usuario inválidos',
-                    'errores': errors
-                }), 400
-                
-        except Exception as e:
-            return jsonify({
-                'success': False,
-                'error': f'Error procesando datos de usuario: {str(e)}'
-            }), 400
-        
-        # Generar session ID único
-        session_id = f"ecplacas_{int(time.time() * 1000)}_{uuid.uuid4().hex[:8]}"
-        
-        logger.info(f"🚀 Nueva consulta ECPlacas 2.0 - Placa: {placa} → {placa_normalizada}, Session: {session_id}")
-        
-        # Función para ejecutar consulta en thread separado
-        def run_consultation():
-            try:
-                # Actualizar progreso
-                active_consultations[session_id]['progress'] = 10
-                active_consultations[session_id]['message'] = '🔍 Validando placa...'
-                
-                # Ejecutar consulta asíncrona
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-                
-                active_consultations[session_id]['progress'] = 30
-                active_consultations[session_id]['message'] = '📡 Consultando APIs externas...'
-                
-                vehicle_data = loop.run_until_complete(
-                    vehicle_scraper.consultar_vehiculo(placa_normalizada)
-                )
-                
-                active_consultations[session_id]['progress'] = 70
-                active_consultations[session_id]['message'] = '💾 Procesando datos...'
-                
-                # Guardar usuario y consulta en base de datos
-                user_id = db.save_user(usuario.to_dict())
-                if user_id:
-                    vehicle_dict = vehicle_data.to_dict()
-                    vehicle_dict['ip_origen'] = request.remote_addr
-                    vehicle_dict['user_agent'] = request.headers.get('User-Agent', '')
-                    
-                    consultation_id = db.save_vehicle_consultation(vehicle_dict, user_id)
-                    
-                    active_consultations[session_id]['progress'] = 100
-                    active_consultations[session_id]['message'] = '✅ Consulta completada'
-                    
-                    # Guardar resultado final
-                    active_consultations[session_id]['status'] = 'completado'
-                    active_consultations[session_id]['result'] = vehicle_data.to_dict()
-                    active_consultations[session_id]['consultation_id'] = consultation_id
-                    active_consultations[session_id]['user_id'] = user_id
-                else:
-                    raise Exception("Error guardando usuario en base de datos")
-                
-                logger.info(f"✅ Consulta completada exitosamente: {session_id}")
-                
-            except Exception as e:
-                logger.error(f"❌ Error en consulta {session_id}: {e}")
-                active_consultations[session_id]['status'] = 'error'
-                active_consultations[session_id]['error'] = str(e)
-                active_consultations[session_id]['progress'] = 0
-                active_consultations[session_id]['message'] = f'❌ Error: {str(e)}'
-            finally:
-                if 'loop' in locals():
-                    loop.close()
-        
-        # Inicializar consulta en progreso
-        active_consultations[session_id] = {
-            'status': 'procesando',
-            'progress': 0,
-            'message': '🚀 Iniciando consulta ECPlacas 2.0...',
-            'placa': placa_normalizada,
-            'usuario': usuario.nombre,
+
+@api_bp.after_request
+def after_api_request(response):
+    """Middleware de respuesta para APIs"""
+    # Agregar headers CORS adicionales
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+    
+    # Headers de cache
+    if request.method == 'GET':
+        response.headers['Cache-Control'] = 'public, max-age=300'  # 5 minutos
+    
+    return response
+
+# ==========================================
+# RUTAS DE INFORMACIÓN DEL SISTEMA
+# ==========================================
+
+@api_bp.route('/version', methods=['GET'])
+def get_version():
+    """Obtener información de versión del sistema"""
+    try:
+        version_info = {
+            'success': True,
+            'version': '2.0.1',
+            'name': 'ECPlacas 2.0 SRI COMPLETO',
+            'author': 'Erick Costa',
+            'project': 'Construcción de Software',
+            'theme': 'Futurista - Azul Neon',
+            'release_date': '2024-12-15',
+            'python_version': f"{current_app.config.get('PYTHON_VERSION', 'Unknown')}",
+            'flask_version': f"{current_app.config.get('FLASK_VERSION', 'Unknown')}",
+            'features': {
+                'sri_completo': True,
+                'propietario_vehiculo': True,
+                'rubros_detallados': True,
+                'componentes_fiscales': True,
+                'historial_pagos': True,
+                'plan_iacv': True,
+                'analisis_consolidado': True,
+                'cache_inteligente': True,
+                'rate_limiting': True,
+                'logs_rotativos': True
+            },
+            'apis_disponibles': {
+                'consulta_completa': '/api/consultar-vehiculo',
+                'estado_consulta': '/api/estado-consulta/<session_id>',
+                'resultado_completo': '/api/resultado/<session_id>',
+                'estadisticas': '/api/estadisticas',
+                'validar_placa': '/api/validar-placa',
+                'validar_cedula': '/api/validar-cedula',
+                'test_sri': '/api/test-sri-completo'
+            },
             'timestamp': datetime.now().isoformat()
         }
         
-        # Ejecutar en thread separado
-        thread = threading.Thread(target=run_consultation, daemon=True)
-        thread.start()
-        
-        return jsonify({
-            'success': True,
-            'message': 'Consulta ECPlacas 2.0 iniciada exitosamente',
-            'session_id': session_id,
-            'placa_original': placa,
-            'placa_normalizada': placa_normalizada,
-            'status': 'procesando',
-            'tiempo_estimado': '10-30 segundos',
-            'usuario': usuario.nombre
-        }), 202
+        return jsonify(version_info)
         
     except Exception as e:
-        logger.error(f"❌ Error en endpoint consultar-vehiculo: {e}")
+        logger.error(f"Error obteniendo versión: {e}")
         return jsonify({
             'success': False,
-            'error': 'Error interno del servidor',
-            'details': str(e) if current_app.debug else None
+            'error': 'Error interno del servidor'
         }), 500
 
-@api_bp.route('/estado-consulta/<session_id>', methods=['GET'])
-def estado_consulta(session_id):
-    """Obtener estado de consulta en progreso"""
+@api_bp.route('/features', methods=['GET'])
+def get_features():
+    """Obtener lista completa de características"""
     try:
-        if session_id not in active_consultations:
-            return jsonify({
-                'success': False,
-                'error': 'Session ID no encontrado',
-                'session_id': session_id
-            }), 404
-        
-        consultation = active_consultations[session_id]
-        
-        response_data = {
+        features = {
             'success': True,
-            'session_id': session_id,
-            'status': consultation.get('status'),
-            'progress': consultation.get('progress', 0),
-            'message': consultation.get('message', ''),
-            'placa': consultation.get('placa'),
-            'usuario': consultation.get('usuario'),
-            'timestamp': consultation.get('timestamp')
+            'sistema': 'ECPlacas 2.0 SRI COMPLETO + PROPIETARIO',
+            'caracteristicas_principales': [
+                {
+                    'categoria': 'Consultas SRI',
+                    'descripcion': 'Consultas completas al Sistema de Rentas Internas',
+                    'funcionalidades': [
+                        'Información básica del vehículo',
+                        'Rubros de deuda detallados',
+                        'Componentes fiscales específicos',
+                        'Historial completo de pagos',
+                        'Plan IACV (Impuesto Ambiental)',
+                        'Estados legales y prohibiciones'
+                    ]
+                },
+                {
+                    'categoria': 'Propietario del Vehículo',
+                    'descripcion': 'Información del propietario actual',
+                    'funcionalidades': [
+                        'Nombre completo del propietario',
+                        'Cédula de identidad',
+                        'Múltiples fuentes de datos',
+                        'Validación cruzada'
+                    ]
+                },
+                {
+                    'categoria': 'Análisis Consolidado',
+                    'descripcion': 'Análisis inteligente de toda la información',
+                    'funcionalidades': [
+                        'Puntuación SRI (0-100)',
+                        'Riesgo tributario',
+                        'Estado legal consolidado',
+                        'Recomendaciones tributarias',
+                        'Estimación de valor'
+                    ]
+                },
+                {
+                    'categoria': 'Performance',
+                    'descripcion': 'Optimizaciones para máximo rendimiento',
+                    'funcionalidades': [
+                        'Cache inteligente',
+                        'Rate limiting',
+                        'Pool de conexiones',
+                        'Logs rotativos',
+                        'Consultas asíncronas'
+                    ]
+                }
+            ],
+            'tecnologias': {
+                'backend': 'Flask + Python 3.8+',
+                'frontend': 'HTML5 + CSS3 + JavaScript ES6+',
+                'base_datos': 'SQLite con WAL mode',
+                'apis_externas': 'SRI Ecuador + Propietarios',
+                'cache': 'Memory-based con TTL',
+                'logs': 'Rotating file handlers'
+            },
+            'timestamp': datetime.now().isoformat()
         }
         
-        # Agregar error si existe
-        if 'error' in consultation:
-            response_data['error'] = consultation['error']
-        
-        return jsonify(response_data)
+        return jsonify(features)
         
     except Exception as e:
-        logger.error(f"❌ Error obteniendo estado de consulta: {e}")
+        logger.error(f"Error obteniendo características: {e}")
         return jsonify({
             'success': False,
-            'error': 'Error obteniendo estado de consulta',
-            'session_id': session_id
+            'error': 'Error interno del servidor'
         }), 500
 
-@api_bp.route('/resultado/<session_id>', methods=['GET'])
-def obtener_resultado(session_id):
-    """Obtener resultado completo de consulta"""
+# ==========================================
+# RUTAS DE UTILIDADES
+# ==========================================
+
+@api_bp.route('/ping', methods=['GET'])
+def ping():
+    """Endpoint simple de ping/pong"""
+    return jsonify({
+        'success': True,
+        'message': 'pong',
+        'timestamp': datetime.now().isoformat(),
+        'server': 'ECPlacas 2.0 SRI COMPLETO'
+    })
+
+@api_bp.route('/time', methods=['GET'])
+def get_server_time():
+    """Obtener hora del servidor"""
+    now = datetime.now()
+    return jsonify({
+        'success': True,
+        'server_time': now.isoformat(),
+        'unix_timestamp': int(now.timestamp()),
+        'timezone': str(now.astimezone().tzinfo),
+        'formatted': now.strftime("%Y-%m-%d %H:%M:%S")
+    })
+
+@api_bp.route('/endpoints', methods=['GET'])
+def list_endpoints():
+    """Listar todos los endpoints disponibles"""
     try:
-        if session_id not in active_consultations:
-            return jsonify({
-                'success': False,
-                'error': 'Session ID no encontrado',
-                'session_id': session_id
-            }), 404
+        from flask import current_app
         
-        consultation = active_consultations[session_id]
+        endpoints = []
+        for rule in current_app.url_map.iter_rules():
+            if rule.endpoint != 'static':
+                endpoints.append({
+                    'endpoint': rule.endpoint,
+                    'methods': sorted(rule.methods - {'HEAD', 'OPTIONS'}),
+                    'path': str(rule),
+                    'description': getattr(current_app.view_functions.get(rule.endpoint), '__doc__', 'Sin descripción')
+                })
         
-        if consultation.get('status') != 'completado':
-            return jsonify({
-                'success': False,
-                'error': 'Consulta no completada',
-                'status': consultation.get('status'),
-                'progress': consultation.get('progress', 0),
-                'message': consultation.get('message', ''),
-                'session_id': session_id
-            }), 400
+        # Agrupar por prefijo
+        grouped = {
+            'api': [e for e in endpoints if e['path'].startswith('/api/')],
+            'admin': [e for e in endpoints if e['path'].startswith('/admin/')],
+            'frontend': [e for e in endpoints if not e['path'].startswith(('/api/', '/admin/'))]
+        }
         
         return jsonify({
             'success': True,
-            'session_id': session_id,
-            'data': consultation.get('result'),
-            'consultation_id': consultation.get('consultation_id'),
-            'user_id': consultation.get('user_id'),
-            'timestamp': consultation.get('timestamp'),
-            'version': '2.0.0',
-            'service': 'ECPlacas 2.0'
+            'total_endpoints': len(endpoints),
+            'endpoints_por_categoria': {k: len(v) for k, v in grouped.items()},
+            'endpoints': grouped,
+            'timestamp': datetime.now().isoformat()
         })
         
     except Exception as e:
-        logger.error(f"❌ Error obteniendo resultado: {e}")
+        logger.error(f"Error listando endpoints: {e}")
         return jsonify({
             'success': False,
-            'error': 'Error obteniendo resultado de consulta',
-            'session_id': session_id
+            'error': 'Error interno del servidor'
         }), 500
 
-@api_bp.route('/estadisticas', methods=['GET'])
-def obtener_estadisticas():
-    """Obtener estadísticas del sistema"""
+# ==========================================
+# RUTAS DE VALIDACIÓN AVANZADA
+# ==========================================
+
+@api_bp.route('/validate/batch', methods=['POST'])
+def validate_batch():
+    """Validar múltiples placas y cédulas en lote"""
     try:
-        # Obtener estadísticas de base de datos
-        db_stats = db.get_system_stats()
+        if not request.is_json:
+            return jsonify({
+                'success': False,
+                'error': 'Contenido debe ser JSON válido'
+            }), 400
         
-        # Obtener estadísticas del scraper
-        scraper_stats = vehicle_scraper.get_statistics()
+        data = request.get_json()
+        placas = data.get('placas', [])
+        cedulas = data.get('cedulas', [])
         
-        # Estadísticas de consultas activas
-        active_stats = {
-            'consultas_activas': len([c for c in active_consultations.values() if c.get('status') == 'procesando']),
-            'consultas_completadas_sesion': len([c for c in active_consultations.values() if c.get('status') == 'completado']),
-            'consultas_error_sesion': len([c for c in active_consultations.values() if c.get('status') == 'error']),
-            'total_consultas_sesion': len(active_consultations)
+        if not placas and not cedulas:
+            return jsonify({
+                'success': False,
+                'error': 'Debe proporcionar al menos una placa o cédula'
+            }), 400
+        
+        # Importar validadores (asumiendo que están en app.py)
+        from backend.app import PlateValidator, CedulaValidator
+        
+        resultados = {
+            'placas': {},
+            'cedulas': {}
         }
+        
+        # Validar placas
+        for placa in placas[:50]:  # Límite de 50 por seguridad
+            try:
+                original, normalizada, modificada = PlateValidator.normalize_plate(placa)
+                es_valida = PlateValidator.validate_plate_format(normalizada)
+                
+                resultados['placas'][placa] = {
+                    'original': original,
+                    'normalizada': normalizada,
+                    'fue_modificada': modificada,
+                    'es_valida': es_valida,
+                    'formato': 'Ecuatoriana estándar' if es_valida else 'Formato inválido'
+                }
+            except Exception as e:
+                resultados['placas'][placa] = {
+                    'error': str(e),
+                    'es_valida': False
+                }
+        
+        # Validar cédulas
+        for cedula in cedulas[:50]:  # Límite de 50 por seguridad
+            try:
+                es_valida = CedulaValidator.validate_ecuadorian_id(cedula)
+                provincia_info = None
+                
+                if es_valida and len(cedula) >= 2:
+                    from backend.app import PROVINCE_CODES
+                    codigo_provincia = cedula[:2]
+                    provincia_info = {
+                        'codigo': codigo_provincia,
+                        'nombre': PROVINCE_CODES.get(codigo_provincia, 'Desconocida')
+                    }
+                
+                resultados['cedulas'][cedula] = {
+                    'es_valida': es_valida,
+                    'provincia': provincia_info,
+                    'algoritmo': 'Validación oficial Ecuador'
+                }
+            except Exception as e:
+                resultados['cedulas'][cedula] = {
+                    'error': str(e),
+                    'es_valida': False
+                }
         
         return jsonify({
             'success': True,
-            'estadisticas': {
-                **db_stats,
-                'scraper': scraper_stats,
-                'sesion_actual': active_stats,
-                'sistema': {
-                    'version': '2.0.0',
-                    'autor': 'Erick Costa',
-                    'proyecto': 'Construcción de Software',
-                    'tema': 'Futurista - Azul Neon'
-                }
+            'resultados': resultados,
+            'resumen': {
+                'placas_procesadas': len(resultados['placas']),
+                'cedulas_procesadas': len(resultados['cedulas']),
+                'placas_validas': sum(1 for r in resultados['placas'].values() if r.get('es_valida')),
+                'cedulas_validas': sum(1 for r in resultados['cedulas'].values() if r.get('es_valida'))
             },
             'timestamp': datetime.now().isoformat()
         })
         
     except Exception as e:
-        logger.error(f"❌ Error obteniendo estadísticas: {e}")
+        logger.error(f"Error en validación por lotes: {e}")
         return jsonify({
             'success': False,
-            'error': 'Error obteniendo estadísticas del sistema'
+            'error': 'Error interno del servidor'
         }), 500
 
-@api_bp.route('/limpiar-consultas', methods=['POST'])
-def limpiar_consultas():
-    """Limpiar consultas completadas o con error (endpoint administrativo)"""
+# ==========================================
+# RUTAS DE DESARROLLO Y DEBUG
+# ==========================================
+
+@api_bp.route('/debug/config', methods=['GET'])
+def debug_config():
+    """Obtener configuración del sistema (solo desarrollo)"""
     try:
-        # Solo limpiar consultas completadas o con error de más de 1 hora
-        current_time = datetime.now()
-        cleaned_count = 0
+        if not current_app.debug:
+            return jsonify({
+                'success': False,
+                'error': 'Endpoint solo disponible en modo debug'
+            }), 403
         
-        sessions_to_remove = []
-        for session_id, consultation in active_consultations.items():
-            if consultation.get('status') in ['completado', 'error']:
-                try:
-                    timestamp = datetime.fromisoformat(consultation.get('timestamp', ''))
-                    if (current_time - timestamp).total_seconds() > 3600:  # 1 hora
-                        sessions_to_remove.append(session_id)
-                except:
-                    sessions_to_remove.append(session_id)  # Remover si no tiene timestamp válido
-        
-        for session_id in sessions_to_remove:
-            del active_consultations[session_id]
-            cleaned_count += 1
-        
-        logger.info(f"🧹 Limpieza de consultas: {cleaned_count} sesiones eliminadas")
-        
-        return jsonify({
+        config_info = {
             'success': True,
-            'message': f'Limpieza completada: {cleaned_count} consultas eliminadas',
-            'consultas_activas': len(active_consultations)
-        })
+            'debug_mode': current_app.debug,
+            'environment': current_app.env,
+            'config_keys': sorted([k for k in current_app.config.keys() if not k.startswith('SECRET')]),
+            'database_path': current_app.config.get('DATABASE_PATH'),
+            'cache_enabled': current_app.config.get('CACHE_ENABLED'),
+            'rate_limit_enabled': current_app.config.get('RATELIMIT_ENABLED'),
+            'timestamp': datetime.now().isoformat()
+        }
+        
+        return jsonify(config_info)
         
     except Exception as e:
-        logger.error(f"❌ Error en limpieza de consultas: {e}")
+        logger.error(f"Error obteniendo config debug: {e}")
         return jsonify({
             'success': False,
-            'error': 'Error en limpieza de consultas'
+            'error': 'Error interno del servidor'
         }), 500
 
-# Manejadores de errores para el blueprint
-@api_bp.errorhandler(404)
-def api_not_found(error):
+# ==========================================
+# MANEJO DE ERRORES
+# ==========================================
+
+@api_bp.errorhandler(400)
+def bad_request(error):
+    """Manejo de errores 400"""
     return jsonify({
         'success': False,
-        'error': 'Endpoint de API no encontrado',
-        'service': 'ECPlacas 2.0',
-        'available_endpoints': [
-            '/api/health',
-            '/api/consultar-vehiculo',
-            '/api/estado-consulta/<session_id>',
-            '/api/resultado/<session_id>',
-            '/api/estadisticas'
-        ]
+        'error': 'Solicitud inválida',
+        'message': str(error.description) if hasattr(error, 'description') else 'Bad Request',
+        'timestamp': datetime.now().isoformat()
+    }), 400
+
+@api_bp.errorhandler(404)
+def not_found(error):
+    """Manejo de errores 404"""
+    return jsonify({
+        'success': False,
+        'error': 'Endpoint no encontrado',
+        'path': request.path,
+        'method': request.method,
+        'available_endpoints': '/api/endpoints',
+        'timestamp': datetime.now().isoformat()
     }), 404
 
 @api_bp.errorhandler(405)
-def api_method_not_allowed(error):
+def method_not_allowed(error):
+    """Manejo de errores 405"""
     return jsonify({
         'success': False,
-        'error': 'Método HTTP no permitido',
-        'service': 'ECPlacas 2.0'
+        'error': 'Método no permitido',
+        'method': request.method,
+        'path': request.path,
+        'allowed_methods': error.valid_methods if hasattr(error, 'valid_methods') else [],
+        'timestamp': datetime.now().isoformat()
     }), 405
 
 @api_bp.errorhandler(500)
-def api_internal_error(error):
+def internal_error(error):
+    """Manejo de errores 500"""
+    logger.error(f"Error interno en API: {error}")
     return jsonify({
         'success': False,
         'error': 'Error interno del servidor',
-        'service': 'ECPlacas 2.0'
+        'timestamp': datetime.now().isoformat(),
+        'support': 'Contacte al desarrollador: Erick Costa'
     }), 500
 
-# Función para limpiar consultas periódicamente
-def cleanup_old_consultations():
-    """Limpia consultas antiguas periódicamente"""
-    import threading
-    import time
-    
-    def cleanup_worker():
-        while True:
-            try:
-                current_time = datetime.now()
-                sessions_to_remove = []
-                
-                for session_id, consultation in active_consultations.items():
-                    try:
-                        timestamp = datetime.fromisoformat(consultation.get('timestamp', ''))
-                        # Remover consultas de más de 24 horas
-                        if (current_time - timestamp).total_seconds() > 86400:
-                            sessions_to_remove.append(session_id)
-                    except:
-                        sessions_to_remove.append(session_id)
-                
-                for session_id in sessions_to_remove:
-                    del active_consultations[session_id]
-                
-                if sessions_to_remove:
-                    logger.info(f"🧹 Limpieza automática: {len(sessions_to_remove)} consultas eliminadas")
-                
-            except Exception as e:
-                logger.error(f"Error en limpieza automática: {e}")
-            
-            # Ejecutar cada 6 horas
-            time.sleep(21600)
-    
-    cleanup_thread = threading.Thread(target=cleanup_worker, daemon=True)
-    cleanup_thread.start()
+# ==========================================
+# RUTAS DE MONITOREO
+# ==========================================
 
-# Inicializar limpieza automática al importar el módulo
-cleanup_old_consultations()
+@api_bp.route('/monitoring/status', methods=['GET'])
+def monitoring_status():
+    """Estado del sistema para monitoreo"""
+    try:
+        import psutil
+        import os
+        
+        # Información básica del sistema
+        status = {
+            'success': True,
+            'status': 'healthy',
+            'uptime': time.time() - psutil.boot_time(),
+            'memory': {
+                'total': psutil.virtual_memory().total,
+                'available': psutil.virtual_memory().available,
+                'percent': psutil.virtual_memory().percent
+            },
+            'cpu_percent': psutil.cpu_percent(interval=1),
+            'disk': {
+                'total': psutil.disk_usage('/').total,
+                'free': psutil.disk_usage('/').free,
+                'percent': psutil.disk_usage('/').percent
+            },
+            'process': {
+                'pid': os.getpid(),
+                'memory_mb': psutil.Process().memory_info().rss / 1024 / 1024,
+                'cpu_percent': psutil.Process().cpu_percent()
+            },
+            'timestamp': datetime.now().isoformat()
+        }
+        
+        return jsonify(status)
+        
+    except ImportError:
+        # Si psutil no está disponible, retornar información básica
+        return jsonify({
+            'success': True,
+            'status': 'healthy',
+            'message': 'Monitoreo básico (psutil no disponible)',
+            'timestamp': datetime.now().isoformat()
+        })
+    except Exception as e:
+        logger.error(f"Error en monitoreo: {e}")
+        return jsonify({
+            'success': False,
+            'error': 'Error obteniendo estado del sistema'
+        }), 500
+
+if __name__ == "__main__":
+    print("🔧 Módulo de rutas API adicionales para ECPlacas 2.0")
+    print("📡 Rutas incluidas:")
+    print("   - /api/version - Información de versión")
+    print("   - /api/features - Características del sistema")
+    print("   - /api/ping - Test de conectividad")
+    print("   - /api/time - Hora del servidor")
+    print("   - /api/endpoints - Lista de endpoints")
+    print("   - /api/validate/batch - Validación por lotes")
+    print("   - /api/debug/config - Configuración (debug)")
+    print("   - /api/monitoring/status - Estado del sistema")

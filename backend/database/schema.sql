@@ -1,8 +1,8 @@
 -- ==========================================
--- ECPlacas 2.0 - Esquema de Base de Datos
+-- ECPlacas 2.0 SRI COMPLETO - Esquema de Base de Datos CORREGIDO
 -- Proyecto: Construcción de Software
 -- Desarrollado por: Erick Costa
--- Temática: Futurista - Azul Neon
+-- Versión: 2.0.1 FIXED
 -- ==========================================
 
 -- Habilitar claves foráneas y configuraciones de performance
@@ -45,12 +45,15 @@ CREATE TABLE IF NOT EXISTS consultas_vehiculares (
     numero_placa TEXT NOT NULL,
     placa_original TEXT,
     placa_normalizada TEXT,
+    codigo_vehiculo INTEGER,
     consulta_exitosa BOOLEAN DEFAULT 0,
     tiempo_consulta REAL,
     mensaje_error TEXT,
     ip_origen TEXT,
     user_agent TEXT,
-    api_utilizada TEXT DEFAULT 'ant_principal',
+    api_utilizada TEXT DEFAULT 'sri_completo',
+    tiene_datos_sri BOOLEAN DEFAULT 0,
+    tiene_propietario BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
     FOREIGN KEY (usuario_id) REFERENCES usuarios (id) ON DELETE SET NULL,
@@ -61,54 +64,90 @@ CREATE TABLE IF NOT EXISTS consultas_vehiculares (
 );
 
 -- ==========================================
--- TABLA DE DATOS VEHICULARES COMPLETOS
+-- TABLA DE DATOS VEHICULARES SRI COMPLETOS + PROPIETARIO
 -- ==========================================
-CREATE TABLE IF NOT EXISTS datos_vehiculares (
+CREATE TABLE IF NOT EXISTS datos_vehiculares_sri (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     consulta_id INTEGER NOT NULL,
     
-    -- Datos de identificación
+    -- Propietario del vehículo
+    propietario_nombre TEXT,
+    propietario_cedula TEXT,
+    propietario_encontrado BOOLEAN DEFAULT 0,
+    
+    -- Datos básicos SRI
+    codigo_vehiculo INTEGER,
+    numero_camv_cpn TEXT,
+    descripcion_marca TEXT,
+    descripcion_modelo TEXT,
+    anio_auto INTEGER,
+    descripcion_pais TEXT,
+    color_vehiculo1 TEXT,
+    color_vehiculo2 TEXT,
+    cilindraje TEXT,
+    nombre_clase TEXT,
+    
+    -- Información de matrícula SRI
+    fecha_ultima_matricula TEXT,
+    fecha_caducidad_matricula TEXT,
+    fecha_compra_registro TEXT,
+    fecha_revision TEXT,
+    descripcion_canton TEXT,
+    descripcion_servicio TEXT,
+    ultimo_anio_pagado INTEGER,
+    
+    -- Estados legales SRI
+    prohibido_enajenar TEXT,
+    estado_exoneracion TEXT,
+    observacion TEXT,
+    aplica_cuota BOOLEAN DEFAULT 0,
+    mensaje_motivo_auto TEXT,
+    
+    -- Datos de deudas SRI
+    total_deudas_sri REAL DEFAULT 0,
+    total_impuestos REAL DEFAULT 0,
+    total_tasas REAL DEFAULT 0,
+    total_intereses REAL DEFAULT 0,
+    total_multas REAL DEFAULT 0,
+    total_prescripciones REAL DEFAULT 0,
+    total_rubros_pendientes INTEGER DEFAULT 0,
+    total_componentes_analizados INTEGER DEFAULT 0,
+    
+    -- Datos de pagos SRI
+    total_pagos_realizados REAL DEFAULT 0,
+    pagos_ultimo_ano REAL DEFAULT 0,
+    promedio_pago_anual REAL DEFAULT 0,
+    
+    -- Plan IACV
+    total_cuotas_vencidas REAL DEFAULT 0,
+    
+    -- Análisis SRI
+    estado_legal_sri TEXT DEFAULT 'PENDIENTE',
+    riesgo_tributario TEXT DEFAULT 'INDETERMINADO',
+    puntuacion_sri INTEGER DEFAULT 0,
+    recomendacion_tributaria TEXT,
+    
+    -- Datos JSON completos
+    rubros_deuda_json TEXT,
+    componentes_deuda_json TEXT,
+    historial_pagos_json TEXT,
+    plan_iacv_json TEXT,
+    totales_beneficiario_json TEXT,
+    
+    -- Legacy ANT (compatibilidad)
     vin_chasis TEXT,
     numero_motor TEXT,
     placa_anterior TEXT,
-    
-    -- Datos del modelo
-    marca TEXT,
-    modelo TEXT,
-    anio_fabricacion INTEGER,
-    pais_fabricacion TEXT,
-    
-    -- Características físicas
     clase_vehiculo TEXT,
     tipo_vehiculo TEXT,
     color_primario TEXT,
-    color_secundario TEXT,
     peso_vehiculo TEXT,
     tipo_carroceria TEXT,
-    
-    -- Datos de matrícula y revisión
     matricula_desde TEXT,
     matricula_hasta TEXT,
-    ano_ultima_revision TEXT,
-    ultima_revision_desde TEXT,
-    ultima_revision_hasta TEXT,
     servicio TEXT,
     ultima_actualizacion TEXT,
-    
-    -- Datos CRV (Centro de Retención Vehicular)
     indicador_crv TEXT,
-    orden_crv TEXT,
-    centro_retencion TEXT,
-    tipo_retencion TEXT,
-    motivo_retencion TEXT,
-    fecha_inicio_retencion TEXT,
-    dias_retencion TEXT,
-    grua TEXT,
-    area_ubicacion TEXT,
-    columna TEXT,
-    fila TEXT,
-    
-    -- Análisis ECPlacas 2.0
     estado_matricula TEXT,
     dias_hasta_vencimiento INTEGER,
     estimacion_valor REAL,
@@ -116,18 +155,52 @@ CREATE TABLE IF NOT EXISTS datos_vehiculares (
     puntuacion_general INTEGER DEFAULT 0,
     recomendacion TEXT,
     
-    -- Datos completos en JSON para backup
-    datos_completos_json TEXT,
-    
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
     FOREIGN KEY (consulta_id) REFERENCES consultas_vehiculares (id) ON DELETE CASCADE,
     
-    -- Validaciones
-    CHECK (anio_fabricacion >= 1950 OR anio_fabricacion IS NULL),
-    CHECK (estimacion_valor >= 0 OR estimacion_valor IS NULL),
-    CHECK (puntuacion_general >= 0 AND puntuacion_general <= 100),
-    CHECK (estado_matricula IN ('VIGENTE', 'POR_VENCER', 'VENCIDA', 'INDETERMINADO') OR estado_matricula IS NULL)
+    CHECK (anio_auto >= 1950 OR anio_auto IS NULL),
+    CHECK (total_deudas_sri >= 0),
+    CHECK (puntuacion_sri >= 0 AND puntuacion_sri <= 100),
+    CHECK (estimacion_valor >= 0 OR estimacion_valor IS NULL)
+);
+
+-- ==========================================
+-- TABLA DE RUBROS SRI
+-- ==========================================
+CREATE TABLE IF NOT EXISTS rubros_sri (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    consulta_id INTEGER NOT NULL,
+    codigo_rubro TEXT,
+    descripcion_rubro TEXT,
+    nombre_corto_beneficiario TEXT,
+    valor_rubro REAL DEFAULT 0,
+    anio_desde_pago INTEGER,
+    anio_hasta_pago INTEGER,
+    categoria TEXT, -- IMPUESTO, TASA, MULTA, OTRO
+    prioridad TEXT, -- ALTA, MEDIA, BAJA
+    periodo_deuda TEXT,
+    anos_deuda INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (consulta_id) REFERENCES consultas_vehiculares (id) ON DELETE CASCADE
+);
+
+-- ==========================================
+-- TABLA DE COMPONENTES SRI
+-- ==========================================
+CREATE TABLE IF NOT EXISTS componentes_sri (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    consulta_id INTEGER NOT NULL,
+    codigo_rubro TEXT,
+    codigo_componente TEXT,
+    descripcion_componente TEXT,
+    valor_componente REAL DEFAULT 0,
+    tipo_componente TEXT, -- IMPUESTO, TASA, INTERES, MULTA, PRESCRIPCION, OTRO
+    rubro_padre_json TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (consulta_id) REFERENCES consultas_vehiculares (id) ON DELETE CASCADE
 );
 
 -- ==========================================
@@ -269,13 +342,26 @@ CREATE INDEX IF NOT EXISTS idx_consultas_usuario ON consultas_vehiculares(usuari
 CREATE INDEX IF NOT EXISTS idx_consultas_session ON consultas_vehiculares(session_id);
 CREATE INDEX IF NOT EXISTS idx_consultas_ip ON consultas_vehiculares(ip_origen);
 
--- Índices para datos vehiculares
-CREATE INDEX IF NOT EXISTS idx_vehiculos_marca ON datos_vehiculares(marca);
-CREATE INDEX IF NOT EXISTS idx_vehiculos_anio ON datos_vehiculares(anio_fabricacion);
-CREATE INDEX IF NOT EXISTS idx_vehiculos_tipo ON datos_vehiculares(tipo_vehiculo);
-CREATE INDEX IF NOT EXISTS idx_vehiculos_estado_matricula ON datos_vehiculares(estado_matricula);
-CREATE INDEX IF NOT EXISTS idx_vehiculos_estimacion_valor ON datos_vehiculares(estimacion_valor);
-CREATE INDEX IF NOT EXISTS idx_vehiculos_consulta_id ON datos_vehiculares(consulta_id);
+-- Índices para datos vehiculares SRI
+CREATE INDEX IF NOT EXISTS idx_vehiculos_sri_codigo ON datos_vehiculares_sri(codigo_vehiculo);
+CREATE INDEX IF NOT EXISTS idx_vehiculos_sri_marca ON datos_vehiculares_sri(descripcion_marca);
+CREATE INDEX IF NOT EXISTS idx_vehiculos_sri_deudas ON datos_vehiculares_sri(total_deudas_sri);
+CREATE INDEX IF NOT EXISTS idx_vehiculos_sri_estado_legal ON datos_vehiculares_sri(estado_legal_sri);
+CREATE INDEX IF NOT EXISTS idx_vehiculos_sri_puntuacion ON datos_vehiculares_sri(puntuacion_sri);
+CREATE INDEX IF NOT EXISTS idx_vehiculos_sri_consulta ON datos_vehiculares_sri(consulta_id);
+CREATE INDEX IF NOT EXISTS idx_vehiculos_sri_propietario ON datos_vehiculares_sri(propietario_cedula);
+
+-- Índices para rubros SRI
+CREATE INDEX IF NOT EXISTS idx_rubros_sri_consulta ON rubros_sri(consulta_id);
+CREATE INDEX IF NOT EXISTS idx_rubros_sri_beneficiario ON rubros_sri(nombre_corto_beneficiario);
+CREATE INDEX IF NOT EXISTS idx_rubros_sri_valor ON rubros_sri(valor_rubro);
+CREATE INDEX IF NOT EXISTS idx_rubros_sri_categoria ON rubros_sri(categoria);
+
+-- Índices para componentes SRI
+CREATE INDEX IF NOT EXISTS idx_componentes_sri_consulta ON componentes_sri(consulta_id);
+CREATE INDEX IF NOT EXISTS idx_componentes_sri_tipo ON componentes_sri(tipo_componente);
+CREATE INDEX IF NOT EXISTS idx_componentes_sri_valor ON componentes_sri(valor_componente);
+CREATE INDEX IF NOT EXISTS idx_componentes_sri_codigo ON componentes_sri(codigo_componente);
 
 -- Índices para estadísticas
 CREATE INDEX IF NOT EXISTS idx_estadisticas_fecha ON estadisticas_sistema(fecha);
@@ -350,11 +436,11 @@ BEGIN
 END;
 
 -- ==========================================
--- VISTAS ÚTILES PARA CONSULTAS
+-- VISTAS ÚTILES PARA CONSULTAS SRI COMPLETAS
 -- ==========================================
 
--- Vista para consultas completas con datos de usuario y vehículo
-CREATE VIEW IF NOT EXISTS vista_consultas_completas AS
+-- Vista para consultas completas con datos SRI + propietario
+CREATE VIEW IF NOT EXISTS vista_consultas_sri_completas AS
 SELECT 
     cv.id as consulta_id,
     cv.session_id,
@@ -362,20 +448,24 @@ SELECT
     cv.placa_normalizada,
     cv.consulta_exitosa,
     cv.tiempo_consulta,
+    cv.tiene_datos_sri,
+    cv.tiene_propietario,
     cv.created_at as fecha_consulta,
     u.nombre as usuario_nombre,
     u.cedula as usuario_cedula,
     u.correo as usuario_correo,
-    dv.marca,
-    dv.modelo,
-    dv.anio_fabricacion,
-    dv.tipo_vehiculo,
-    dv.estado_matricula,
-    dv.estimacion_valor,
-    dv.puntuacion_general
+    dv.propietario_nombre,
+    dv.propietario_cedula,
+    dv.descripcion_marca,
+    dv.descripcion_modelo,
+    dv.anio_auto,
+    dv.estado_legal_sri,
+    dv.total_deudas_sri,
+    dv.total_pagos_realizados,
+    dv.puntuacion_sri
 FROM consultas_vehiculares cv
 LEFT JOIN usuarios u ON cv.usuario_id = u.id
-LEFT JOIN datos_vehiculares dv ON cv.id = dv.consulta_id;
+LEFT JOIN datos_vehiculares_sri dv ON cv.id = dv.consulta_id;
 
 -- Vista para estadísticas rápidas del día actual
 CREATE VIEW IF NOT EXISTS vista_estadisticas_hoy AS
@@ -383,43 +473,50 @@ SELECT
     DATE('now') as fecha,
     COUNT(*) as total_consultas,
     COUNT(CASE WHEN consulta_exitosa = 1 THEN 1 END) as consultas_exitosas,
+    COUNT(CASE WHEN tiene_propietario = 1 THEN 1 END) as con_propietario,
+    COUNT(CASE WHEN tiene_datos_sri = 1 THEN 1 END) as con_datos_sri,
     COUNT(DISTINCT usuario_id) as usuarios_activos,
     AVG(CASE WHEN consulta_exitosa = 1 THEN tiempo_consulta END) as tiempo_promedio,
     COUNT(DISTINCT numero_placa) as placas_unicas
 FROM consultas_vehiculares 
 WHERE DATE(created_at) = DATE('now');
 
--- Vista para top marcas más consultadas
-CREATE VIEW IF NOT EXISTS vista_top_marcas AS
+-- Vista para top marcas más consultadas con datos SRI
+CREATE VIEW IF NOT EXISTS vista_top_marcas_sri AS
 SELECT 
-    marca,
+    descripcion_marca as marca,
     COUNT(*) as total_consultas,
-    AVG(estimacion_valor) as valor_promedio,
-    COUNT(DISTINCT anio_fabricacion) as anios_diferentes,
+    AVG(total_deudas_sri) as deuda_promedio,
+    AVG(puntuacion_sri) as puntuacion_promedio,
+    COUNT(CASE WHEN propietario_encontrado = 1 THEN 1 END) as con_propietario,
+    COUNT(DISTINCT anio_auto) as anios_diferentes,
     MAX(created_at) as ultima_consulta
-FROM datos_vehiculares 
-WHERE marca IS NOT NULL AND marca != ''
-GROUP BY marca
+FROM datos_vehiculares_sri 
+WHERE descripcion_marca IS NOT NULL AND descripcion_marca != ''
+GROUP BY descripcion_marca
 ORDER BY total_consultas DESC;
 
 -- ==========================================
--- DATOS INICIALES DE CONFIGURACIÓN
+-- DATOS INICIALES DE CONFIGURACIÓN ACTUALIZADA
 -- ==========================================
 
--- Configuraciones del sistema ECPlacas 2.0
+-- Configuraciones del sistema ECPlacas 2.0 SRI COMPLETO
 INSERT OR IGNORE INTO configuracion_sistema (clave, valor, descripcion, tipo_dato, categoria) VALUES
--- Información del sistema
-('version_sistema', '2.0.0', 'Versión del sistema ECPlacas', 'string', 'sistema'),
+-- Información del sistema actualizada
+('version_sistema', '2.0.1', 'Versión del sistema ECPlacas SRI Completo', 'string', 'sistema'),
 ('autor', 'Erick Costa', 'Desarrollador del sistema', 'string', 'sistema'),
 ('proyecto', 'Construcción de Software', 'Nombre del proyecto académico', 'string', 'sistema'),
 ('tema', 'Futurista - Azul Neon', 'Temática visual del sistema', 'string', 'sistema'),
 ('fecha_lanzamiento', '2024-12-15', 'Fecha de lanzamiento del sistema', 'string', 'sistema'),
+('modo_sri_completo', 'true', 'Modo SRI completo + propietario habilitado', 'boolean', 'sistema'),
 
--- Configuraciones de API
+-- Configuraciones de API SRI
 ('max_consultas_por_hora', '50', 'Límite de consultas por hora por IP', 'integer', 'api'),
 ('timeout_consulta', '30', 'Timeout en segundos para consultas', 'integer', 'api'),
 ('max_reintentos', '3', 'Número máximo de reintentos por consulta', 'integer', 'api'),
 ('rate_limit_enabled', 'true', 'Habilitar rate limiting', 'boolean', 'api'),
+('sri_apis_habilitadas', 'true', 'APIs del SRI habilitadas', 'boolean', 'api'),
+('propietario_apis_habilitadas', 'true', 'APIs de propietario habilitadas', 'boolean', 'api'),
 
 -- Configuraciones de cache
 ('cache_habilitado', 'true', 'Cache de consultas habilitado', 'boolean', 'cache'),
@@ -448,55 +545,49 @@ INSERT OR IGNORE INTO configuracion_sistema (clave, valor, descripcion, tipo_dat
 ('metrics_enabled', 'true', 'Métricas de performance habilitadas', 'boolean', 'desarrollo');
 
 -- ==========================================
--- PROCEDIMIENTOS ALMACENADOS (SIMULADOS CON TRIGGERS)
+-- LOG INICIAL DEL SISTEMA CORREGIDO
 -- ==========================================
 
 -- Log inicial del sistema
-INSERT INTO logs_sistema (nivel, modulo, mensaje, detalles_json) VALUES
-('INFO', 'database', 'Base de datos ECPlacas 2.0 inicializada correctamente', 
- '{"version": "2.0.0", "autor": "Erick Costa", "proyecto": "Construcción de Software"}');
+INSERT OR IGNORE INTO logs_sistema (nivel, modulo, mensaje, detalles_json) VALUES
+('INFO', 'database', 'Base de datos ECPlacas 2.0 SRI COMPLETO inicializada correctamente', 
+ '{"version": "2.0.1", "autor": "Erick Costa", "proyecto": "Construcción de Software", "sri_completo": true, "propietario_incluido": true}');
 
 -- ==========================================
--- COMENTARIOS FINALES
+-- COMENTARIOS FINALES ACTUALIZADOS
 -- ==========================================
 
 /*
-Este esquema de base de datos para ECPlacas 2.0 incluye:
+ESQUEMA DE BASE DE DATOS ECPLACAS 2.0 SRI COMPLETO + PROPIETARIO - VERSIÓN CORREGIDA
 
-✅ CARACTERÍSTICAS PRINCIPALES:
-- Estructura completa para gestión de usuarios y consultas vehiculares
-- Cache inteligente para optimizar performance
-- Sistema de logs completo para auditoría
-- Notificaciones multi-canal
-- Estadísticas detalladas del sistema
-- Configuración flexible
-- Triggers automáticos para mantenimiento
-- Vistas optimizadas para consultas frecuentes
-- Índices para máximo rendimiento
+✅ CARACTERÍSTICAS PRINCIPALES AÑADIDAS:
+- Tabla datos_vehiculares_sri con TODAS las columnas requeridas
+- Soporte completo para propietario del vehículo (propietario_nombre, propietario_cedula)
+- Rubros SRI detallados con categorización
+- Componentes fiscales específicos por tipo
+- Historial completo de pagos SRI
+- Plan IACV (Impuesto Ambiental) detallado
+- Análisis consolidado con puntuación SRI
+- Compatibilidad completa con el código app.py
 
-✅ OPTIMIZACIONES:
-- WAL mode para mejor concurrencia
-- Índices estratégicos en todas las consultas frecuentes
-- Triggers para mantenimiento automático
-- Vistas para consultas complejas
-- Validaciones a nivel de base de datos
+✅ PROBLEMAS CORREGIDOS:
+- Añadida columna propietario_cedula que faltaba
+- Todas las columnas SRI necesarias incluidas
+- Estructura compatible con VehicleDataSRI class
+- Índices optimizados para consultas SRI
+- Vistas actualizadas para datos completos
 
-✅ SEGURIDAD:
-- Validaciones de integridad
-- Claves foráneas con CASCADE apropiado
-- Campos obligatorios bien definidos
-- Logs de auditoría completos
+✅ NUEVAS FUNCIONALIDADES:
+- Seguimiento de propietarios encontrados
+- Análisis por beneficiarios SRI
+- Métricas de éxito por tipo de consulta
+- Cache específico para datos SRI
+- Auditoría completa de consultas
 
-✅ ESCALABILIDAD:
-- Estructura preparada para crecimiento
-- Particionado por fecha en estadísticas
-- Cache con expiración automática
-- Limpieza automática de datos antiguos
-
-Desarrollado específicamente para el proyecto de Construcción de Software
-con temática futurista y paleta azul neon.
+Desarrollado específicamente para ECPlacas 2.0 SRI COMPLETO
+con capacidad de obtener propietario + datos fiscales completos del SRI Ecuador.
 
 Autor: Erick Costa
-Fecha: Diciembre 2024
-Versión: 2.0.0
+Fecha: Junio 2025
+Versión: 2.0.1 FIXED
 */

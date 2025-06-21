@@ -1,361 +1,395 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-ECPlacas 2.0 - Rutas de Frontend
+==========================================
+ECPlacas 2.0 SRI COMPLETO - Rutas de Frontend
+==========================================
 Proyecto: Construcción de Software
 Desarrollado por: Erick Costa
+Versión: 2.0.1
+==========================================
 
-Rutas para servir archivos del frontend
+Rutas que complementan las del app.py para servir archivos estáticos
+y manejar el frontend de manera optimizada
 """
 
 import os
-from flask import Blueprint, send_from_directory, send_file, current_app
-from pathlib import Path
+import mimetypes
 import logging
-
-logger = logging.getLogger(__name__)
+from pathlib import Path
+from flask import Blueprint, send_from_directory, send_file, request, current_app, abort
+from werkzeug.exceptions import NotFound
 
 # Crear blueprint para rutas de frontend
 frontend_bp = Blueprint('frontend', __name__)
 
-# Obtener rutas del proyecto
-PROJECT_ROOT = Path(__file__).parent.parent.parent
-FRONTEND_DIR = PROJECT_ROOT / "frontend"
-PUBLIC_DIR = PROJECT_ROOT / "public"
+logger = logging.getLogger('ecplacas.frontend')
 
-@frontend_bp.route('/')
-def index():
-    """Página principal de ECPlacas 2.0"""
-    try:
-        index_path = FRONTEND_DIR / "index.html"
-        if index_path.exists():
-            return send_file(index_path)
-        else:
-            return """
-            <html>
-            <head><title>ECPlacas 2.0 - Error</title></head>
-            <body style="font-family: Arial; text-align: center; padding: 50px; background: #000; color: #00ffff;">
-                <h1>🚫 ECPlacas 2.0</h1>
-                <h2>Archivo index.html no encontrado</h2>
-                <p>Por favor verifique que el archivo frontend/index.html existe</p>
-                <p><a href="/api/health" style="color: #00ffff;">Verificar API</a></p>
-            </body>
-            </html>
-            """, 404
-    except Exception as e:
-        logger.error(f"Error sirviendo index.html: {e}")
-        return f"Error cargando página principal: {e}", 500
+# ==========================================
+# CONFIGURACIÓN DE PATHS
+# ==========================================
 
-@frontend_bp.route('/admin')
-def admin():
-    """Dashboard administrativo de ECPlacas 2.0"""
-    try:
-        admin_path = FRONTEND_DIR / "admin.html"
-        if admin_path.exists():
-            return send_file(admin_path)
-        else:
-            return """
-            <html>
-            <head><title>ECPlacas 2.0 Admin - Error</title></head>
-            <body style="font-family: Arial; text-align: center; padding: 50px; background: #000; color: #00ffff;">
-                <h1>🔧 ECPlacas 2.0 - Dashboard Admin</h1>
-                <h2>Archivo admin.html no encontrado</h2>
-                <p>Por favor verifique que el archivo frontend/admin.html existe</p>
-                <p><a href="/" style="color: #00ffff;">Volver al Frontend</a></p>
-            </body>
-            </html>
-            """, 404
-    except Exception as e:
-        logger.error(f"Error sirviendo admin.html: {e}")
-        return f"Error cargando dashboard administrativo: {e}", 500
+def get_frontend_path():
+    """Obtener path del directorio frontend"""
+    # Buscar en varios lugares posibles
+    possible_paths = [
+        Path(current_app.root_path).parent / "frontend",  # ../frontend desde backend
+        Path(current_app.root_path) / "frontend",         # ./frontend desde raíz
+        Path(current_app.root_path) / "static",           # ./static como fallback
+        Path(current_app.root_path) / ".." / ".." / "frontend"  # ../../frontend
+    ]
+    
+    for path in possible_paths:
+        if path.exists() and (path / "index.html").exists():
+            return path
+    
+    # Si no encuentra, usar el primero como default
+    return possible_paths[0]
 
-@frontend_bp.route('/static/<path:filename>')
-def static_files(filename):
-    """Servir archivos estáticos desde public/"""
-    try:
-        return send_from_directory(PUBLIC_DIR, filename)
-    except Exception as e:
-        logger.error(f"Error sirviendo archivo estático {filename}: {e}")
-        return f"Archivo {filename} no encontrado", 404
+def get_static_path():
+    """Obtener path del directorio de archivos estáticos"""
+    frontend_path = get_frontend_path()
+    static_paths = [
+        frontend_path / "assets",
+        frontend_path / "static", 
+        frontend_path,
+        Path(current_app.root_path) / "static"
+    ]
+    
+    for path in static_paths:
+        if path.exists():
+            return path
+    
+    return static_paths[0]
 
-@frontend_bp.route('/frontend/<path:filename>')
-def frontend_files(filename):
-    """Servir archivos del frontend"""
-    try:
-        return send_from_directory(FRONTEND_DIR, filename)
-    except Exception as e:
-        logger.error(f"Error sirviendo archivo frontend {filename}: {e}")
-        return f"Archivo {filename} no encontrado", 404
+# ==========================================
+# MIDDLEWARE
+# ==========================================
+
+@frontend_bp.before_request
+def before_frontend_request():
+    """Middleware para requests de frontend"""
+    # Log solo para requests importantes
+    if not request.path.startswith(('/css/', '/js/', '/img/', '/assets/')):
+        logger.info(f"Frontend: {request.method} {request.path} from {request.remote_addr}")
+
+@frontend_bp.after_request
+def after_frontend_request(response):
+    """Middleware de respuesta para frontend"""
+    # Headers de cache optimizados según tipo de archivo
+    if request.path.endswith(('.css', '.js')):
+        response.headers['Cache-Control'] = 'public, max-age=86400'  # 24 horas
+    elif request.path.endswith(('.png', '.jpg', '.jpeg', '.gif', '.ico', '.svg')):
+        response.headers['Cache-Control'] = 'public, max-age=604800'  # 7 días
+    elif request.path.endswith('.html'):
+        response.headers['Cache-Control'] = 'public, max-age=300'  # 5 minutos
+    
+    # Headers de seguridad
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    
+    return response
+
+# ==========================================
+# RUTAS DE ARCHIVOS ESTÁTICOS
+# ==========================================
 
 @frontend_bp.route('/css/<path:filename>')
-def css_files(filename):
-    """Servir archivos CSS desde public/css/"""
+def serve_css(filename):
+    """Servir archivos CSS optimizados"""
     try:
-        css_dir = PUBLIC_DIR / "css"
-        return send_from_directory(css_dir, filename)
+        frontend_path = get_frontend_path()
+        css_paths = [
+            frontend_path / "css",
+            frontend_path / "assets" / "css",
+            frontend_path
+        ]
+        
+        for css_path in css_paths:
+            file_path = css_path / filename
+            if file_path.exists():
+                response = send_file(file_path, mimetype='text/css')
+                response.headers['Cache-Control'] = 'public, max-age=86400'
+                return response
+        
+        logger.warning(f"CSS file not found: {filename}")
+        abort(404)
+        
     except Exception as e:
-        logger.error(f"Error sirviendo CSS {filename}: {e}")
-        return f"Archivo CSS {filename} no encontrado", 404
+        logger.error(f"Error serving CSS {filename}: {e}")
+        abort(500)
 
 @frontend_bp.route('/js/<path:filename>')
-def js_files(filename):
-    """Servir archivos JavaScript desde public/js/"""
+def serve_js(filename):
+    """Servir archivos JavaScript optimizados"""
     try:
-        js_dir = PUBLIC_DIR / "js"
-        return send_from_directory(js_dir, filename)
+        frontend_path = get_frontend_path()
+        js_paths = [
+            frontend_path / "js",
+            frontend_path / "assets" / "js",
+            frontend_path
+        ]
+        
+        for js_path in js_paths:
+            file_path = js_path / filename
+            if file_path.exists():
+                response = send_file(file_path, mimetype='application/javascript')
+                response.headers['Cache-Control'] = 'public, max-age=86400'
+                return response
+        
+        logger.warning(f"JS file not found: {filename}")
+        abort(404)
+        
     except Exception as e:
-        logger.error(f"Error sirviendo JS {filename}: {e}")
-        return f"Archivo JS {filename} no encontrado", 404
+        logger.error(f"Error serving JS {filename}: {e}")
+        abort(500)
 
+@frontend_bp.route('/img/<path:filename>')
 @frontend_bp.route('/images/<path:filename>')
-def image_files(filename):
-    """Servir imágenes desde public/images/"""
+@frontend_bp.route('/assets/img/<path:filename>')
+def serve_images(filename):
+    """Servir archivos de imagen optimizados"""
     try:
-        images_dir = PUBLIC_DIR / "images"
-        return send_from_directory(images_dir, filename)
+        frontend_path = get_frontend_path()
+        img_paths = [
+            frontend_path / "img",
+            frontend_path / "images", 
+            frontend_path / "assets" / "img",
+            frontend_path / "assets" / "images",
+            frontend_path
+        ]
+        
+        for img_path in img_paths:
+            file_path = img_path / filename
+            if file_path.exists():
+                # Detectar MIME type automáticamente
+                mimetype, _ = mimetypes.guess_type(str(file_path))
+                response = send_file(file_path, mimetype=mimetype)
+                response.headers['Cache-Control'] = 'public, max-age=604800'  # 7 días
+                return response
+        
+        logger.warning(f"Image file not found: {filename}")
+        abort(404)
+        
     except Exception as e:
-        logger.error(f"Error sirviendo imagen {filename}: {e}")
-        return f"Imagen {filename} no encontrada", 404
+        logger.error(f"Error serving image {filename}: {e}")
+        abort(500)
 
-@frontend_bp.route('/fonts/<path:filename>')
-def font_files(filename):
-    """Servir fuentes desde public/fonts/"""
+@frontend_bp.route('/assets/<path:filename>')
+def serve_assets(filename):
+    """Servir archivos de assets generales"""
     try:
-        fonts_dir = PUBLIC_DIR / "fonts"
-        return send_from_directory(fonts_dir, filename)
+        frontend_path = get_frontend_path()
+        assets_paths = [
+            frontend_path / "assets",
+            frontend_path
+        ]
+        
+        for assets_path in assets_paths:
+            file_path = assets_path / filename
+            if file_path.exists():
+                # Detectar MIME type
+                mimetype, _ = mimetypes.guess_type(str(file_path))
+                if not mimetype:
+                    mimetype = 'application/octet-stream'
+                
+                response = send_file(file_path, mimetype=mimetype)
+                
+                # Cache según extensión
+                if filename.endswith(('.css', '.js')):
+                    response.headers['Cache-Control'] = 'public, max-age=86400'
+                elif filename.endswith(('.png', '.jpg', '.jpeg', '.gif', '.ico', '.svg')):
+                    response.headers['Cache-Control'] = 'public, max-age=604800'
+                else:
+                    response.headers['Cache-Control'] = 'public, max-age=3600'
+                
+                return response
+        
+        logger.warning(f"Asset file not found: {filename}")
+        abort(404)
+        
     except Exception as e:
-        logger.error(f"Error sirviendo fuente {filename}: {e}")
-        return f"Fuente {filename} no encontrada", 404
+        logger.error(f"Error serving asset {filename}: {e}")
+        abort(500)
+
+# ==========================================
+# RUTAS DE FAVICON Y ROBOTS
+# ==========================================
 
 @frontend_bp.route('/favicon.ico')
 def favicon():
-    """Favicon del sitio"""
+    """Servir favicon"""
     try:
-        favicon_path = PUBLIC_DIR / "images" / "favicon.ico"
-        if favicon_path.exists():
-            return send_file(favicon_path)
-        else:
-            # Retornar un favicon por defecto si no existe
-            return """
-            <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                <rect width="32" height="32" fill="#000"/>
-                <text x="16" y="20" text-anchor="middle" fill="#00ffff" font-family="Arial" font-size="16" font-weight="bold">EC</text>
-            </svg>
-            """, 200, {'Content-Type': 'image/svg+xml'}
+        frontend_path = get_frontend_path()
+        favicon_paths = [
+            frontend_path / "favicon.ico",
+            frontend_path / "img" / "favicon.ico",
+            frontend_path / "assets" / "img" / "favicon.ico"
+        ]
+        
+        for favicon_path in favicon_paths:
+            if favicon_path.exists():
+                response = send_file(favicon_path, mimetype='image/x-icon')
+                response.headers['Cache-Control'] = 'public, max-age=604800'
+                return response
+        
+        # Generar favicon básico si no existe
+        return generate_basic_favicon()
+        
     except Exception as e:
-        logger.error(f"Error sirviendo favicon: {e}")
-        return "", 404
+        logger.error(f"Error serving favicon: {e}")
+        abort(404)
+
+@frontend_bp.route('/robots.txt')
+def robots_txt():
+    """Servir robots.txt"""
+    try:
+        frontend_path = get_frontend_path()
+        robots_path = frontend_path / "robots.txt"
+        
+        if robots_path.exists():
+            return send_file(robots_path, mimetype='text/plain')
+        else:
+            # Generar robots.txt básico
+            robots_content = """User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Sitemap: /sitemap.xml
+"""
+            from flask import Response
+            return Response(robots_content, mimetype='text/plain')
+        
+    except Exception as e:
+        logger.error(f"Error serving robots.txt: {e}")
+        abort(500)
 
 @frontend_bp.route('/manifest.json')
 def manifest():
-    """Manifest PWA"""
-    manifest_data = {
-        "name": "ECPlacas 2.0",
-        "short_name": "ECPlacas",
-        "description": "Sistema de Consulta Vehicular - Construcción de Software",
-        "version": "2.0.0",
-        "author": "Erick Costa",
-        "start_url": "/",
-        "display": "standalone",
-        "theme_color": "#00ffff",
-        "background_color": "#000000",
-        "orientation": "portrait",
-        "icons": [
-            {
-                "src": "/static/images/icon-192.png",
-                "sizes": "192x192",
-                "type": "image/png"
-            },
-            {
-                "src": "/static/images/icon-512.png",
-                "sizes": "512x512",
-                "type": "image/png"
-            }
-        ]
-    }
-    
-    return manifest_data, 200, {'Content-Type': 'application/json'}
-
-@frontend_bp.route('/robots.txt')
-def robots():
-    """Archivo robots.txt"""
-    robots_content = """User-agent: *
-Disallow: /api/
-Disallow: /admin/
-Disallow: /static/
-Allow: /
-
-# ECPlacas 2.0 - Sistema de Consulta Vehicular
-# Desarrollado por: Erick Costa
-# Proyecto: Construcción de Software
-"""
-    
-    return robots_content, 200, {'Content-Type': 'text/plain'}
-
-@frontend_bp.route('/sitemap.xml')
-def sitemap():
-    """Sitemap XML básico"""
-    sitemap_content = """<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-    <url>
-        <loc>http://localhost:5000/</loc>
-        <lastmod>2024-12-15</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>1.0</priority>
-    </url>
-    <url>
-        <loc>http://localhost:5000/admin</loc>
-        <lastmod>2024-12-15</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-    </url>
-</urlset>"""
-    
-    return sitemap_content, 200, {'Content-Type': 'application/xml'}
-
-@frontend_bp.route('/service-worker.js')
-def service_worker():
-    """Service Worker básico para PWA"""
-    sw_content = """
-// ECPlacas 2.0 - Service Worker
-// Versión: 2.0.0
-// Autor: Erick Costa
-
-const CACHE_NAME = 'ecplacas-v2.0.0';
-const urlsToCache = [
-    '/',
-    '/static/css/main.css',
-    '/static/js/main.js',
-    '/api/health'
-];
-
-// Instalación del Service Worker
-self.addEventListener('install', event => {
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(cache => {
-                console.log('ECPlacas 2.0: Cache abierto');
-                return cache.addAll(urlsToCache);
-            })
-    );
-});
-
-// Interceptar requests
-self.addEventListener('fetch', event => {
-    event.respondWith(
-        caches.match(event.request)
-            .then(response => {
-                // Retornar desde cache si existe
-                if (response) {
-                    return response;
-                }
-                return fetch(event.request);
-            }
-        )
-    );
-});
-
-// Actualización del Service Worker
-self.addEventListener('activate', event => {
-    event.waitUntil(
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames.map(cacheName => {
-                    if (cacheName !== CACHE_NAME) {
-                        console.log('ECPlacas 2.0: Eliminando cache antiguo', cacheName);
-                        return caches.delete(cacheName);
+    """Servir manifest.json para PWA"""
+    try:
+        frontend_path = get_frontend_path()
+        manifest_path = frontend_path / "manifest.json"
+        
+        if manifest_path.exists():
+            return send_file(manifest_path, mimetype='application/json')
+        else:
+            # Generar manifest básico
+            manifest_data = {
+                "name": "ECPlacas 2.0 SRI COMPLETO",
+                "short_name": "ECPlacas 2.0",
+                "description": "Sistema de Consulta Vehicular SRI + Propietario",
+                "start_url": "/",
+                "display": "standalone",
+                "background_color": "#000033",
+                "theme_color": "#00ffff",
+                "icons": [
+                    {
+                        "src": "/img/icon-192.png",
+                        "sizes": "192x192",
+                        "type": "image/png"
+                    },
+                    {
+                        "src": "/img/icon-512.png", 
+                        "sizes": "512x512",
+                        "type": "image/png"
                     }
-                })
-            );
-        })
-    );
-});
-"""
-    
-    return sw_content, 200, {'Content-Type': 'application/javascript'}
+                ]
+            }
+            
+            from flask import jsonify
+            response = jsonify(manifest_data)
+            response.headers['Cache-Control'] = 'public, max-age=86400'
+            return response
+        
+    except Exception as e:
+        logger.error(f"Error serving manifest.json: {e}")
+        abort(500)
 
-# Manejador de errores 404 para el frontend
+# ==========================================
+# FUNCIONES AUXILIARES
+# ==========================================
+
+def generate_basic_favicon():
+    """Generar favicon básico si no existe"""
+    try:
+        # Crear un favicon básico de 16x16 en formato ICO
+        # Esto es un placeholder - en producción usar un favicon real
+        from flask import Response
+        
+        # ICO file header para 16x16 favicon básico (azul)
+        ico_data = b'\x00\x00\x01\x00\x01\x00\x10\x10\x00\x00\x01\x00\x20\x00\x68\x04\x00\x00\x16\x00\x00\x00'
+        
+        response = Response(ico_data, mimetype='image/x-icon')
+        response.headers['Cache-Control'] = 'public, max-age=86400'
+        return response
+        
+    except Exception as e:
+        logger.error(f"Error generating basic favicon: {e}")
+        abort(404)
+
+# ==========================================
+# MANEJO DE ERRORES ESPECÍFICO PARA FRONTEND
+# ==========================================
+
 @frontend_bp.errorhandler(404)
 def frontend_not_found(error):
-    """Página 404 personalizada"""
-    return """
-    <!DOCTYPE html>
-    <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>ECPlacas 2.0 - Página No Encontrada</title>
-        <style>
-            @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+    """Manejo de 404 para archivos estáticos"""
+    # Para archivos estáticos, retornar 404 normal
+    if request.path.startswith(('/css/', '/js/', '/img/', '/assets/')):
+        logger.warning(f"Static file not found: {request.path}")
+        abort(404)
+    
+    # Para otras rutas, podría redirigir al index.html (SPA)
+    try:
+        frontend_path = get_frontend_path()
+        index_path = frontend_path / "index.html"
+        
+        if index_path.exists():
+            logger.info(f"SPA fallback: {request.path} -> index.html")
+            return send_file(index_path, mimetype='text/html')
+        else:
+            abort(404)
             
-            body {
-                font-family: 'Orbitron', monospace;
-                background: linear-gradient(135deg, #000 0%, #001122 50%, #000033 100%);
-                color: #00ffff;
-                margin: 0;
-                padding: 0;
-                min-height: 100vh;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                text-align: center;
+    except Exception as e:
+        logger.error(f"Error in frontend 404 handler: {e}")
+        abort(404)
+
+# ==========================================
+# RUTAS DE UTILIDADES DE FRONTEND
+# ==========================================
+
+@frontend_bp.route('/healthcheck')
+def frontend_healthcheck():
+    """Healthcheck específico para frontend"""
+    try:
+        frontend_path = get_frontend_path()
+        index_exists = (frontend_path / "index.html").exists()
+        
+        return {
+            'success': True,
+            'frontend_available': index_exists,
+            'frontend_path': str(frontend_path),
+            'static_files': {
+                'css': len(list((frontend_path / "css").glob("*.css"))) if (frontend_path / "css").exists() else 0,
+                'js': len(list((frontend_path / "js").glob("*.js"))) if (frontend_path / "js").exists() else 0,
+                'images': len(list((frontend_path / "img").glob("*"))) if (frontend_path / "img").exists() else 0
             }
-            
-            .container {
-                background: rgba(0, 0, 0, 0.8);
-                border: 2px solid #00ffff;
-                border-radius: 20px;
-                padding: 3rem;
-                box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
-            }
-            
-            h1 {
-                font-size: 4rem;
-                margin-bottom: 1rem;
-                text-shadow: 0 0 20px #00ffff;
-            }
-            
-            h2 {
-                font-size: 2rem;
-                margin-bottom: 2rem;
-                color: #99ccff;
-            }
-            
-            p {
-                font-size: 1.2rem;
-                margin-bottom: 2rem;
-                color: #cccccc;
-            }
-            
-            a {
-                display: inline-block;
-                background: linear-gradient(135deg, #0066ff, #00ffff);
-                color: #000;
-                padding: 1rem 2rem;
-                text-decoration: none;
-                border-radius: 25px;
-                font-weight: bold;
-                transition: all 0.3s ease;
-                margin: 0 1rem;
-            }
-            
-            a:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 10px 25px rgba(0, 255, 255, 0.5);
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <h1>404</h1>
-            <h2>Página No Encontrada</h2>
-            <p>La página que busca no existe en ECPlacas 2.0</p>
-            <div>
-                <a href="/">🏠 Inicio</a>
-                <a href="/admin">🔧 Admin</a>
-                <a href="/api/health">🔍 API</a>
-            </div>
-        </div>
-    </body>
-    </html>
-    """, 404
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in frontend healthcheck: {e}")
+        return {'success': False, 'error': str(e)}, 500
+
+if __name__ == "__main__":
+    print("🎨 Módulo de rutas de Frontend para ECPlacas 2.0")
+    print("📁 Rutas incluidas:")
+    print("   - /css/<filename> - Archivos CSS")
+    print("   - /js/<filename> - Archivos JavaScript")
+    print("   - /img/<filename> - Archivos de imagen")
+    print("   - /assets/<filename> - Assets generales")
+    print("   - /favicon.ico - Favicon")
+    print("   - /robots.txt - Robots.txt")
+    print("   - /manifest.json - PWA Manifest")
+    print("   - /healthcheck - Estado del frontend")
