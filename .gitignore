@@ -1,0 +1,315 @@
+# ==========================================
+# ECPlacas 2.0 - Git Ignore
+# Proyecto: Construcción de Software - EPN
+# Desarrollado por: Erick Costa
+# ==========================================
+
+# ==========================================
+# PYTHON
+# ==========================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# ==========================================
+# FLASK
+# ==========================================
+
+instance/
+.webassets-cache
+
+# ==========================================
+# BASE DE DATOS
+# ==========================================
+
+# SQLite
+*.sqlite
+*.sqlite3
+*.sqlite-shm
+*.sqlite-wal
+*.db
+*.db-shm
+*.db-wal
+
+# Backups de base de datos
+*.sql.bak
+*.dump
+
+# ==========================================
+# LOGS
+# ==========================================
+
+# Archivos de log
+*.log
+logs/
+*.log.*
+
+# ==========================================
+# DESARROLLO
+# ==========================================
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# Spyder
+.spyderproject
+.spyproject
+
+# ==========================================
+# SISTEMA OPERATIVO
+# ==========================================
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ==========================================
+# DOCKER
+# ==========================================
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# ==========================================
+# FRONTEND
+# ==========================================
+
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist/
+build/
+
+# ==========================================
+# ARCHIVOS ESPECÍFICOS DEL PROYECTO
+# ==========================================
+
+# Configuración local
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Cache del proyecto
+cache/
+*.cache
+
+# Archivos temporales del proyecto
+temp/
+tmp/
+*.tmp
+
+# Reportes y outputs
+automation_report_*.json
+flake8-report.txt
+bandit-report.json
+safety-report.txt
+
+# Certificados y claves (NUNCA commitear)
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+secrets/
+
+# Archivos de configuración sensibles
+config.local.py
+settings.local.py
+
+# ==========================================
+# HERRAMIENTAS DE DESARROLLO
+# ==========================================
+
+# Coverage
+.coverage
+htmlcov/
+coverage.xml
+
+# Pytest
+.pytest_cache/
+
+# Bandit
+.bandit
+
+# Safety
+safety.json
+
+# Pre-commit
+.pre-commit-config.yaml
+
+# ==========================================
+# ARCHIVOS DE BACKUP
+# ==========================================
+
+*.bak
+*.backup
+*.old
+*.orig
+
+# ==========================================
+# OTROS
+# ==========================================
+
+# Archivos de lock (excepto los necesarios)
+*.lock
+
+# Archivos de patch
+*.patch
+*.diff
+
+# Archivos comprimidos
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Archivos de documentación generados
+docs/_build/
+docs/build/
+
+# Archivos de profiling
+*.prof
+*.lprof
+
+# ==========================================
+# EXCEPCIONES (archivos que SÍ queremos commitear)
+# ==========================================
+
+# Archivos de configuración importantes
+!.env.example
+!docker-compose.yml
+!Dockerfile
+!requirements.txt
+!pyproject.toml
+!.flake8
+
+# Archivos de documentación
+!README.md
+!LICENSE
+!CHANGELOG.md
+
+# Configuraciones de CI/CD
+!.github/
+!.gitlab-ci.yml
+
+# Schemas y migrations importantes
+!backend/database/schema.sql

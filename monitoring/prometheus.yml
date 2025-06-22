@@ -1,0 +1,65 @@
+# ==========================================
+# ECPlacas 2.0 - Configuración Prometheus
+# Proyecto: Construcción de Software - EPN
+# Desarrollado por: Erick Costa
+# ==========================================
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+# Alertmanager configuration (opcional)
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# Cargar reglas de alerta (opcional)
+rule_files:
+  # - "rules/*.yml"
+
+# Configuración de scrape
+scrape_configs:
+  # El propio Prometheus
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # ECPlacas Application
+  - job_name: 'ecplacas-app'
+    static_configs:
+      - targets: ['ecplacas-app:5000']
+    metrics_path: '/api/metrics'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+    honor_labels: true
+    params:
+      format: ['prometheus']
+
+  # ECPlacas Health Check
+  - job_name: 'ecplacas-health'
+    static_configs:
+      - targets: ['ecplacas-app:5000']
+    metrics_path: '/api/health'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # Nginx (si está configurado con stub_status)
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['nginx:80']
+    metrics_path: '/nginx_status'
+    scrape_interval: 30s
+
+  # Redis (si está disponible)
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+    scrape_interval: 30s
+
+  # Node Exporter (si se agrega)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['localhost:9100']
+    scrape_interval: 30s

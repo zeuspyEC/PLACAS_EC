@@ -1,0 +1,121 @@
+# ==========================================
+# ECPlacas 2.0 - Dependencias Python
+# Proyecto: Construcción de Software - EPN
+# Desarrollado por: Erick Costa
+# Enfoque: Rendimiento | Sostenibilidad | Escalabilidad
+# ==========================================
+
+# ==========================================
+# DEPENDENCIAS PRINCIPALES
+# ==========================================
+
+# Framework web
+Flask>=3.0.0,<4.0.0
+Flask-CORS>=4.0.0,<5.0.0
+Werkzeug>=3.0.0,<4.0.0
+
+# HTTP y APIs
+requests>=2.31.0,<3.0.0
+aiohttp>=3.9.0,<4.0.0
+
+# Utilidades
+python-dotenv>=1.0.0,<2.0.0
+python-dateutil>=2.8.0,<3.0.0
+colorama>=0.4.6,<1.0.0
+
+# ==========================================
+# DEPENDENCIAS DE DESARROLLO
+# ==========================================
+
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-asyncio>=0.21.0
+pytest-mock>=3.11.0
+httpx>=0.24.0
+factory-boy>=3.3.0
+
+# Linting y formateo
+flake8>=6.0.0
+flake8-docstrings>=1.7.0
+flake8-import-order>=0.18.0
+flake8-bugbear>=23.7.0
+black>=23.7.0
+isort>=5.12.0
+mypy>=1.5.0
+
+# Seguridad
+bandit>=1.7.5
+safety>=2.3.0
+
+# Herramientas
+pre-commit>=3.3.0
+
+# ==========================================
+# DEPENDENCIAS OPCIONALES
+# ==========================================
+
+# Cache (si se usa Redis)
+# redis>=4.5.0
+
+# Base de datos avanzada (si se migra de SQLite)
+# SQLAlchemy>=2.0.0
+# psycopg2-binary>=2.9.0  # Para PostgreSQL
+
+# Monitoreo
+# prometheus-client>=0.17.0
+
+# Producción
+gunicorn>=21.2.0
+gevent>=23.7.0
+psutil>=5.9.0
+
+# ==========================================
+# COMPATIBILIDAD
+# ==========================================
+
+# Python 3.8+    ✅ Compatible
+# Python 3.9+    ✅ Compatible  
+# Python 3.10+   ✅ Compatible
+# Python 3.11+   ✅ Compatible
+# Python 3.12+   ✅ Compatible
+# Python 3.13+   ✅ Compatible
+
+# Windows 10+    ✅ Compatible
+# Windows 11     ✅ Compatible
+# Linux          ✅ Compatible
+# macOS          ✅ Compatible
+
+# ==========================================
+# NOTAS DE INSTALACIÓN
+# ==========================================
+
+# 1. Crear entorno virtual:
+#    python -m venv venv
+#    venv\Scripts\activate  (Windows)
+#    source venv/bin/activate  (Linux/Mac)
+
+# 2. Actualizar pip:
+#    python -m pip install --upgrade pip
+
+# 3. Instalar dependencias:
+#    pip install -r requirements.txt
+
+# 4. Verificar instalación:
+#    python -c "import flask, requests, aiohttp; print('✅ Dependencias instaladas correctamente')"
+
+# ==========================================
+# INSTALACIÓN PARA DESARROLLO
+# ==========================================
+
+# Para instalar todas las dependencias de desarrollo:
+# pip install -e .[dev]
+
+# Para instalar solo testing:
+# pip install -e .[test]
+
+# Para instalar solo documentación:
+# pip install -e .[docs]
+
+# Para instalar todo:
+# pip install -e .[dev,test,docs,production]
