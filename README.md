@@ -476,7 +476,7 @@ FLASK_DEBUG=True python ECPlacas.py
 - **Universidad:** Escuela Politécnica Nacional
 - **Materia:** Construcción de Software
 - **Email:** erick.costa@epn.edu.ec
-- **GitHub:** [@erickcosta](https://github.com/erickcosta)
+- **GitHub:** [@zeuspyEC](https://github.com/zeuspyEC)
 
 ### **Recursos Adicionales**
 - **Documentación:** [docs/](./docs/)
