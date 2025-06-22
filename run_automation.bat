@@ -1,328 +1,209 @@
 @echo off
 chcp 65001 >nul
-title ECPlacas 2.0 - Automatización Completa EPN
+setlocal enabledelayedexpansion
 
-:: ==========================================
-:: ECPlacas 2.0 - Script de Automatización Completa
-:: Proyecto: Construcción de Software - EPN
-:: Desarrollado por: Erick Costa
-:: Enfoque: Rendimiento | Sostenibilidad | Escalabilidad
-:: ==========================================
+REM ==========================================
+REM ECPlacas 2.0 - Script de Automatización Windows
+REM Proyecto: Construcción de Software - EPN
+REM Desarrollado por: Erick Costa
+REM Enfoque: Rendimiento | Sostenibilidad | Escalabilidad
+REM ==========================================
 
-setlocal EnableDelayedExpansion
-color 0B
+title ECPlacas 2.0 - Automatización EPN
 
-echo.
-echo ╔══════════════════════════════════════════════════════════════════════╗
-echo ║                    🚀 ECPlacas 2.0 - EPN 🚀                        ║
-echo ║                                                                      ║
-echo ║  Automatización Completa de Tareas del Examen                      ║
-echo ║  Escuela Politécnica Nacional                                       ║
-echo ║  Desarrollado por: Erick Costa                                      ║
-echo ║  Construcción de Software - Junio 2025                            ║
-echo ║                                                                      ║
-echo ║  💻 Enfoque: Rendimiento ^| Sostenibilidad ^| Escalabilidad          ║
-echo ║  🔥 Script de Automatización Python                                ║
-echo ╚══════════════════════════════════════════════════════════════════════╝
+echo ========================================
+echo ECPlacas 2.0 - Sistema de Automatización
+echo Escuela Politécnica Nacional
+echo Desarrollado por: Erick Costa
+echo Fecha: %date% %time%
+echo ========================================
 echo.
 
-:: Verificar Python
+REM Verificar Python
 python --version >nul 2>&1
 if errorlevel 1 (
-    echo ❌ Python no encontrado. Instala Python 3.8+ desde python.org
+    echo [ERROR] Python no está instalado o no está en PATH
+    echo Por favor instala Python 3.8+ desde https://python.org
     pause
     exit /b 1
 )
 
-echo ✅ Python detectado
-
-:: Verificar estructura del proyecto
-if not exist "scripts\run_exam_tasks.py" (
-    echo ❌ Script de automatización no encontrado
-    echo 💡 Asegúrate de ejecutar desde el directorio del proyecto
+REM Verificar si estamos en el directorio correcto
+if not exist "ECPlacas.py" (
+    echo [ERROR] No se encuentra ECPlacas.py
+    echo Por favor ejecuta este script desde el directorio raíz del proyecto
     pause
     exit /b 1
 )
 
-echo ✅ Script de automatización encontrado
-
-:menu
+:MENU
 cls
+echo ========================================
+echo ECPlacas 2.0 - Menu Principal
+echo ========================================
 echo.
-echo ╔══════════════════════════════════════════════════════════════════════╗
-echo ║               🎓 MENÚ DE AUTOMATIZACIÓN - EPN                      ║
-echo ╚══════════════════════════════════════════════════════════════════════╝
+echo 1. Ejecutar TODAS las tareas del examen
+echo 2. Solo Compilación
+echo 3. Solo Linting
+echo 4. Solo Pruebas
+echo 5. Solo Docker
+echo 6. Configurar entorno
+echo 7. Ver reportes
+echo 8. Limpiar proyecto
+echo 9. Salir
 echo.
-echo 🔧 Tareas del Examen Disponibles:
-echo.
-echo    1. 🔨 Compilación del Proyecto
-echo    2. 🔍 Análisis de Código (Linting)
-echo    3. 🧪 Pruebas Unitarias e Integración
-echo    4. 🐳 Build de Docker
-echo    5. 🚀 TODAS LAS TAREAS AUTOMÁTICAS
-echo    6. 🌟 TODO EXCEPTO DOCKER
-echo.
-echo 📊 Opciones Adicionales:
-echo.
-echo    7. ⚙️  Configurar Entorno de Desarrollo
-echo    8. 📄 Ver Último Reporte
-echo    9. 🧹 Limpiar Archivos Temporales
-echo    0. ❌ Salir
-echo.
-set /p choice=💭 Selecciona una opción (0-9): 
+set /p choice="Selecciona una opción (1-9): "
 
-if "%choice%"=="1" goto :compile
-if "%choice%"=="2" goto :lint
-if "%choice%"=="3" goto :test
-if "%choice%"=="4" goto :docker
-if "%choice%"=="5" goto :all_tasks
-if "%choice%"=="6" goto :all_no_docker
-if "%choice%"=="7" goto :setup_env
-if "%choice%"=="8" goto :view_report
-if "%choice%"=="9" goto :cleanup
-if "%choice%"=="0" goto :exit
-echo ⚠️ Opción inválida. Presiona cualquier tecla para continuar...
-pause >nul
-goto :menu
+if "%choice%"=="1" goto ALL_TASKS
+if "%choice%"=="2" goto COMPILE_ONLY
+if "%choice%"=="3" goto LINT_ONLY
+if "%choice%"=="4" goto TEST_ONLY
+if "%choice%"=="5" goto DOCKER_ONLY
+if "%choice%"=="6" goto SETUP_ENV
+if "%choice%"=="7" goto VIEW_REPORTS
+if "%choice%"=="8" goto CLEAN_PROJECT
+if "%choice%"=="9" goto EXIT
 
-:compile
-cls
-echo.
-echo ╔══════════════════════════════════════════════════════════════════════╗
-echo ║                      🔨 COMPILACIÓN                                ║
-echo ╚══════════════════════════════════════════════════════════════════════╝
-echo.
-echo 🔨 Ejecutando compilación del proyecto...
-echo.
-python scripts\run_exam_tasks.py --compile
-echo.
-echo ✅ Compilación completada. Presiona cualquier tecla para continuar...
-pause >nul
-goto :menu
-
-:lint
-cls
-echo.
-echo ╔══════════════════════════════════════════════════════════════════════╗
-echo ║                    🔍 ANÁLISIS DE CÓDIGO                           ║
-echo ╚══════════════════════════════════════════════════════════════════════╝
-echo.
-echo 🔍 Ejecutando análisis de código (linting)...
-echo.
-python scripts\run_exam_tasks.py --lint
-echo.
-echo ✅ Linting completado. Presiona cualquier tecla para continuar...
-pause >nul
-goto :menu
-
-:test
-cls
-echo.
-echo ╔══════════════════════════════════════════════════════════════════════╗
-echo ║               🧪 PRUEBAS UNITARIAS E INTEGRACIÓN                   ║
-echo ╚══════════════════════════════════════════════════════════════════════╝
-echo.
-echo 🧪 Ejecutando suite completa de pruebas...
-echo.
-python scripts\run_exam_tasks.py --test
-echo.
-echo ✅ Pruebas completadas. Presiona cualquier tecla para continuar...
-pause >nul
-goto :menu
-
-:docker
-cls
-echo.
-echo ╔══════════════════════════════════════════════════════════════════════╗
-echo ║                       🐳 BUILD DOCKER                              ║
-echo ╚══════════════════════════════════════════════════════════════════════╝
-echo.
-echo 🐳 Ejecutando build de imagen Docker...
-echo.
-python scripts\run_exam_tasks.py --docker
-echo.
-echo ✅ Docker build completado. Presiona cualquier tecla para continuar...
-pause >nul
-goto :menu
-
-:all_tasks
-cls
-echo.
-echo ╔══════════════════════════════════════════════════════════════════════╗
-echo ║              🚀 AUTOMATIZACIÓN COMPLETA - EPN                      ║
-echo ╚══════════════════════════════════════════════════════════════════════╝
-echo.
-echo 🚀 Ejecutando TODAS las tareas del examen automáticamente...
-echo.
-echo 📋 Tareas a ejecutar:
-echo    ✓ 1. Compilación
-echo    ✓ 2. Linting
-echo    ✓ 3. Pruebas
-echo    ✓ 4. Docker Build
-echo.
-echo ⏱️ Esto puede tomar varios minutos...
-echo.
-python scripts\run_exam_tasks.py --all
-echo.
-echo 🎉 ¡Automatización completa finalizada!
-echo 📊 Revisa el reporte generado para ver los resultados detallados.
-echo.
+echo [ERROR] Opción inválida. Por favor selecciona 1-9.
 pause
-goto :menu
+goto MENU
 
-:all_no_docker
-cls
+:ALL_TASKS
 echo.
-echo ╔══════════════════════════════════════════════════════════════════════╗
-echo ║            🌟 AUTOMATIZACIÓN SIN DOCKER - EPN                      ║
-echo ╚══════════════════════════════════════════════════════════════════════╝
-echo.
-echo 🌟 Ejecutando todas las tareas EXCEPTO Docker...
-echo.
-echo 📋 Tareas a ejecutar:
-echo    ✓ 1. Compilación
-echo    ✓ 2. Linting
-echo    ✓ 3. Pruebas
-echo    ⏭️ 4. Docker Build (omitido)
-echo.
-python scripts\run_exam_tasks.py --no-docker
-echo.
-echo 🎉 ¡Automatización (sin Docker) finalizada!
-echo.
-pause
-goto :menu
+echo [INFO] Ejecutando TODAS las tareas del examen...
+python scripts/run_exam_tasks.py --all
+goto SHOW_RESULTS
 
-:setup_env
-cls
+:COMPILE_ONLY
 echo.
-echo ╔══════════════════════════════════════════════════════════════════════╗
-echo ║               ⚙️ CONFIGURAR ENTORNO                                ║
-echo ╚══════════════════════════════════════════════════════════════════════╝
+echo [INFO] Ejecutando solo compilación...
+python scripts/run_exam_tasks.py --compile
+goto SHOW_RESULTS
+
+:LINT_ONLY
 echo.
-echo ⚙️ Configurando entorno de desarrollo...
+echo [INFO] Ejecutando solo linting...
+python scripts/run_exam_tasks.py --lint
+goto SHOW_RESULTS
+
+:TEST_ONLY
 echo.
-echo 📦 Instalando dependencias...
+echo [INFO] Ejecutando solo pruebas...
+python scripts/run_exam_tasks.py --test
+goto SHOW_RESULTS
+
+:DOCKER_ONLY
+echo.
+echo [INFO] Ejecutando solo Docker...
+python scripts/run_exam_tasks.py --docker
+goto SHOW_RESULTS
+
+:SETUP_ENV
+echo.
+echo [INFO] Configurando entorno de desarrollo...
+echo [INFO] Verificando entorno virtual...
+
+if not exist "venv\" (
+    echo [INFO] Creando entorno virtual...
+    python -m venv venv
+)
+
+echo [INFO] Activando entorno virtual...
+call venv\Scripts\activate.bat
+
+echo [INFO] Actualizando pip...
 python -m pip install --upgrade pip
-if exist "requirements.txt" (
-    python -m pip install -r requirements.txt
-)
-echo.
-echo 🔧 Instalando herramientas de desarrollo...
-python -m pip install pytest pytest-cov flake8 black isort mypy bandit
-echo.
-echo ✅ Entorno configurado correctamente.
+
+echo [INFO] Instalando dependencias...
+pip install -r requirements.txt
+
+echo [SUCCESS] Entorno configurado correctamente
 pause
-goto :menu
+goto MENU
 
-:view_report
-cls
+:VIEW_REPORTS
 echo.
-echo ╔══════════════════════════════════════════════════════════════════════╗
-echo ║                    📄 ÚLTIMO REPORTE                               ║
-echo ╚══════════════════════════════════════════════════════════════════════╝
-echo.
-echo 📄 Buscando último reporte de automatización...
-echo.
+echo [INFO] Abriendo reportes...
 
-:: Buscar el archivo de reporte más reciente
-set "latest_report="
-for /f "delims=" %%i in ('dir "automation_report_*.json" /b /o-d 2^>nul') do (
-    set "latest_report=%%i"
-    goto :found_report
+if exist "htmlcov\index.html" (
+    echo [INFO] Abriendo reporte de cobertura...
+    start htmlcov\index.html
 )
 
-:found_report
-if "%latest_report%"=="" (
-    echo ⚠️ No se encontraron reportes de automatización.
-    echo 💡 Ejecuta primero la automatización para generar un reporte.
+for %%f in (automation_report_*.json) do (
+    echo [INFO] Reporte encontrado: %%f
+)
+
+if exist "flake8-report.txt" (
+    echo [INFO] Mostrando reporte de linting...
+    type flake8-report.txt
+)
+
+pause
+goto MENU
+
+:CLEAN_PROJECT
+echo.
+echo [WARNING] Esto eliminará archivos temporales y cache
+set /p confirm="¿Estás seguro? (S/N): "
+
+if /i "%confirm%"=="S" (
+    echo [INFO] Limpiando proyecto...
+    
+    if exist "__pycache__" rmdir /s /q __pycache__
+    if exist ".pytest_cache" rmdir /s /q .pytest_cache
+    if exist "htmlcov" rmdir /s /q htmlcov
+    if exist ".coverage" del .coverage
+    if exist "coverage.xml" del coverage.xml
+    if exist "flake8-report.txt" del flake8-report.txt
+    del automation_report_*.json 2>nul
+    
+    echo [SUCCESS] Proyecto limpiado
 ) else (
-    echo 📊 Último reporte encontrado: %latest_report%
-    echo.
-    echo 📈 Mostrando resumen del reporte...
-    echo.
-    type "%latest_report%" | findstr /i "overall_score compilation_success linting_score testing_success docker_success coverage_percentage"
-    echo.
-    echo 💡 Para ver el reporte completo, abre: %latest_report%
+    echo [INFO] Operación cancelada
 )
+
+pause
+goto MENU
+
+:SHOW_RESULTS
+echo.
+echo ========================================
+echo Ejecución completada
+echo ========================================
+echo.
+echo [INFO] Revisa los logs arriba para ver los resultados
+echo [INFO] Los reportes se han guardado en el directorio del proyecto
+echo.
+
+REM Buscar el reporte más reciente
+for /f "delims=" %%f in ('dir /b /od automation_report_*.json 2^>nul') do set latest_report=%%f
+
+if defined latest_report (
+    echo [INFO] Reporte más reciente: %latest_report%
+)
+
+echo.
+set /p view_report="¿Quieres ver el reporte de cobertura? (S/N): "
+if /i "%view_report%"=="S" (
+    if exist "htmlcov\index.html" (
+        start htmlcov\index.html
+    ) else (
+        echo [WARNING] Reporte de cobertura no encontrado
+    )
+)
+
+echo.
+set /p return_menu="¿Volver al menú principal? (S/N): "
+if /i "%return_menu%"=="S" goto MENU
+
+:EXIT
+echo.
+echo ========================================
+echo Gracias por usar ECPlacas 2.0
+echo Desarrollado por: Erick Costa
+echo Escuela Politécnica Nacional
+echo ========================================
 echo.
 pause
-goto :menu
-
-:cleanup
-cls
-echo.
-echo ╔══════════════════════════════════════════════════════════════════════╗
-echo ║                    🧹 LIMPIAR ARCHIVOS                             ║
-echo ╚══════════════════════════════════════════════════════════════════════╝
-echo.
-echo 🧹 Limpiando archivos temporales...
-echo.
-
-:: Limpiar cache de Python
-if exist "__pycache__" (
-    echo 🗑️ Eliminando cache de Python...
-    rmdir /s /q __pycache__ 2>nul
-)
-
-:: Limpiar cache de pytest
-if exist ".pytest_cache" (
-    echo 🗑️ Eliminando cache de pytest...
-    rmdir /s /q .pytest_cache 2>nul
-)
-
-:: Limpiar cache de mypy
-if exist ".mypy_cache" (
-    echo 🗑️ Eliminando cache de mypy...
-    rmdir /s /q .mypy_cache 2>nul
-)
-
-:: Limpiar archivos de coverage antiguos
-if exist "htmlcov" (
-    echo 🗑️ Eliminando reportes de coverage antiguos...
-    rmdir /s /q htmlcov 2>nul
-)
-
-if exist "coverage.xml" (
-    del coverage.xml 2>nul
-)
-
-:: Limpiar reportes antiguos (mantener los 3 más recientes)
-echo 🗑️ Limpiando reportes antiguos...
-for /f "skip=3 delims=" %%i in ('dir "automation_report_*.json" /b /o-d 2^>nul') do (
-    del "%%i" 2>nul
-)
-
-echo.
-echo ✅ Limpieza completada.
-pause
-goto :menu
-
-:exit
-cls
-echo.
-echo ╔══════════════════════════════════════════════════════════════════════╗
-echo ║                       👋 HASTA LUEGO                               ║
-echo ╚══════════════════════════════════════════════════════════════════════╝
-echo.
-echo 🎓 ECPlacas 2.0 - Escuela Politécnica Nacional
-echo 💻 Desarrollado por: Erick Costa
-echo 📚 Construcción de Software - Junio 2025
-echo.
-echo 🚀 ¡Gracias por usar el sistema de automatización!
-echo 📧 Para soporte: erick.costa@epn.edu.ec
-echo.
-echo ✨ ¡Éxito en tus estudios! ✨
-echo.
-timeout /t 3 /nobreak >nul
 exit /b 0
-
-:: ==========================================
-:: ERROR HANDLERS
-:: ==========================================
-:error
-echo.
-echo ❌ Se produjo un error durante la ejecución.
-echo 💡 Verifica los logs para más detalles.
-echo.
-pause
-goto :menu

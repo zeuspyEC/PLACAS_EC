@@ -1,321 +1,217 @@
 # ==========================================
-# ECPlacas 2.0 - Docker Compose Optimizado
+# ECPlacas 2.0 - Docker Compose Configuration
 # Proyecto: Construcción de Software - EPN
 # Desarrollado por: Erick Costa
+# Enfoque: Rendimiento | Sostenibilidad | Escalabilidad
 # ==========================================
-
-version: '3.8'
 
 services:
   # ==========================================
-  # APLICACIÓN PRINCIPAL
+  # APLICACIÓN PRINCIPAL - ECPLACAS
   # ==========================================
   ecplacas-app:
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        BUILD_DATE: ${BUILD_DATE:-2025-06-21}
-        VCS_REF: ${VCS_REF:-local}
-        VERSION: ${VERSION:-2.0.1}
-    image: ecplacas-epn:${VERSION:-2.0.1}
+        BUILD_DATE: "${BUILD_DATE:-}"
+        VCS_REF: "${VCS_REF:-}"
+        VERSION: "2.0.1"
+    image: ecplacas-epn:2.0.1
     container_name: ecplacas-production
     restart: unless-stopped
+    
     ports:
-      - "${APP_PORT:-5000}:5000"
+      - "5000:5000"
+    
     environment:
-      # Configuración de aplicación
-      FLASK_ENV: ${FLASK_ENV:-production}
-      FLASK_HOST: 0.0.0.0
-      FLASK_PORT: 5000
-      
-      # Configuración de workers
-      WORKERS: ${WORKERS:-4}
-      TIMEOUT: ${TIMEOUT:-30}
-      KEEPALIVE: ${KEEPALIVE:-5}
-      MAX_REQUESTS: ${MAX_REQUESTS:-1000}
-      MAX_REQUESTS_JITTER: ${MAX_REQUESTS_JITTER:-50}
-      
-      # Base de datos
-      DATABASE_PATH: /app/database/ecplacas.sqlite
-      
-      # Logging
-      LOG_LEVEL: ${LOG_LEVEL:-INFO}
-      
-      # Performance
-      CACHE_ENABLED: ${CACHE_ENABLED:-true}
-      CACHE_TIMEOUT: ${CACHE_TIMEOUT:-300}
-      
+      - FLASK_ENV=production
+      - FLASK_HOST=0.0.0.0
+      - FLASK_PORT=5000
+      - WORKERS=4
+      - TIMEOUT=30
+      - DATABASE_URL=sqlite:///app/database/ecplacas.sqlite
+      - REDIS_URL=redis://ecplacas-redis:6379/0
+      - TZ=America/Guayaquil
+    
     volumes:
-      # Persistencia de datos
       - ecplacas_data:/app/database
       - ecplacas_logs:/app/logs
       - ecplacas_cache:/app/cache
-      
-      # Configuración (opcional para desarrollo)
-      - type: bind
-        source: ./.env
-        target: /app/.env
-        read_only: true
-      
-    networks:
-      - ecplacas-network
     
-    # Health check
     healthcheck:
-      test: ["/app/healthcheck.sh"]
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
     
-    # Límites de recursos para sostenibilidad
+    depends_on:
+      ecplacas-redis:
+        condition: service_healthy
+    
+    networks:
+      - ecplacas-network
+    
     deploy:
       resources:
         limits:
-          cpus: '2.0'
-          memory: 1G
-        reservations:
-          cpus: '0.5'
           memory: 512M
-    
-    # Logs estructurados
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+          cpus: '1.0'
+        reservations:
+          memory: 256M
+          cpus: '0.5'
 
   # ==========================================
-  # NGINX REVERSE PROXY (Opcional)
+  # CACHE REDIS
   # ==========================================
-  nginx:
-    image: nginx:alpine
-    container_name: ecplacas-nginx
-    restart: unless-stopped
-    ports:
-      - "${NGINX_PORT:-80}:80"
-      - "${NGINX_SSL_PORT:-443}:443"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      - nginx_logs:/var/log/nginx
-      # SSL certificates (si tienes)
-      # - ./ssl:/etc/nginx/ssl:ro
-    networks:
-      - ecplacas-network
-    depends_on:
-      ecplacas-app:
-        condition: service_healthy
-    profiles:
-      - production
-      - nginx
-
-  # ==========================================
-  # REDIS PARA CACHE (Opcional)
-  # ==========================================
-  redis:
+  ecplacas-redis:
     image: redis:7-alpine
     container_name: ecplacas-redis
     restart: unless-stopped
-    ports:
-      - "${REDIS_PORT:-6379}:6379"
-    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
-    volumes:
-      - redis_data:/data
-    networks:
-      - ecplacas-network
-    profiles:
-      - cache
-      - production-full
     
-    # Health check para Redis
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    
+    volumes:
+      - ecplacas_redis:/data
+    
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 30s
-      timeout: 10s
+      interval: 10s
+      timeout: 5s
       retries: 3
+    
+    networks:
+      - ecplacas-network
+    
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.5'
 
   # ==========================================
-  # MONITOREO CON PROMETHEUS (Opcional)
+  # REVERSE PROXY NGINX
   # ==========================================
-  prometheus:
+  ecplacas-nginx:
+    image: nginx:alpine
+    container_name: ecplacas-nginx
+    restart: unless-stopped
+    
+    ports:
+      - "80:80"
+      - "443:443"
+    
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ecplacas_static:/var/www/static:ro
+    
+    depends_on:
+      - ecplacas-app
+    
+    networks:
+      - ecplacas-network
+    
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.3'
+
+  # ==========================================
+  # MONITOREO - PROMETHEUS
+  # ==========================================
+  ecplacas-prometheus:
     image: prom/prometheus:latest
     container_name: ecplacas-prometheus
     restart: unless-stopped
+    
     ports:
-      - "${PROMETHEUS_PORT:-9090}:9090"
+      - "9090:9090"
+    
     volumes:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
+    
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--storage.tsdb.retention.time=200h'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
       - '--web.enable-lifecycle'
+    
     networks:
       - ecplacas-network
+    
     profiles:
       - monitoring
 
   # ==========================================
-  # GRAFANA PARA DASHBOARDS (Opcional)
+  # VISUALIZACIÓN - GRAFANA
   # ==========================================
-  grafana:
+  ecplacas-grafana:
     image: grafana/grafana:latest
     container_name: ecplacas-grafana
     restart: unless-stopped
+    
     ports:
-      - "${GRAFANA_PORT:-3000}:3000"
+      - "3000:3000"
+    
     environment:
-      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin123}
-      GF_USERS_ALLOW_SIGN_UP: false
+      - GF_SECURITY_ADMIN_PASSWORD=ecplacas2024
+    
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
-      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    
+    depends_on:
+      - ecplacas-prometheus
+    
     networks:
       - ecplacas-network
-    depends_on:
-      - prometheus
+    
     profiles:
       - monitoring
 
 # ==========================================
-# NETWORKS
+# VOLÚMENES PERSISTENTES
+# ==========================================
+volumes:
+  ecplacas_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./database
+  
+  ecplacas_logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./logs
+  
+  ecplacas_cache:
+    driver: local
+  
+  ecplacas_redis:
+    driver: local
+  
+  ecplacas_static:
+    driver: local
+  
+  prometheus_data:
+    driver: local
+  
+  grafana_data:
+    driver: local
+
+# ==========================================
+# REDES
 # ==========================================
 networks:
   ecplacas-network:
     driver: bridge
-    name: ecplacas-network
-
-# ==========================================
-# VOLUMES
-# ==========================================
-volumes:
-  # Datos de aplicación
-  ecplacas_data:
-    driver: local
-    name: ecplacas_data
-  
-  ecplacas_logs:
-    driver: local
-    name: ecplacas_logs
-  
-  ecplacas_cache:
-    driver: local
-    name: ecplacas_cache
-  
-  # Nginx
-  nginx_logs:
-    driver: local
-    name: nginx_logs
-  
-  # Redis
-  redis_data:
-    driver: local
-    name: redis_data
-  
-  # Monitoreo
-  prometheus_data:
-    driver: local
-    name: prometheus_data
-  
-  grafana_data:
-    driver: local
-    name: grafana_data
-
-# ==========================================
-# CONFIGURACIÓN DE EJEMPLO
-# ==========================================
-
-# Para usar este archivo, crea un .env con:
-# 
-# # Aplicación
-# APP_PORT=5000
-# FLASK_ENV=production
-# WORKERS=4
-# TIMEOUT=30
-# LOG_LEVEL=INFO
-# 
-# # Build
-# BUILD_DATE=2025-06-21T10:30:00Z
-# VERSION=2.0.1
-# VCS_REF=main
-# 
-# # Nginx (opcional)
-# NGINX_PORT=80
-# NGINX_SSL_PORT=443
-# 
-# # Cache (opcional)
-# REDIS_PORT=6379
-# CACHE_ENABLED=true
-# 
-# # Monitoreo (opcional)
-# PROMETHEUS_PORT=9090
-# GRAFANA_PORT=3000
-# GRAFANA_PASSWORD=admin123
-
-# ==========================================
-# COMANDOS DE USO
-# ==========================================
-
-# Desarrollo básico:
-# docker-compose up -d
-
-# Producción con nginx:
-# docker-compose --profile production up -d
-
-# Con cache Redis:
-# docker-compose --profile cache up -d
-
-# Producción completa con monitoreo:
-# docker-compose --profile production-full --profile monitoring up -d
-
-# Escalado horizontal:
-# docker-compose up -d --scale ecplacas-app=3
-
-# Ver logs:
-# docker-compose logs -f ecplacas-app
-
-# Verificar salud:
-# docker-compose ps
-
-# Backup de datos:
-# docker run --rm -v ecplacas_data:/data -v $(pwd):/backup alpine tar czf /backup/ecplacas_backup_$(date +%Y%m%d_%H%M%S).tar.gz -C /data .
-
-# Restaurar backup:
-# docker run --rm -v ecplacas_data:/data -v $(pwd):/backup alpine tar xzf /backup/ecplacas_backup_YYYYMMDD_HHMMSS.tar.gz -C /data
-
-# ==========================================
-# NOTAS DE PRODUCCIÓN - EPN
-# ==========================================
-
-# 1. Seguridad:
-#    - Cambiar todas las contraseñas por defecto
-#    - Usar HTTPS en producción
-#    - Configurar firewall apropiadamente
-#    - Mantener imágenes actualizadas
-
-# 2. Performance:
-#    - Ajustar WORKERS según CPU disponible
-#    - Configurar límites de memoria apropiados
-#    - Usar Redis para cache en producción
-#    - Monitorear métricas regularmente
-
-# 3. Backup:
-#    - Hacer backup automático de volúmenes
-#    - Probar procedimientos de restore
-#    - Mantener múltiples copias de seguridad
-
-# 4. Monitoreo:
-#    - Configurar alertas en Grafana
-#    - Revisar logs regularmente
-#    - Monitorear recursos del sistema
-
-# 5. Escalabilidad:
-#    - Usar load balancer para múltiples instancias
-#    - Configurar auto-scaling si es necesario
-#    - Monitorear crecimiento de datos
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

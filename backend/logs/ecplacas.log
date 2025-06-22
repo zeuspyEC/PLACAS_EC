@@ -4384,3 +4384,135 @@
 2025-06-20 08:51:58 - werkzeug - INFO - 127.0.0.1 - - [20/Jun/2025 08:51:58] "GET /api/health HTTP/1.1" 200 -
 2025-06-20 08:52:07 - werkzeug - INFO - 127.0.0.1 - - [20/Jun/2025 08:52:07] "GET /api/health HTTP/1.1" 200 -
 2025-06-20 08:52:08 - werkzeug - INFO - 127.0.0.1 - - [20/Jun/2025 08:52:08] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 21:37:12 - ecplacas - INFO - ✅ Base de datos ECPlacas 2.0 SRI + Propietario inicializada
+2025-06-21 21:41:26 - ecplacas - INFO - ✅ Base de datos ECPlacas 2.0 SRI + Propietario inicializada
+2025-06-21 21:41:26 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.100.73:5000
+2025-06-21 21:41:26 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-06-21 21:41:29 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:41:29] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 21:41:29 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:41:29] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-06-21 21:42:23 - ecplacas - INFO - ✅ Base de datos ECPlacas 2.0 SRI + Propietario inicializada
+2025-06-21 21:42:23 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.100.73:5000
+2025-06-21 21:42:23 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-06-21 21:42:25 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:42:25] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 21:42:28 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:42:28] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 21:42:35 - ecplacas - INFO - 🚀 Nueva consulta ECPlacas 2.0 COMPLETA - Placa: TBX0160, Session: ecplacas_completo_1750560155815_860d8272
+2025-06-21 21:42:35 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:42:35] "[35m[1mPOST /api/consultar-vehiculo HTTP/1.1[0m" 202 -
+2025-06-21 21:42:35 - ecplacas - INFO - 🚀 Iniciando consulta COMPLETA para: TBX0160 → TBX0160
+2025-06-21 21:42:37 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:42:37] "GET /api/estado-consulta/ecplacas_completo_1750560155815_860d8272 HTTP/1.1" 200 -
+2025-06-21 21:42:40 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:42:40] "GET /api/estado-consulta/ecplacas_completo_1750560155815_860d8272 HTTP/1.1" 200 -
+2025-06-21 21:42:41 - ecplacas - INFO - ℹ️ No se pudo obtener información del propietario para TBX0160
+2025-06-21 21:42:41 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:42:41] "GET /api/estado-consulta/ecplacas_completo_1750560155815_860d8272 HTTP/1.1" 200 -
+2025-06-21 21:42:43 - ecplacas - INFO - ✅ Información base SRI obtenida para TBX0160
+2025-06-21 21:42:43 - ecplacas - INFO - ✅ 4 rubros SRI obtenidos
+2025-06-21 21:42:44 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:42:44] "GET /api/estado-consulta/ecplacas_completo_1750560155815_860d8272 HTTP/1.1" 200 -
+2025-06-21 21:42:45 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:42:45] "GET /api/estado-consulta/ecplacas_completo_1750560155815_860d8272 HTTP/1.1" 200 -
+2025-06-21 21:42:47 - ecplacas - INFO - ✅ 37 componentes SRI procesados
+2025-06-21 21:42:48 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:42:48] "GET /api/estado-consulta/ecplacas_completo_1750560155815_860d8272 HTTP/1.1" 200 -
+2025-06-21 21:42:48 - ecplacas - INFO - ✅ 12 pagos SRI encontrados
+2025-06-21 21:42:49 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:42:49] "GET /api/estado-consulta/ecplacas_completo_1750560155815_860d8272 HTTP/1.1" 200 -
+2025-06-21 21:42:52 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:42:52] "GET /api/estado-consulta/ecplacas_completo_1750560155815_860d8272 HTTP/1.1" 200 -
+2025-06-21 21:42:53 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:42:53] "GET /api/estado-consulta/ecplacas_completo_1750560155815_860d8272 HTTP/1.1" 200 -
+2025-06-21 21:42:55 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:42:55] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 21:42:56 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:42:56] "GET /api/estado-consulta/ecplacas_completo_1750560155815_860d8272 HTTP/1.1" 200 -
+2025-06-21 21:42:57 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:42:57] "GET /api/estado-consulta/ecplacas_completo_1750560155815_860d8272 HTTP/1.1" 200 -
+2025-06-21 21:42:59 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:42:59] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 21:42:59 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:42:59] "GET /api/estado-consulta/ecplacas_completo_1750560155815_860d8272 HTTP/1.1" 200 -
+2025-06-21 21:43:00 - ecplacas - INFO - ✅ Pagos SRI procesados: Total $1190.68
+2025-06-21 21:43:01 - ecplacas - INFO - ✅ Plan IACV obtenido: 3 cuotas
+2025-06-21 21:43:01 - ecplacas - INFO - ✅ Plan IACV: 3 cuotas, $28.80 vencidas
+2025-06-21 21:43:01 - ecplacas - INFO - ✅ Rubros agrupados por 3 beneficiarios
+2025-06-21 21:43:01 - ecplacas - INFO - ✅ Análisis componentes SRI: Total $746.50
+2025-06-21 21:43:01 - ecplacas - INFO - ✅ Análisis SRI consolidado: Puntuación 65.5079, Estado REGULAR - DEUDAS MODERADAS
+2025-06-21 21:43:01 - ecplacas - INFO - ✅ Consulta COMPLETA exitosa para TBX0160: Propietario: False, Rubros: 4, Componentes: 37, Deudas: $746.50
+2025-06-21 21:43:01 - ecplacas - ERROR - ❌ Error guardando usuario: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 20300 and this is thread id 20820.
+2025-06-21 21:43:01 - ecplacas - INFO - ✅ Consulta COMPLETA finalizada: ecplacas_completo_1750560155815_860d8272 - Propietario: False, Deudas: $746.50, Rubros: 4, Pagos: $1190.68
+2025-06-21 21:43:02 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:43:02] "GET /api/estado-consulta/ecplacas_completo_1750560155815_860d8272 HTTP/1.1" 200 -
+2025-06-21 21:43:02 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:43:02] "GET /api/resultado/ecplacas_completo_1750560155815_860d8272 HTTP/1.1" 200 -
+2025-06-21 21:43:25 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:43:25] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 21:43:29 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:43:29] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 21:43:54 - ecplacas - INFO - ✅ Base de datos ECPlacas 2.0 SRI + Propietario inicializada
+2025-06-21 21:43:54 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.100.73:5000
+2025-06-21 21:43:54 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-06-21 21:43:57 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:43:57] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 21:44:07 - ecplacas - INFO - 🚀 Nueva consulta ECPlacas 2.0 COMPLETA - Placa: PBO7109, Session: ecplacas_completo_1750560247701_b6d51d7d
+2025-06-21 21:44:07 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:44:07] "[35m[1mPOST /api/consultar-vehiculo HTTP/1.1[0m" 202 -
+2025-06-21 21:44:07 - ecplacas - INFO - 🚀 Iniciando consulta COMPLETA para: PBO7109 → PBO7109
+2025-06-21 21:44:10 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:44:10] "GET /api/estado-consulta/ecplacas_completo_1750560247701_b6d51d7d HTTP/1.1" 200 -
+2025-06-21 21:44:11 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:44:11] "GET /api/estado-consulta/ecplacas_completo_1750560247701_b6d51d7d HTTP/1.1" 200 -
+2025-06-21 21:44:12 - ecplacas - INFO - ℹ️ No se pudo obtener información del propietario para PBO7109
+2025-06-21 21:44:14 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:44:14] "GET /api/estado-consulta/ecplacas_completo_1750560247701_b6d51d7d HTTP/1.1" 200 -
+2025-06-21 21:44:14 - ecplacas - INFO - ✅ Información base SRI obtenida para PBO7109
+2025-06-21 21:44:14 - ecplacas - INFO - ✅ 1 rubros SRI obtenidos
+2025-06-21 21:44:15 - ecplacas - INFO - ✅ 1 componentes SRI procesados
+2025-06-21 21:44:15 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:44:15] "GET /api/estado-consulta/ecplacas_completo_1750560247701_b6d51d7d HTTP/1.1" 200 -
+2025-06-21 21:44:16 - ecplacas - INFO - ✅ 18 pagos SRI encontrados
+2025-06-21 21:44:18 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:44:18] "GET /api/estado-consulta/ecplacas_completo_1750560247701_b6d51d7d HTTP/1.1" 200 -
+2025-06-21 21:44:19 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:44:19] "GET /api/estado-consulta/ecplacas_completo_1750560247701_b6d51d7d HTTP/1.1" 200 -
+2025-06-21 21:44:22 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:44:22] "GET /api/estado-consulta/ecplacas_completo_1750560247701_b6d51d7d HTTP/1.1" 200 -
+2025-06-21 21:44:23 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:44:23] "GET /api/estado-consulta/ecplacas_completo_1750560247701_b6d51d7d HTTP/1.1" 200 -
+2025-06-21 21:44:26 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:44:26] "GET /api/estado-consulta/ecplacas_completo_1750560247701_b6d51d7d HTTP/1.1" 200 -
+2025-06-21 21:44:26 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:44:26] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 21:44:28 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:44:28] "GET /api/estado-consulta/ecplacas_completo_1750560247701_b6d51d7d HTTP/1.1" 200 -
+2025-06-21 21:44:29 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:44:29] "GET /api/estado-consulta/ecplacas_completo_1750560247701_b6d51d7d HTTP/1.1" 200 -
+2025-06-21 21:44:32 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:44:32] "GET /api/estado-consulta/ecplacas_completo_1750560247701_b6d51d7d HTTP/1.1" 200 -
+2025-06-21 21:44:33 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:44:33] "GET /api/estado-consulta/ecplacas_completo_1750560247701_b6d51d7d HTTP/1.1" 200 -
+2025-06-21 21:44:36 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:44:36] "GET /api/estado-consulta/ecplacas_completo_1750560247701_b6d51d7d HTTP/1.1" 200 -
+2025-06-21 21:44:36 - ecplacas - INFO - ✅ Pagos SRI procesados: Total $3858.76
+2025-06-21 21:44:37 - ecplacas - INFO - ✅ Plan IACV obtenido: 3 cuotas
+2025-06-21 21:44:37 - ecplacas - INFO - ✅ Plan IACV: 3 cuotas, $0.00 vencidas
+2025-06-21 21:44:37 - ecplacas - INFO - ✅ Rubros agrupados por 1 beneficiarios
+2025-06-21 21:44:37 - ecplacas - INFO - ✅ Análisis componentes SRI: Total $75.00
+2025-06-21 21:44:37 - ecplacas - INFO - ✅ Análisis SRI consolidado: Puntuación 100, Estado EXCELENTE - SIN DEUDAS
+2025-06-21 21:44:37 - ecplacas - INFO - ✅ Consulta COMPLETA exitosa para PBO7109: Propietario: False, Rubros: 1, Componentes: 1, Deudas: $75.00
+2025-06-21 21:44:37 - ecplacas - ERROR - ❌ Error guardando usuario: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 20248 and this is thread id 19988.
+2025-06-21 21:44:37 - ecplacas - INFO - ✅ Consulta COMPLETA finalizada: ecplacas_completo_1750560247701_b6d51d7d - Propietario: False, Deudas: $75.00, Rubros: 1, Pagos: $3858.76
+2025-06-21 21:44:37 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:44:37] "GET /api/estado-consulta/ecplacas_completo_1750560247701_b6d51d7d HTTP/1.1" 200 -
+2025-06-21 21:44:38 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:44:38] "GET /api/resultado/ecplacas_completo_1750560247701_b6d51d7d HTTP/1.1" 200 -
+2025-06-21 21:44:56 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:44:56] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 21:45:27 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:45:27] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 21:45:56 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:45:56] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 21:46:27 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:46:27] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 21:46:56 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:46:56] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 21:47:27 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:47:27] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 21:48:28 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:48:28] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 21:49:29 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:49:29] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 21:49:56 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:49:56] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 21:50:27 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:50:27] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 21:51:28 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:51:28] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 21:51:36 - ecplacas - INFO - ✅ Base de datos ECPlacas 2.0 SRI + Propietario inicializada
+2025-06-21 21:52:29 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:52:29] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 21:53:02 - ecplacas - INFO - ✅ Base de datos ECPlacas 2.0 SRI + Propietario inicializada
+2025-06-21 21:53:02 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-21 21:53:03 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-21 21:53:04 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-21 21:53:04 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-21 21:53:04 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-21 21:53:12 - ecplacas - INFO - ✅ Base de datos ECPlacas 2.0 SRI + Propietario inicializada
+2025-06-21 21:53:12 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-21 21:53:17 - ecplacas - INFO - ✅ Base de datos ECPlacas 2.0 SRI + Propietario inicializada
+2025-06-21 21:53:17 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-21 21:53:17 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-21 21:53:30 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:53:30] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 21:54:31 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:54:31] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 21:55:32 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:55:32] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 21:56:33 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:56:33] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 21:57:34 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:57:34] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 21:58:35 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:58:35] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 21:59:36 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 21:59:36] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:00:37 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:00:37] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:01:38 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:01:38] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:02:39 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:02:39] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:03:40 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:03:40] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:04:41 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:04:41] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:05:42 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:05:42] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:06:43 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:06:43] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:07:44 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:07:44] "GET /api/health HTTP/1.1" 200 -

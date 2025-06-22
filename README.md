@@ -417,6 +417,18 @@ docker logs ecplacas-production
 # Modo debug
 FLASK_DEBUG=True python ECPlacas.py
 ```
+## 🎬 **Demostración del Sistema**
+
+![ECPlacas 2.0 Demo](Demos.gif)
+
+*Demostración completa del sistema ECPlacas 2.0 mostrando consultas de vehículos y propietarios*
+
+### **Características Demostradas:**
+- ✅ Consulta rápida de información vehicular
+- ✅ Interfaz intuitiva y responsive
+- ✅ Integración con APIs del SRI
+- ✅ Resultados en tiempo real
+- ✅ Dashboard administrativo funcional
 
 ---
 
