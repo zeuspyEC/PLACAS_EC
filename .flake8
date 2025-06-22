@@ -1,0 +1,146 @@
+# ==========================================
+# ECPlacas 2.0 - Configuración Flake8
+# Proyecto: Construcción de Software - EPN
+# Enfoque: Rendimiento | Sostenibilidad | Escalabilidad
+# ==========================================
+
+[flake8]
+# Configuración básica
+max-line-length = 88
+max-complexity = 12
+max-doc-length = 100
+
+# Archivos y directorios a incluir/excluir
+extend-ignore = 
+    # Errores de formato (manejados por Black)
+    E203,  # whitespace before ':'
+    E501,  # line too long (manejado por Black)
+    W503,  # line break before binary operator
+    W504,  # line break after binary operator
+    
+    # Docstrings opcionales para algunos casos
+    D100,  # Missing docstring in public module
+    D104,  # Missing docstring in public package
+    D105,  # Missing docstring in magic method
+    
+    # Imports específicos
+    F401,  # imported but unused (en __init__.py)
+    F403,  # star import used
+    
+    # Otros
+    B008,  # Do not perform function calls in argument defaults
+    B902,  # Invalid first argument name for method
+
+# Selección específica de reglas
+select = 
+    E,      # pycodestyle errors
+    W,      # pycodestyle warnings
+    F,      # pyflakes
+    C,      # mccabe complexity
+    B,      # flake8-bugbear
+    I,      # flake8-import-order
+    D,      # flake8-docstrings
+    S,      # flake8-bandit security
+    N,      # pep8-naming
+    T,      # flake8-print
+
+# Archivos y directorios a excluir
+exclude = 
+    .git,
+    __pycache__,
+    .pytest_cache,
+    .mypy_cache,
+    .tox,
+    .eggs,
+    *.egg,
+    build,
+    dist,
+    .venv,
+    venv,
+    env,
+    ENV,
+    env.bak,
+    venv.bak,
+    frontend,
+    node_modules,
+    logs,
+    database,
+    migrations,
+    alembic,
+    .env*,
+    *.log,
+    *.sqlite,
+    *.db
+
+# Patrones de archivos específicos a ignorar
+per-file-ignores = 
+    # __init__.py puede tener imports no usados
+    __init__.py:F401,D104
+    
+    # Scripts de configuración pueden ser menos estrictos
+    setup.py:D100,D103
+    ECPlacas.py:D100,D103,T201
+    
+    # Tests pueden tener reglas más flexibles
+    tests/*:D100,D101,D102,D103,D104,S101,S311,T201
+    test_*.py:D100,D101,D102,D103,D104,S101,S311,T201
+    *_test.py:D100,D101,D102,D103,D104,S101,S311,T201
+    
+    # Configuración puede tener imports complejos
+    config.py:F401,C901
+
+# ==========================================
+# CONFIGURACIÓN DOCSTRING
+# ==========================================
+docstring-convention = google
+strictness = short
+require-return-section-when-returning-nothing = false
+
+# ==========================================
+# CONFIGURACIÓN IMPORT-ORDER
+# ==========================================
+import-order-style = google
+application-import-names = backend,scripts,ecplacas
+
+# ==========================================
+# CONFIGURACIÓN DE COMPLEJIDAD
+# ==========================================
+# Función con complejidad ciclomática > 12 será reportada
+max-complexity = 12
+
+# ==========================================
+# CONFIGURACIÓN DE NAMING
+# ==========================================
+# Convenciones de nomenclatura PEP8
+classname = ^[A-Z][a-zA-Z0-9]*$
+constantname = ^[A-Z_][A-Z0-9_]*$
+functionname = ^[a-z_][a-z0-9_]*$
+methodname = ^[a-z_][a-z0-9_]*$
+variablename = ^[a-z_][a-z0-9_]*$
+
+# ==========================================
+# CONFIGURACIÓN AVANZADA PARA ESCALABILIDAD
+# ==========================================
+
+# Límites específicos para rendimiento
+hang-closing = false
+aggressive = 1
+
+# Configuración para proyectos grandes
+jobs = auto
+count = true
+statistics = true
+benchmark = true
+
+# Formato de salida optimizado
+format = %(path)s:%(row)d:%(col)d: %(code)s %(text)s
+show-source = true
+verbose = 1
+
+# ==========================================
+# INTEGRACIÓN CON HERRAMIENTAS DE CI/CD
+# ==========================================
+
+# Para GitHub Actions / CI
+output-file = flake8-report.txt
+tee = true

@@ -1,0 +1,145 @@
+[build-system]
+requires = ["setuptools>=65.0", "wheel>=0.38.0", "build>=0.8.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ecplacas"
+version = "2.0.1"
+description = "Sistema de Consulta Vehicular ECPlacas 2.0 - Construcción de Software"
+authors = [
+    {name = "Erick Costa", email = "erick.costa@epn.edu.ec"},
+]
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.8"
+keywords = ["placas", "vehiculos", "sri", "ecuador", "consulta"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent",
+    "Framework :: Flask",
+    "Environment :: Web Environment",
+]
+
+dependencies = [
+    "Flask>=3.0.0,<4.0.0",
+    "Flask-CORS>=4.0.0,<5.0.0",
+    "requests>=2.31.0,<3.0.0",
+    "aiohttp>=3.9.0,<4.0.0",
+    "python-dotenv>=1.0.0,<2.0.0",
+    "python-dateutil>=2.8.0,<3.0.0",
+    "colorama>=0.4.6,<1.0.0",
+    "Werkzeug>=3.0.0,<4.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-mock>=3.11.0",
+    "black>=23.7.0",
+    "flake8>=6.0.0",
+    "flake8-docstrings>=1.7.0",
+    "flake8-import-order>=0.18.0",
+    "flake8-bugbear>=23.7.0",
+    "isort>=5.12.0",
+    "mypy>=1.5.0",
+    "pre-commit>=3.3.0",
+    "bandit>=1.7.5",
+    "safety>=2.3.0",
+]
+test = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-mock>=3.11.0",
+    "httpx>=0.24.0",
+    "factory-boy>=3.3.0",
+]
+
+[project.scripts]
+ecplacas = "backend.app:main"
+
+# ==========================================
+# CONFIGURACIÓN DE HERRAMIENTAS DE DESARROLLO
+# ==========================================
+
+[tool.black]
+line-length = 88
+target-version = ['py38', 'py39', 'py310', 'py311', 'py312', 'py313']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | node_modules
+  | frontend
+  | logs
+  | database
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+known_first_party = ["backend", "scripts"]
+known_third_party = ["flask", "requests", "aiohttp"]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+    "--cov=backend",
+    "--cov-report=term-missing",
+    "--cov-report=html:htmlcov",
+    "--cov-report=xml",
+    "--cov-fail-under=80",
+    "--tb=short",
+]
+testpaths = [
+    "tests",
+]
+markers = [
+    "slow: marks tests as slow",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+    "api: marks tests as API tests",
+]
+
+[tool.coverage.run]
+source = ["backend"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__pycache__/*",
+    "*/venv/*",
+    "*/env/*",
+]
+branch = true
