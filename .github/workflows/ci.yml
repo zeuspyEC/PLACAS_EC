@@ -95,7 +95,7 @@ jobs:
       run: |
         echo "Validating imports..."
         export PYTHONPATH="${PYTHONPATH}:$(pwd)"
-        python -c "import sys, os; sys.path.insert(0, os.path.join(os.getcwd(), 'backend')); import db, utils; print('All imports successful')"
+        cd backend && python -c "import db, utils; print('All imports successful')"
 
   linting:
     name: 🔍 Code Quality & Linting
