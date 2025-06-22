@@ -4516,3 +4516,93 @@
 2025-06-21 22:05:42 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:05:42] "GET /api/health HTTP/1.1" 200 -
 2025-06-21 22:06:43 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:06:43] "GET /api/health HTTP/1.1" 200 -
 2025-06-21 22:07:44 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:07:44] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:08:45 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:08:45] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:09:01 - ecplacas - INFO - ✅ Base de datos ECPlacas 2.0 SRI + Propietario inicializada
+2025-06-21 22:09:44 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:09:44] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:10:45 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:10:45] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:11:44 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:11:44] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:12:06 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:12:06] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:12:26 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:12:26] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:12:57 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:12:57] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:13:44 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:13:44] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:14:45 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:14:45] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:15:45 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:15:45] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:16:05 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:16:05] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:16:27 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:16:27] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:16:56 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:16:56] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:17:45 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:17:45] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:18:44 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:18:44] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:19:45 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:19:45] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:20:44 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:20:44] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:21:45 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:21:45] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:22:44 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:22:44] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:23:45 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:23:45] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:24:44 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:24:44] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:25:45 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:25:45] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:26:44 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:26:44] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:27:45 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:27:45] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:28:44 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:28:44] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:29:45 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:29:45] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:30:44 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:30:44] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:31:45 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:31:45] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:32:44 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:32:44] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:32:58 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:32:58] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:33:26 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:33:26] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:33:57 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:33:57] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:34:44 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:34:44] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:35:45 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:35:45] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:36:44 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:36:44] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:37:45 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:37:45] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:38:44 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:38:44] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:39:45 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:39:45] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:40:44 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:40:44] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:41:45 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:41:45] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:42:10 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:42:10] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:42:27 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:42:27] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:42:56 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:42:56] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:43:45 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:43:45] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:44:44 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:44:44] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:45:45 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:45:45] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:46:45 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:46:45] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:47:17 - ecplacas - INFO - ✅ Base de datos ECPlacas 2.0 SRI + Propietario inicializada
+2025-06-21 22:47:44 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:47:44] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:48:15 - ecplacas - INFO - ✅ Base de datos ECPlacas 2.0 SRI + Propietario inicializada
+2025-06-21 22:48:15 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-21 22:48:15 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-21 22:48:15 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-21 22:48:15 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-21 22:48:15 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-21 22:48:22 - ecplacas - INFO - ✅ Base de datos ECPlacas 2.0 SRI + Propietario inicializada
+2025-06-21 22:48:22 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-21 22:48:27 - ecplacas - INFO - ✅ Base de datos ECPlacas 2.0 SRI + Propietario inicializada
+2025-06-21 22:48:27 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-21 22:48:27 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-21 22:48:45 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:48:45] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:49:44 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:49:44] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:50:45 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:50:45] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:51:45 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:51:45] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:52:45 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:52:45] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:53:44 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:53:44] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:54:15 - ecplacas - INFO - ✅ Base de datos ECPlacas 2.0 SRI + Propietario inicializada
+2025-06-21 22:54:15 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-21 22:54:16 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-21 22:54:16 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-21 22:54:16 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-21 22:54:16 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-21 22:54:22 - ecplacas - INFO - ✅ Base de datos ECPlacas 2.0 SRI + Propietario inicializada
+2025-06-21 22:54:23 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-21 22:54:28 - ecplacas - INFO - ✅ Base de datos ECPlacas 2.0 SRI + Propietario inicializada
+2025-06-21 22:54:28 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-21 22:54:28 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-21 22:54:45 - werkzeug - INFO - 127.0.0.1 - - [21/Jun/2025 22:54:45] "GET /api/health HTTP/1.1" 200 -
+2025-06-21 22:54:55 - ecplacas - INFO - ✅ Base de datos ECPlacas 2.0 SRI + Propietario inicializada
+2025-06-21 22:54:55 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-21 22:54:55 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-21 22:54:55 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-21 22:54:55 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-21 22:54:55 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-21 22:55:02 - ecplacas - INFO - ✅ Base de datos ECPlacas 2.0 SRI + Propietario inicializada
+2025-06-21 22:55:02 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-21 22:55:07 - ecplacas - INFO - ✅ Base de datos ECPlacas 2.0 SRI + Propietario inicializada
+2025-06-21 22:55:07 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
+2025-06-21 22:55:07 - db - INFO - ✅ Base de datos ECPlacas 2.0 inicializada correctamente
