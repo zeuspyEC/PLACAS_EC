@@ -49,15 +49,7 @@ jobs:
 
     - name: ✅ Validate Project Structure
       run: |
-        python -c "
-        import os
-        required_files = ['backend/app.py', 'frontend/index.html', 'requirements.txt']
-        missing = [f for f in required_files if not os.path.exists(f)]
-        if missing:
-            print(f'Missing files: {missing}')
-            exit(1)
-        print('Project structure valid')
-        "
+        python -c "import os; required=['backend/app.py', 'frontend/index.html', 'requirements.txt']; missing=[f for f in required if not os.path.exists(f)]; print('Missing:', missing) if missing else print('Project structure valid'); exit(1) if missing else exit(0)"
 
   compilation:
     name: 🔨 Compilation & Syntax Check
@@ -103,16 +95,7 @@ jobs:
       run: |
         echo "Validating imports..."
         export PYTHONPATH="${PYTHONPATH}:$(pwd)"
-        python -c "
-import sys, os
-sys.path.insert(0, os.path.join(os.getcwd(), 'backend'))
-try:
-    import db, utils
-    print('All imports successful')
-except Exception as e:
-    print(f'Import error: {e}')
-    sys.exit(1)
-"
+        python -c "import sys, os; sys.path.insert(0, os.path.join(os.getcwd(), 'backend')); import db, utils; print('All imports successful')"
 
   linting:
     name: 🔍 Code Quality & Linting
